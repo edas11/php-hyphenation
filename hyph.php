@@ -19,13 +19,18 @@ if (count($argv)>1) {
         $inputWords[$i-1] = $argv[$i];
     }
 } else {
-    echo "Not enough input arguments.\n";
-    exit;
+    echo "Reading word from words.txt file.\n";
+    $inputWords = file('words.txt', FILE_IGNORE_NEW_LINES);
+    if($inputWords === false) {
+        echo "Could not read words.txt file.\n";
+        exit;
+    }
 }
 
+$result = [];
 foreach($inputWords as $inputWord) {
-    $result = hyphenationAlgorithm($patterns, $inputWord);
-    echo $result . "\n";
-    $endTime = microtime(true);
+    array_push($result, (new HyphenationAlgorithm())->execute($patterns, $inputWord) );
 }
-echo "Finished in " . ($endTime - $startTime) . " microseconds.\n";
+var_dump($result);
+$endTime = microtime(true);
+echo "Finished in " . ($endTime - $startTime) . " seconds.\n";

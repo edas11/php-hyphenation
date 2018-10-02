@@ -27,34 +27,93 @@ foreach($patterns as $pattern) {
 
 
     $found = -1;
-    $matchedNumbers = [];
+    $matchedNumbers = array_fill(0, strlen($inputWord)-1, 0);
     while( ($found = stripos($inputWord, $reducedPattern, $found+1)) !== false) {
-        echo $pattern."\n";
-        if ($pattern[0] === '.' && $found !== 0) break;
-        if ($pattern[strlen($pattern)-1] === '.' && $found !== ( strlen($inputWord) - strlen($reducedPattern))) break;
-        $matchedNumbers = array_merge($matchedNumbers, numbersOfOneMatch($found, $numberPositionsInPattern));
+        //echo $pattern."\n";
+        if ($pattern[0] === '.' && $found !== 0) {
+            break;
+        }
+        if (
+            $pattern[strlen($pattern)-1] === '.'
+            && $found !== ( strlen($inputWord) - strlen($reducedPattern))
+        ) {
+            break;
+        }
+
+        $matchedNumbers = addMatchedNumbers(
+            $matchedNumbers,
+            numbersOfOneMatch($found, $numberPositionsInPattern, strlen($inputWord)-1)
+        );
     }
-    if (count($matchedNumbers) > 0)  array_push($matchedNumbersAll, $matchedNumbers);
+    if (array_sum($matchedNumbers) > 0)  array_push($matchedNumbersAll, $matchedNumbers);
 }
 
-var_dump($matchedNumbersAll);
+//var_dump($matchedNumbersAll);
+$numberInWord = array_fill(0, strlen($inputWord)-1, 0);
+foreach($matchedNumbersAll as $matchedNumbers) {
+    $numberInWord = addMatchedNumbers($numberInWord, $matchedNumbers);
+}
+var_dump($numberInWord);
+$result = $inputWord;
+$dashesNumber = 0;
+foreach ( $numberInWord as $index=>$number ) {
+    $cutPoint = $index + $dashesNumber;
+    if ( isOdd($number) ) {
+        $result = substr($result, 0, $cutPoint+1).'-'.substr($result, $cutPoint+1);
+        $dashesNumber = $dashesNumber + 1;
+    }
+}
+echo $result."\n";
 
-// pattern index => pattern number
+// pattern gap index => pattern number
 function numberPositionsInPattern(string $pattern): array {
+    $patternNoPoint = str_replace('.', '', $pattern);
+    $numberIndexAddition = 0;
+    if ( !is_numeric($patternNoPoint[0]) ) {
+        $numberIndexAddition = 1;
+    }
+
+    $patternExpaned = '';
+    for ( $i = 0; $i < strlen($patternNoPoint); $i++) {
+        if (is_numeric($patternNoPoint[$i])){
+            $patternExpaned = $patternExpaned.$patternNoPoint[$i];
+        } elseif (!is_numeric($patternNoPoint[$i+1])) {
+            $patternExpaned = $patternExpaned.$patternNoPoint[$i].' ';
+        } else {
+            $patternExpaned = $patternExpaned.$patternNoPoint[$i];
+        }
+    }
+
     $numberPos = [];
-    for ( $i = 0; $i < strlen($pattern ); $i++){
-        if (is_numeric($pattern[$i])) {
-            $numberPos[$i] = $pattern[$i];
+    for ( $i = 0; $i < strlen($patternExpaned); $i++){
+        if (is_numeric($patternExpaned[$i])) {
+            $numberPos[($i + $numberIndexAddition)/2] = $patternExpaned[$i];
         };
     }
+    if ($pattern==='.mis1') var_dump($numberPos);
     return $numberPos;
 }
 
-// word index => pattern number
-function numbersOfOneMatch($found, $numberPositionsInPattern): array {
+// word gap index => pattern number
+function numbersOfOneMatch($found, $numberPositionsInPattern, $wordGapsLength): array {
+//    var_dump($found, $numberPositionsInPattern);
+    $matchedNumbers = array_fill(0, $wordGapsLength, 0);
     foreach ($numberPositionsInPattern as $indx=>$number) {
-        $numberIndexInWord = $indx + $found;
+        $numberIndexInWord = $indx + $found - 1;
         $matchedNumbers[$numberIndexInWord] = $number;
     }
     return $matchedNumbers;
+}
+
+function addMatchedNumbers(array $currentNumbers, array $numbersToAdd): array {
+    foreach($currentNumbers as $index=>$number) {
+        $newNumbers[$index] = ($numbersToAdd[$index] > $number) ? $numbersToAdd[$index] : $number;
+    }
+    return $newNumbers;
+}
+function isOdd(int $number): bool {
+    if ($number%2 === 1) {
+        return true;
+    }
+    return false;
 }

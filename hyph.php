@@ -5,7 +5,8 @@
  * Date: 18.10.1
  * Time: 15.03
  */
-require('algorithm.php');
+require('HyphenationAlgorithm.php');
+require('Patterns.php');
 $startTime = microtime(true);
 
 $patterns = file('patterns', FILE_IGNORE_NEW_LINES);
@@ -30,8 +31,9 @@ if (count($argv)>1) {
 $result = [];
 $hyphAlgorithm = new HyphenationAlgorithm($patterns);
 foreach($inputWords as $inputWord) {
-    array_push($result, $hyphAlgorithm->execute($inputWord) );
+    //array_push($result, $hyphAlgorithm->execute($inputWord) );
+    var_dump($hyphAlgorithm->execute($inputWord));
 }
-var_dump($result);
+//var_dump($result);
 $endTime = microtime(true);
 echo "Finished in " . ($endTime - $startTime) . " seconds.\n";

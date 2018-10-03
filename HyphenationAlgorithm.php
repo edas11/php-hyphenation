@@ -17,8 +17,8 @@ class HyphenationAlgorithm
 
     public function __construct(array $patterns)
     {
-        $this->patternTree = $this->parseShortPatternTree($patterns);
-        //$this->patternTree = $this->parsePatternTree($patterns);
+        //$this->patternTree = $this->parseShortPatternTree($patterns);
+        $this->patternTree = $this->parsePatternTree($patterns);
     }
 
     function execute($inputWord): string
@@ -33,7 +33,7 @@ class HyphenationAlgorithm
      * @param $inputWord
      * @return array
      */
-    private function getMatchedPatternsNumbers(string $inputWord): array
+    private function getMatchedPatternsNumberss(string $inputWord): array
     {
         $matchedNumbersAll = array_fill(0, strlen($inputWord) - 1, 0);
         $reduceChar = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, '.'];
@@ -171,36 +171,36 @@ class HyphenationAlgorithm
 
 
     // With full pattern tree, currently not working correctly
-    private function getMatchedPatternsNumbersTree(string $inputWord): array
+    private function getMatchedPatternsNumbers(string $inputWord): array
     {
         $matchedNumbersAll = array_fill(0, strlen($inputWord) - 1, 0);
         $reduceChar = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, '.'];
         $match = false;
+        //var_dump($this->patternTree['n']['s']);
         for ( $wordIndex=0; $wordIndex<strlen($inputWord); $wordIndex++ ) {
-            $pattern=$this->matchedPattern($inputWord, $wordIndex, $this->patternTree);
-            if ($pattern !== false) var_dump($pattern);
-            $reducedPattern = str_replace($reduceChar, '', $pattern);
-            //$found = stripos($inputWord, $reducedPattern, $wordIndex);
-            if ($pattern !== false) {
-                $matchedNumbers = array_fill(0, strlen($inputWord) - 1, 0);
-                if ($pattern[0] === '.' && $wordIndex !== 0) {
-                    continue;
+            $patterns=$this->matchedPattern($inputWord, $wordIndex, $this->patternTree);
+                //var_dump($patterns);
+                foreach ($patterns as $pattern) {
+                    $reducedPattern = str_replace($reduceChar, '', $pattern);
+                    //$found = stripos($inputWord, $reducedPattern, $wordIndex);
+                    $matchedNumbers = array_fill(0, strlen($inputWord) - 1, 0);
+                    if ($pattern[0] === '.' && $wordIndex !== 0) {
+                        continue;
+                    }
+                    if (
+                        $pattern[strlen($pattern) - 1] === '.'
+                        && $wordIndex !== (strlen($inputWord) - strlen($reducedPattern))
+                    ) {
+                        continue;
+                    }
+                    $match = true;
+                    $numberPositionsInPattern = $this->numberPositionsInPattern($pattern);
+                    $matchedNumbers = $this->numbersOfOneMatch($wordIndex, $numberPositionsInPattern, strlen($inputWord) - 1);
+                    if ($match) {
+                        $matchedNumbersAll = $this->addMatchedNumbers($matchedNumbersAll, $matchedNumbers);
+                        $match = false;
+                    }
                 }
-                if (
-                    $pattern[strlen($pattern) - 1] === '.'
-                    && $wordIndex !== (strlen($inputWord) - strlen($reducedPattern))
-                ) {
-                    continue;
-                }
-                $match = true;
-                $numberPositionsInPattern = $this->numberPositionsInPattern($pattern);
-                $matchedNumbers = $this->numbersOfOneMatch($wordIndex, $numberPositionsInPattern, strlen($inputWord) - 1);
-            }
-            if ($match) {
-                $matchedNumbersAll = $this->addMatchedNumbers($matchedNumbersAll, $matchedNumbers);
-                $match = false;
-            }
-
         }
         return $matchedNumbersAll;
     }
@@ -214,8 +214,11 @@ class HyphenationAlgorithm
         return $patternsTree;
     }
     private function putPatternToTree(string $pattern, string $reducedPattern, array &$patternsTree, int $level=0) {
-        if ($level >= strlen($reducedPattern)) {
-            $patternsTree[0] = $pattern;
+        if ($level === strlen($reducedPattern)) {
+            if (!array_key_exists(0, $patternsTree)) {
+                $patternsTree[0] = new Patterns();
+            }
+            $patternsTree[0]->add($pattern);
             return;
         }
         $letter = (string)$reducedPattern[$level];
@@ -224,21 +227,28 @@ class HyphenationAlgorithm
         }
         $this->putPatternToTree($pattern, $reducedPattern, $patternsTree[$letter], $level+1);
     }
-    private function matchedPattern(string $inputWord, int $wordIndex, &$patternTree, int $level=0) {
+    private function matchedPattern(string $inputWord, int $wordIndex, $patternTree, int $level=0) {
         $currentIndex = $wordIndex + $level;
-        //not found
-        if ($currentIndex >= strlen($inputWord)) {return false;}
-        $letter = $inputWord[$currentIndex];
-        //not found
-        if (!array_key_exists( $letter, $patternTree)) {return false;}
-        //last letter
-        if (array_key_exists(0, $patternTree)) {return $patternTree[0];}
-        /*if ($currentIndex === strlen($inputWord)-1) {
-            //not found
-            if (!array_key_exists(0, $this->patternTree)) {return false;}
-            return $this->patternTree[0];
-        }*/
-        //not last letter
-        return $this->matchedPattern($inputWord, $wordIndex, $patternTree[(string)$letter], $level+1);
+        if ($currentIndex > strlen($inputWord)) {
+            return [];
+        }
+
+        $patternsOfThisLevel = new Patterns();
+        if (array_key_exists(0, $patternTree)) {
+            $patternsOfThisLevel->addAll($patternTree[0]->get());
+        }
+
+        $patternsOfNextLevels = new Patterns();
+        if ($currentIndex < strlen($inputWord)) {
+            $letter = $inputWord[$currentIndex];
+            if (array_key_exists($letter, $patternTree)) {
+                $patternsOfNextLevels->addAll(
+                    $this->matchedPattern($inputWord, $wordIndex, $patternTree[(string)$letter], $level + 1)
+                );
+            }
+        }
+
+        $patternsOfThisLevel->addAll($patternsOfNextLevels->get());
+        return $patternsOfThisLevel->get();
     }
 }

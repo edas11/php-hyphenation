@@ -8,15 +8,22 @@
 
 class HyphenationAlgorithm
 {
-    private $reducedPatterns;
+    private $patternTree;
     /**
      * @param $patterns
      * @param $inputWord
      * @return string
      */
-    function execute($patterns, $inputWord): string
+
+    public function __construct(array $patterns)
     {
-        $matchedNumbersAll = $this->getMatchedPatternsNumbers($patterns, $inputWord);
+        $this->patternTree = $this->parseShortPatternTree($patterns);
+        //$this->patternTree = $this->parsePatternTree($patterns);
+    }
+
+    function execute($inputWord): string
+    {
+        $matchedNumbersAll = $this->getMatchedPatternsNumbers($inputWord);
         $result = $this->getResultString($inputWord, $matchedNumbersAll);
         return $result;
     }
@@ -26,14 +33,13 @@ class HyphenationAlgorithm
      * @param $inputWord
      * @return array
      */
-    private function getMatchedPatternsNumbers(array $patterns, string $inputWord): array
+    private function getMatchedPatternsNumbers(string $inputWord): array
     {
         $matchedNumbersAll = array_fill(0, strlen($inputWord) - 1, 0);
         $reduceChar = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, '.'];
         $match = false;
-        $patternTree = $this->parseShortPatternTree($patterns);
         for ( $wordIndex=0; $wordIndex<strlen($inputWord); $wordIndex++ ) {
-            $possiblePatterns = $patternTree[$inputWord[$wordIndex]];
+            $possiblePatterns = $this->patternTree[$inputWord[$wordIndex]];
             foreach ($possiblePatterns as $pattern) {
                 $reducedPattern = str_replace($reduceChar, '', $pattern);
                 $found = stripos($inputWord, $reducedPattern, $wordIndex);
@@ -153,13 +159,86 @@ class HyphenationAlgorithm
         $shortPatternsTree = [];
         $reduceChar = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, '.'];
         foreach ($patterns as $index=>$pattern) {
-            $this->reducedPatterns[$index] = str_replace($reduceChar, '', $pattern);
-            $firstLetter = $this->reducedPatterns[$index][0];
+            $reducedPattern = str_replace($reduceChar, '', $pattern);
+            $firstLetter = $reducedPattern[0];
             if (!array_key_exists( (string)$firstLetter, $shortPatternsTree )) {
                 $shortPatternsTree[(string)$firstLetter] = [];
             }
             array_push($shortPatternsTree[$firstLetter], $pattern);
         }
         return $shortPatternsTree;
+    }
+
+
+    // With full pattern tree, currently not working correctly
+    private function getMatchedPatternsNumbersTree(string $inputWord): array
+    {
+        $matchedNumbersAll = array_fill(0, strlen($inputWord) - 1, 0);
+        $reduceChar = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, '.'];
+        $match = false;
+        for ( $wordIndex=0; $wordIndex<strlen($inputWord); $wordIndex++ ) {
+            $pattern=$this->matchedPattern($inputWord, $wordIndex, $this->patternTree);
+            if ($pattern !== false) var_dump($pattern);
+            $reducedPattern = str_replace($reduceChar, '', $pattern);
+            //$found = stripos($inputWord, $reducedPattern, $wordIndex);
+            if ($pattern !== false) {
+                $matchedNumbers = array_fill(0, strlen($inputWord) - 1, 0);
+                if ($pattern[0] === '.' && $wordIndex !== 0) {
+                    continue;
+                }
+                if (
+                    $pattern[strlen($pattern) - 1] === '.'
+                    && $wordIndex !== (strlen($inputWord) - strlen($reducedPattern))
+                ) {
+                    continue;
+                }
+                $match = true;
+                $numberPositionsInPattern = $this->numberPositionsInPattern($pattern);
+                $matchedNumbers = $this->numbersOfOneMatch($wordIndex, $numberPositionsInPattern, strlen($inputWord) - 1);
+            }
+            if ($match) {
+                $matchedNumbersAll = $this->addMatchedNumbers($matchedNumbersAll, $matchedNumbers);
+                $match = false;
+            }
+
+        }
+        return $matchedNumbersAll;
+    }
+    private function parsePatternTree(array $patterns): array {
+        $patternsTree = [];
+        $reduceChar = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, '.'];
+        foreach ($patterns as $index=>$pattern) {
+            $reducedPattern = str_replace($reduceChar, '', $pattern);
+            $this->putPatternToTree($pattern, $reducedPattern, $patternsTree);
+        }
+        return $patternsTree;
+    }
+    private function putPatternToTree(string $pattern, string $reducedPattern, array &$patternsTree, int $level=0) {
+        if ($level >= strlen($reducedPattern)) {
+            $patternsTree[0] = $pattern;
+            return;
+        }
+        $letter = (string)$reducedPattern[$level];
+        if (!array_key_exists( $letter, $patternsTree )) {
+            $patternsTree[$letter] = [];
+        }
+        $this->putPatternToTree($pattern, $reducedPattern, $patternsTree[$letter], $level+1);
+    }
+    private function matchedPattern(string $inputWord, int $wordIndex, &$patternTree, int $level=0) {
+        $currentIndex = $wordIndex + $level;
+        //not found
+        if ($currentIndex >= strlen($inputWord)) {return false;}
+        $letter = $inputWord[$currentIndex];
+        //not found
+        if (!array_key_exists( $letter, $patternTree)) {return false;}
+        //last letter
+        if (array_key_exists(0, $patternTree)) {return $patternTree[0];}
+        /*if ($currentIndex === strlen($inputWord)-1) {
+            //not found
+            if (!array_key_exists(0, $this->patternTree)) {return false;}
+            return $this->patternTree[0];
+        }*/
+        //not last letter
+        return $this->matchedPattern($inputWord, $wordIndex, $patternTree[(string)$letter], $level+1);
     }
 }

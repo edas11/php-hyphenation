@@ -28,8 +28,9 @@ if (count($argv)>1) {
 }
 
 $result = [];
+$hyphAlgorithm = new HyphenationAlgorithm($patterns);
 foreach($inputWords as $inputWord) {
-    array_push($result, (new HyphenationAlgorithm())->execute($patterns, $inputWord) );
+    array_push($result, $hyphAlgorithm->execute($inputWord) );
 }
 var_dump($result);
 $endTime = microtime(true);

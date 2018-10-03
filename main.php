@@ -5,9 +5,18 @@
  * Date: 18.10.1
  * Time: 15.03
  */
-require('HyphenationAlgorithm.php');
-require('Patterns.php');
-$startTime = microtime(true);
+use Edvardas\Hyphenation\Timer\Timer;
+use Edvardas\Hyphenation\HyphenationAlgorithm\FullTreeHyphenationAlgorithm;
+use Edvardas\Hyphenation\HyphenationAlgorithm\ShortTreeHyphenationAlgorithm;
+
+spl_autoload_register(function ($class_name) {
+    $fileName = str_replace('Edvardas\Hyphenation', './src', $class_name);
+    $fileName = str_replace('\\', '/', $fileName);
+    include $fileName . '.php';
+});
+
+$timer = new Timer();
+$timer->start();
 
 $patterns = file('patterns', FILE_IGNORE_NEW_LINES);
 if($patterns === false) {
@@ -29,11 +38,10 @@ if (count($argv)>1) {
 }
 
 $result = [];
-$hyphAlgorithm = new HyphenationAlgorithm($patterns);
+$hyphAlgorithm = new FullTreeHyphenationAlgorithm($patterns);
 foreach($inputWords as $inputWord) {
     //array_push($result, $hyphAlgorithm->execute($inputWord) );
     var_dump($hyphAlgorithm->execute($inputWord));
 }
 //var_dump($result);
-$endTime = microtime(true);
-echo "Finished in " . ($endTime - $startTime) . " seconds.\n";
+echo "Finished in " . $timer->getInterval() . " seconds.\n";

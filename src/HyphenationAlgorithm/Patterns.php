@@ -5,6 +5,8 @@
  * Date: 18.10.3
  * Time: 13.10
  */
+namespace Edvardas\Hyphenation\HyphenationAlgorithm;
+
 class Patterns{
 
     private $patterns = [];

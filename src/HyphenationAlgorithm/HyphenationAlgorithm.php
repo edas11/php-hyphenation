@@ -5,6 +5,8 @@
  * Date: 18.10.2
  * Time: 11.50
  */
+namespace Edvardas\Hyphenation\HyphenationAlgorithm;
+use Edvardas\Hyphenation\HyphenationAlgorithm\Patterns;
 
 class HyphenationAlgorithm
 {

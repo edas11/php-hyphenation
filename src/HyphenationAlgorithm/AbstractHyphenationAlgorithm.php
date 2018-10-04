@@ -7,13 +7,15 @@
  */
 
 namespace Edvardas\Hyphenation\HyphenationAlgorithm;
+
 use Edvardas\Hyphenation\HyphenationAlgorithm\HyphenationAlgorithmInterface;
 use Edvardas\Hyphenation\HyphenationAlgorithm\WordHyphenationNumbers;
 
-
 abstract class AbstractHyphenationAlgorithm implements HyphenationAlgorithmInterface
 {
-    abstract protected function getWordHyphenationNumbers(string $inputWord): WordHyphenationNumbers;
+    abstract protected function getWordHyphenationNumbers(
+        string $inputWord
+    ): WordHyphenationNumbers;
 
     abstract protected function parsePatternTree(array $patterns);
 
@@ -33,21 +35,30 @@ abstract class AbstractHyphenationAlgorithm implements HyphenationAlgorithmInter
         return $result;
     }
 
-    protected function getResultString(string $inputWord, WordHyphenationNumbers $numberInWord): string
-    {
+    protected function getResultString(
+        string $inputWord,
+        WordHyphenationNumbers $numberInWord
+    ): string {
         $result = $inputWord;
         $dashesNumber = 0;
         foreach ($numberInWord as $index => $number) {
             $cutPoint = $index + $dashesNumber;
             if ($this->isOdd($number)) {
-                $result = substr($result, 0, $cutPoint + 1) . '-' . substr($result, $cutPoint + 1);
+                $result = substr($result, 0, $cutPoint + 1)
+                    . '-'
+                    . substr($result, $cutPoint + 1);
                 $dashesNumber = $dashesNumber + 1;
             }
         }
         return $result;
     }
 
-    protected function beginingOrEndPatternFoundInMiddle(string $pattern, string $reducedPattern, $inputWord, int $matchIndex): bool {
+    protected function beginingOrEndPatternFoundInMiddle(
+        string $pattern,
+        string $reducedPattern,
+        $inputWord,
+        int $matchIndex
+    ): bool {
         $beginingPatternNotInBegining = false;
         $endPatternNotInEnd = false;
         if ($pattern[0] === '.' && $matchIndex !== 0) {
@@ -69,5 +80,4 @@ abstract class AbstractHyphenationAlgorithm implements HyphenationAlgorithmInter
         }
         return false;
     }
-
 }

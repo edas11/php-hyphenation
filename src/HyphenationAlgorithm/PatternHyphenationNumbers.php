@@ -7,11 +7,11 @@
  */
 
 namespace Edvardas\Hyphenation\HyphenationAlgorithm;
+
 use Edvardas\Hyphenation\HyphenationAlgorithm\HyphenationNumbers;
 
 class PatternHyphenationNumbers extends HyphenationNumbers
 {
-
     public function __construct(string $pattern) {
         $this->numbersArray = $this->numberPositionsInPattern($pattern);
     }
@@ -43,7 +43,8 @@ class PatternHyphenationNumbers extends HyphenationNumbers
                 $patternExpaned = $patternExpaned . $patternNoPoint[$i];
             } elseif (
                 $i + 1 < strlen($patternNoPoint)
-                && !is_numeric($patternNoPoint[$i + 1])) {
+                && !is_numeric($patternNoPoint[$i + 1])
+            ) {
                 $patternExpaned = $patternExpaned . $patternNoPoint[$i] . ' ';
             } else {
                 $patternExpaned = $patternExpaned . $patternNoPoint[$i];

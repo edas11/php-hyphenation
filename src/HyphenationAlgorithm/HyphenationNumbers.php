@@ -8,12 +8,12 @@
 
 namespace Edvardas\Hyphenation\HyphenationAlgorithm;
 
-
 abstract class HyphenationNumbers
 {
     protected $numbersArray;
 
-    protected function get(): array {
+    protected function get(): array
+    {
         return $this->numbersArray;
     }
 }

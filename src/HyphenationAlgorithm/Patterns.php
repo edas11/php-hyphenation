@@ -7,19 +7,23 @@
  */
 namespace Edvardas\Hyphenation\HyphenationAlgorithm;
 
-class Patterns{
+class Patterns
+{
 
     private $patterns = [];
 
-    public function add(string $pattern) {
+    public function add(string $pattern)
+    {
         array_push($this->patterns, $pattern);
     }
 
-    public function addAll(array $patterns) {
+    public function addAll(array $patterns)
+    {
         $this->patterns = array_merge($this->patterns, $patterns);
     }
 
-    public function get() {
+    public function get()
+    {
         return $this->patterns;
     }
 }

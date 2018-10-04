@@ -8,7 +8,6 @@
 
 namespace Edvardas\Hyphenation\HyphenationAlgorithm;
 
-
 interface HyphenationAlgorithmInterface
 {
     public function execute(string $inputWord): string;

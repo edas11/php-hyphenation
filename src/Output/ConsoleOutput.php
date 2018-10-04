@@ -8,15 +8,15 @@
 
 namespace Edvardas\Hyphenation\Output;
 
-
 class ConsoleOutput
 {
-
-    public function writeError(string $errorMsg) {
+    public function writeError(string $errorMsg)
+    {
         echo "Erros: $errorMsg";
     }
 
-    public function writeInfo(string $infoMsg) {
+    public function writeInfo(string $infoMsg)
+    {
         echo "Info: $infoMsg";
     }
 

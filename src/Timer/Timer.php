@@ -11,11 +11,13 @@ class Timer
 {
     private $time = -1;
 
-    public function start() {
+    public function start()
+    {
         $this->time = microtime(true);
     }
 
-    public function getInterval(): float {
+    public function getInterval(): float
+    {
         if ($this->time === -1) {
             throw new \Exception('Timer not started');
         }

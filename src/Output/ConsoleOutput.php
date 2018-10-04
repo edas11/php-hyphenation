@@ -10,14 +10,14 @@ namespace Edvardas\Hyphenation\Output;
 
 class ConsoleOutput
 {
-    public function writeError(string $errorMsg)
+    public function printResult(array $result)
     {
-        echo "Erros: $errorMsg";
+        print_r($result);
     }
 
-    public function writeInfo(string $infoMsg)
+    public function printTime(float $executionTime)
     {
-        echo "Info: $infoMsg";
+        echo "Finished in $executionTime seconds.\n";
     }
 
 }

@@ -13,21 +13,15 @@ use Edvardas\Hyphenation\HyphenationAlgorithm\WordHyphenationNumbers;
 
 abstract class AbstractHyphenationAlgorithm implements HyphenationAlgorithmInterface
 {
-    abstract protected function getWordHyphenationNumbers(
-        string $inputWord
-    ): WordHyphenationNumbers;
-
-    abstract protected function parsePatternTree(array $patterns);
-
     protected const REDUCE_CHARS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, '.'];
-
-    //protected $patternTree;
 
     public function __construct(array $patterns)
     {
         $patternTree = $this->parsePatternTree($patterns);
         \Edvardas\Hyphenation\App\App::$cache->set('patterns-tree', $patternTree);
     }
+
+    abstract protected function parsePatternTree(array $patterns);
 
     public function execute(string $inputWord): string
     {
@@ -36,10 +30,29 @@ abstract class AbstractHyphenationAlgorithm implements HyphenationAlgorithmInter
         return $result;
     }
 
-    protected function getResultString(
+    protected function getWordHyphenationNumbers(string $inputWord): WordHyphenationNumbers
+    {
+        \Edvardas\Hyphenation\App\App::$logger->info("Hyphenation on word $inputWord.");
+        $matchedNumbersAll = new WordHyphenationNumbers(strlen($inputWord) - 1);
+        for ( $wordIndex=0; $wordIndex<strlen($inputWord); $wordIndex++ ) {
+            $possiblePatterns=$this->matchedPattern($inputWord, $wordIndex, $this->patternTree());
+            foreach ($possiblePatterns as $pattern) {
+                $matchedNumbers = $this->getPossiblePatternWordNumbers($inputWord, $pattern, $wordIndex);
+                $matchedNumbersAll->addWordNumbers($matchedNumbers);
+            }
+        }
+        return $matchedNumbersAll;
+    }
+
+    abstract protected function matchedPattern(string $inputWord, int $wordIndex, $patternTree, int $level=0);
+
+    abstract protected function getPossiblePatternWordNumbers(
         string $inputWord,
-        WordHyphenationNumbers $numberInWord
-    ): string {
+        $pattern,
+        $wordIndex
+    ): WordHyphenationNumbers;
+
+    protected function getResultString(string $inputWord, WordHyphenationNumbers $numberInWord): string {
         $result = $inputWord;
         $dashesNumber = 0;
         foreach ($numberInWord as $index => $number) {
@@ -63,7 +76,7 @@ abstract class AbstractHyphenationAlgorithm implements HyphenationAlgorithmInter
         return $tree;
     }
 
-    protected function beginingOrEndPatternFoundInMiddle(
+    protected function begginingOrEndPatternFoundInMiddle(
         string $pattern,
         string $reducedPattern,
         $inputWord,

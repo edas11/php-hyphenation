@@ -11,11 +11,18 @@ namespace Edvardas\Hyphenation\HyphenationAlgorithm;
 use Edvardas\Hyphenation\HyphenationAlgorithm\HyphenationNumbers;
 use Edvardas\Hyphenation\HyphenationAlgorithm\PatternHyphenationNumbers;
 
-class WordHyphenationNumbers extends HyphenationNumbers implements \IteratorAggregate
+class WordHyphenationNumbers implements HyphenationNumbers, \IteratorAggregate
 {
+    protected $numbersArray;
+
     public function __construct($wordGapsLength)
     {
         $this->numbersArray = array_fill(0, $wordGapsLength, 0);
+    }
+
+    public function get(): array
+    {
+        return $this->numbersArray;
     }
 
     public function addWordNumbers(WordHyphenationNumbers $numbersToAdd)

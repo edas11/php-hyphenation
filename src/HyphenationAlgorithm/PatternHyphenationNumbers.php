@@ -10,10 +10,17 @@ namespace Edvardas\Hyphenation\HyphenationAlgorithm;
 
 use Edvardas\Hyphenation\HyphenationAlgorithm\HyphenationNumbers;
 
-class PatternHyphenationNumbers extends HyphenationNumbers
+class PatternHyphenationNumbers implements HyphenationNumbers
 {
+    protected $numbersArray;
+
     public function __construct(string $pattern) {
         $this->numbersArray = $this->numberPositionsInPattern($pattern);
+    }
+
+    public function get(): array
+    {
+        return $this->numbersArray;
     }
 
     // pattern gap index => pattern number. Pattern is considered to start with a gap.

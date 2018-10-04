@@ -29,7 +29,7 @@ class App
 
     public function __construct()
     {
-        $this->registerAutoload();
+        $this->registerProjectSrcAutoload();
 
         self::$logger = new FileLogger();
         self::$cache = new MemoryCache();
@@ -55,15 +55,11 @@ class App
         $this->printTime();
     }
 
-    public function registerAutoload()
+    public function registerProjectSrcAutoload()
     {
         spl_autoload_register(
             function ($class_name) {
-                if (strpos($class_name, 'Edvardas\Hyphenation') === 0) {
-                    $fileName = str_replace('Edvardas\Hyphenation', './src', $class_name);
-                } else {
-                    $fileName = "./vendor/$class_name";
-                }
+                $fileName = str_replace('Edvardas\Hyphenation', './src', $class_name);
                 $fileName = str_replace('\\', '/', $fileName);
                 include $fileName . '.php';
             }
@@ -111,12 +107,14 @@ class App
 
     public function printResult($result)
     {
-        var_dump($result);
+        $this->output->printResult($result);
     }
 
     public function printTime(): void
     {
-        self::$logger->info("Finished in " . $this->timer->getInterval() . " seconds.");
+        $time = $this->timer->getInterval();
+        $this->output->printTime($time);
+        self::$logger->info("Finished in $time seconds.");
     }
 
 }

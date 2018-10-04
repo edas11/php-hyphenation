@@ -1,0 +1,15 @@
+{
+    "name": "edvardas/hyphenation",
+    "description": "Hyphenation algorithm",
+    "type": "project",
+    "require": {
+        "psr/log": "^1.0",
+        "psr/simple-cache": "^1.0"
+    },
+    "authors": [
+        {
+            "name": "Edvardas",
+            "email": "edas1123@gmail.com"
+        }
+    ]
+}

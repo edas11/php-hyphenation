@@ -7,7 +7,7 @@
  */
 namespace Edvardas\Hyphenation\HyphenationAlgorithm;
 
-use Edvardas\Hyphenation\HyphenationAlgorithm\Patterns;
+use Edvardas\Hyphenation\HyphenationAlgorithm\PatternsNodeInTree;
 use Edvardas\Hyphenation\HyphenationAlgorithm\AbstractHyphenationAlgorithm;
 use Edvardas\Hyphenation\HyphenationAlgorithm\WordHyphenationNumbers;
 
@@ -18,35 +18,6 @@ class ShortTreeHyphenationAlgorithm extends AbstractHyphenationAlgorithm
         parent::__construct($patterns);
         \Edvardas\Hyphenation\App\App::$logger->info("Started short tree hyphenation algorithm.");
     }
-
-    protected function getWordHyphenationNumbers(string $inputWord): WordHyphenationNumbers
-    {
-        \Edvardas\Hyphenation\App\App::$logger->info("Hyphenation on word $inputWord.");
-        $matchedNumbersAll = new WordHyphenationNumbers(strlen($inputWord) - 1);
-        for ($wordIndex=0; $wordIndex<strlen($inputWord); $wordIndex++) {
-            $possiblePatterns = $this->patternTree()[$inputWord[$wordIndex]];
-            foreach ($possiblePatterns as $pattern) {
-                $reducedPattern = str_replace(AbstractHyphenationAlgorithm::REDUCE_CHARS, '', $pattern);
-                $found = stripos($inputWord, $reducedPattern, $wordIndex);
-                if ($found !== false) {
-                    if ($this->beginingOrEndPatternFoundInMiddle($pattern, $reducedPattern, $inputWord, $found)) {
-                        continue;
-                    }
-                    \Edvardas\Hyphenation\App\App::$logger->info("Matched pattern $pattern");
-                    $numberPositionsInPattern = new PatternHyphenationNumbers($pattern);
-                    $matchedNumbers = WordHyphenationNumbers::createFromPatternNumbers(
-                        $found,
-                        $numberPositionsInPattern,
-                        strlen($inputWord) - 1
-                    );
-                    $matchedNumbersAll->addWordNumbers($matchedNumbers);
-                }
-
-            }
-        }
-        return $matchedNumbersAll;
-    }
-
 
     protected function parsePatternTree(array $patterns): array
     {
@@ -60,6 +31,32 @@ class ShortTreeHyphenationAlgorithm extends AbstractHyphenationAlgorithm
             array_push($shortPatternsTree[$firstLetter], $pattern);
         }
         return $shortPatternsTree;
+    }
+
+    protected function getPossiblePatternWordNumbers(string $inputWord, $pattern, $wordIndex): \Edvardas\Hyphenation\HyphenationAlgorithm\WordHyphenationNumbers
+    {
+        $reducedPattern = str_replace(AbstractHyphenationAlgorithm::REDUCE_CHARS, '', $pattern);
+        $found = stripos($inputWord, $reducedPattern, $wordIndex);
+        if ($found !== false) {
+            if ($this->begginingOrEndPatternFoundInMiddle($pattern, $reducedPattern, $inputWord, $found)) {
+                return new WordHyphenationNumbers(strlen($inputWord) - 1);
+            }
+            \Edvardas\Hyphenation\App\App::$logger->info("Matched pattern $pattern");
+            $numberPositionsInPattern = new PatternHyphenationNumbers($pattern);
+            $matchedNumbers = WordHyphenationNumbers::createFromPatternNumbers(
+                $found,
+                $numberPositionsInPattern,
+                strlen($inputWord) - 1
+            );
+        } else {
+            $matchedNumbers = new WordHyphenationNumbers(strlen($inputWord) - 1);
+        }
+        return $matchedNumbers;
+    }
+
+    protected function matchedPattern(string $inputWord, int $wordIndex, $patternTree, int $level=0)
+    {
+        return $patternTree[$inputWord[$wordIndex]];
     }
 
 }

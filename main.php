@@ -7,5 +7,6 @@
  */
 
 require './src/App/App.php';
+require './vendor/autoload.php';
 $app = new \Edvardas\Hyphenation\App\App();
 $app->executeCommand();

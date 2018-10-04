@@ -7,7 +7,7 @@
  */
 namespace Edvardas\Hyphenation\HyphenationAlgorithm;
 
-use Edvardas\Hyphenation\HyphenationAlgorithm\Patterns;
+use Edvardas\Hyphenation\HyphenationAlgorithm\PatternsNodeInTree;
 use Edvardas\Hyphenation\HyphenationAlgorithm\WordHyphenationNumbers;
 use Edvardas\Hyphenation\HyphenationAlgorithm\PatternHyphenationNumbers;
 use Edvardas\Hyphenation\HyphenationAlgorithm\AbstractHyphenationAlgorithm;
@@ -18,41 +18,6 @@ class FullTreeHyphenationAlgorithm extends AbstractHyphenationAlgorithm
     {
         parent::__construct($patterns);
         \Edvardas\Hyphenation\App\App::$logger->info("Started full tree hyphenation algorithm.");
-    }
-
-    protected function getWordHyphenationNumbers(string $inputWord): WordHyphenationNumbers {
-        \Edvardas\Hyphenation\App\App::$logger->info("Hyphenation on word $inputWord.");
-        $matchedNumbersAll = new WordHyphenationNumbers(strlen($inputWord) - 1);
-        for ( $wordIndex=0; $wordIndex<strlen($inputWord); $wordIndex++ ) {
-            $patterns=$this->matchedPattern(
-                $inputWord,
-                $wordIndex,
-                $this->patternTree()
-            );
-            foreach ($patterns as $pattern) {
-                $reducedPattern = str_replace(
-                    AbstractHyphenationAlgorithm::REDUCE_CHARS,
-                    '', $pattern
-                );
-                if ($this->beginingOrEndPatternFoundInMiddle(
-                    $pattern,
-                    $reducedPattern,
-                    $inputWord,
-                    $wordIndex
-                )) {
-                    continue;
-                }
-                \Edvardas\Hyphenation\App\App::$logger->info("Matched pattern $pattern");
-                $numberPositionsInPattern = new PatternHyphenationNumbers($pattern);
-                $matchedNumbers = WordHyphenationNumbers::createFromPatternNumbers(
-                    $wordIndex,
-                    $numberPositionsInPattern,
-                    strlen($inputWord) - 1
-                );
-                $matchedNumbersAll->addWordNumbers($matchedNumbers);
-            }
-        }
-        return $matchedNumbersAll;
     }
 
     protected function parsePatternTree(array $patterns): array
@@ -68,48 +33,35 @@ class FullTreeHyphenationAlgorithm extends AbstractHyphenationAlgorithm
         return $patternsTree;
     }
 
-    private function putPatternToTree(
-        string $pattern,
-        string $reducedPattern,
-        array &$patternsTree,
-        int $level=0
-    ) {
-        if ($level === strlen($reducedPattern)) {
-            if (!array_key_exists(0, $patternsTree)) {
-                $patternsTree[0] = new Patterns();
-            }
-            $patternsTree[0]->add($pattern);
-            return;
+    protected function getPossiblePatternWordNumbers(string $inputWord, $pattern, $wordIndex): WordHyphenationNumbers
+    {
+        $reducedPattern = str_replace(AbstractHyphenationAlgorithm::REDUCE_CHARS, '', $pattern);
+        if ($this->begginingOrEndPatternFoundInMiddle($pattern, $reducedPattern, $inputWord, $wordIndex)) {
+            return new WordHyphenationNumbers(strlen($inputWord) - 1);
         }
-        $letter = (string)$reducedPattern[$level];
-        if (!array_key_exists($letter, $patternsTree)) {
-            $patternsTree[$letter] = [];
-        }
-        $this->putPatternToTree(
-            $pattern,
-            $reducedPattern,
-            $patternsTree[$letter],
-            $level+1
+        \Edvardas\Hyphenation\App\App::$logger->info("Matched pattern $pattern");
+        $numberPositionsInPattern = new PatternHyphenationNumbers($pattern);
+        $matchedNumbers = WordHyphenationNumbers::createFromPatternNumbers(
+            $wordIndex,
+            $numberPositionsInPattern,
+            strlen($inputWord) - 1
         );
+        return $matchedNumbers;
     }
 
-    private function matchedPattern(
-        string $inputWord,
-        int $wordIndex,
-        $patternTree,
-        int $level=0
-    ) {
+    protected function matchedPattern(string $inputWord, int $wordIndex, $patternTree, int $level=0)
+    {
         $currentIndex = $wordIndex + $level;
         if ($currentIndex > strlen($inputWord)) {
             return [];
         }
 
-        $patternsOfThisLevel = new Patterns();
+        $patternsOfThisLevel = new PatternsNodeInTree();
         if (array_key_exists(0, $patternTree)) {
             $patternsOfThisLevel->addAll($patternTree[0]->get());
         }
 
-        $patternsOfNextLevels = new Patterns();
+        $patternsOfNextLevels = new PatternsNodeInTree();
         if ($currentIndex < strlen($inputWord)) {
             $letter = $inputWord[$currentIndex];
             if (array_key_exists($letter, $patternTree)) {
@@ -130,6 +82,27 @@ class FullTreeHyphenationAlgorithm extends AbstractHyphenationAlgorithm
 
         $patternsOfThisLevel->addAll($patternsOfNextLevels->get());
         return $patternsOfThisLevel->get();
+    }
+
+    private function putPatternToTree(string $pattern, string $reducedPattern, array &$patternsTree, int $level=0)
+    {
+        if ($level === strlen($reducedPattern)) {
+            if (!array_key_exists(0, $patternsTree)) {
+                $patternsTree[0] = new PatternsNodeInTree();
+            }
+            $patternsTree[0]->add($pattern);
+            return;
+        }
+        $letter = (string)$reducedPattern[$level];
+        if (!array_key_exists($letter, $patternsTree)) {
+            $patternsTree[$letter] = [];
+        }
+        $this->putPatternToTree(
+            $pattern,
+            $reducedPattern,
+            $patternsTree[$letter],
+            $level+1
+        );
     }
 
 }

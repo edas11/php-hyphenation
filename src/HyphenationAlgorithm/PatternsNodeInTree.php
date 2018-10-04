@@ -7,9 +7,8 @@
  */
 namespace Edvardas\Hyphenation\HyphenationAlgorithm;
 
-class Patterns
+class PatternsNodeInTree
 {
-
     private $patterns = [];
 
     public function add(string $pattern)

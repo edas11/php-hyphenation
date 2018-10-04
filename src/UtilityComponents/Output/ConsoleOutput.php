@@ -6,7 +6,7 @@
  * Time: 09.15
  */
 
-namespace Edvardas\Hyphenation\Output;
+namespace Edvardas\Hyphenation\UtilityComponents\Output;
 
 class ConsoleOutput
 {

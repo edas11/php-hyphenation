@@ -10,6 +10,7 @@ namespace Edvardas\Hyphenation\HyphenationAlgorithm;
 
 use Edvardas\Hyphenation\HyphenationAlgorithm\HyphenationAlgorithmInterface;
 use Edvardas\Hyphenation\HyphenationAlgorithm\WordHyphenationNumbers;
+use Edvardas\Hyphenation\App\App;
 
 abstract class AbstractHyphenationAlgorithm implements HyphenationAlgorithmInterface
 {
@@ -18,7 +19,7 @@ abstract class AbstractHyphenationAlgorithm implements HyphenationAlgorithmInter
     public function __construct(array $patterns)
     {
         $patternTree = $this->parsePatternTree($patterns);
-        \Edvardas\Hyphenation\App\App::$cache->set('patterns-tree', $patternTree);
+        App::$cache->set('patterns-tree', $patternTree);
     }
 
     abstract protected function parsePatternTree(array $patterns);
@@ -32,7 +33,7 @@ abstract class AbstractHyphenationAlgorithm implements HyphenationAlgorithmInter
 
     protected function getWordHyphenationNumbers(string $inputWord): WordHyphenationNumbers
     {
-        \Edvardas\Hyphenation\App\App::$logger->info("Hyphenation on word $inputWord.");
+        App::$logger->info("Hyphenation on word $inputWord.");
         $matchedNumbersAll = new WordHyphenationNumbers(strlen($inputWord) - 1);
         for ( $wordIndex=0; $wordIndex<strlen($inputWord); $wordIndex++ ) {
             $possiblePatterns=$this->matchedPattern($inputWord, $wordIndex, $this->patternTree());
@@ -69,7 +70,7 @@ abstract class AbstractHyphenationAlgorithm implements HyphenationAlgorithmInter
 
     protected function patternTree(): array
     {
-        $tree = \Edvardas\Hyphenation\App\App::$cache->get('patterns-tree');
+        $tree = App::$cache->get('patterns-tree');
         if ($tree === null) {
             throw new \Exception('Patterns tree not founc in cache');
         }

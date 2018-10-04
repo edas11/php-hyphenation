@@ -6,7 +6,7 @@
  * Time: 13.58
  */
 
-namespace Edvardas\Hyphenation\Cache;
+namespace Edvardas\Hyphenation\UtilityComponents\Cache;
 
 use Psr\Log\SimpleCache\InvalidArgumentException as PsrInvalidArgumentException;
 

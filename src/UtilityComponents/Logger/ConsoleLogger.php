@@ -6,9 +6,9 @@
  * Time: 11.50
  */
 
-namespace Edvardas\Hyphenation\Logger;
+namespace Edvardas\Hyphenation\UtilityComponents\Logger;
 
-use Edvardas\Hyphenation\Logger\AbstractLogger;
+use Edvardas\Hyphenation\UtilityComponents\Logger\AbstractLogger;
 
 class ConsoleLogger extends AbstractLogger
 {

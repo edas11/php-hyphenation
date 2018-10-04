@@ -8,14 +8,15 @@
 
 namespace Edvardas\Hyphenation\App;
 
-use Edvardas\Hyphenation\Timer\Timer;
-use Edvardas\Hyphenation\Output\ConsoleOutput;
+use Edvardas\Hyphenation\UtilityComponents\Input\ConsoleInput;
+use Edvardas\Hyphenation\UtilityComponents\Timer\Timer;
+use Edvardas\Hyphenation\UtilityComponents\Output\ConsoleOutput;
 use Edvardas\Hyphenation\HyphenationAlgorithm\FullTreeHyphenationAlgorithm;
 use Edvardas\Hyphenation\HyphenationAlgorithm\ShortTreeHyphenationAlgorithm;
-use Edvardas\Hyphenation\Logger\NullLogger;
-use Edvardas\Hyphenation\Logger\ConsoleLogger;
-use Edvardas\Hyphenation\Logger\FileLogger;
-use Edvardas\Hyphenation\Cache\MemoryCache;
+use Edvardas\Hyphenation\UtilityComponents\Logger\NullLogger;
+use Edvardas\Hyphenation\UtilityComponents\Logger\ConsoleLogger;
+use Edvardas\Hyphenation\UtilityComponents\Logger\FileLogger;
+use Edvardas\Hyphenation\UtilityComponents\Cache\MemoryCache;
 
 class App
 {
@@ -27,6 +28,10 @@ class App
 
     private $output;
 
+    private $input;
+
+    private const WORDS_THRESHOLD = 100000;
+
     public function __construct()
     {
         $this->registerProjectSrcAutoload();
@@ -36,6 +41,7 @@ class App
 
         $this->timer = new Timer();
         $this->output = new ConsoleOutput();
+        $this->input = new ConsoleInput();
     }
 
     public function executeCommand()
@@ -46,7 +52,9 @@ class App
 
         $patterns = $this->loadPatterns();
 
-        $inputWords = $this->loadInputWords();
+        $inputWords = $this->input->getWords();
+
+        $this->turnOffLoggerIfMoreWordsThanThreshold($inputWords);
 
         $result = $this->hyphenateWords($inputWords, $patterns);
 
@@ -76,23 +84,11 @@ class App
         return $patterns;
     }
 
-    public function loadInputWords(): array
-    {
-        global $argv;
-        if (count($argv) > 1) {
-            for ($i=1; $i<count($argv); $i++){
-                $inputWords[$i-1] = $argv[$i];
-            }
-        } else {
-            self::$logger->info("Reading words from words.txt file.");
-            $inputWords = file('words.txt', FILE_IGNORE_NEW_LINES);
-            if($inputWords === false) {
-                self::$logger->error("Could not read words.txt file.");
-                exit;
-            }
+    public function turnOffLoggerIfMoreWordsThanThreshold(array $inputWords): void {
+        if (count($inputWords) > self::WORDS_THRESHOLD) {
+            self::$logger->notice('Too many words, disabling logger.');
             self::$logger = new NullLogger();
         }
-        return $inputWords;
     }
 
     public function hyphenateWords(array $inputWords, array $patterns): array

@@ -10,13 +10,14 @@ namespace Edvardas\Hyphenation\HyphenationAlgorithm;
 use Edvardas\Hyphenation\HyphenationAlgorithm\PatternsNodeInTree;
 use Edvardas\Hyphenation\HyphenationAlgorithm\AbstractHyphenationAlgorithm;
 use Edvardas\Hyphenation\HyphenationAlgorithm\WordHyphenationNumbers;
+use Edvardas\Hyphenation\App\App;
 
 class ShortTreeHyphenationAlgorithm extends AbstractHyphenationAlgorithm
 {
     public function __construct(array $patterns)
     {
         parent::__construct($patterns);
-        \Edvardas\Hyphenation\App\App::$logger->info("Started short tree hyphenation algorithm.");
+        App::$logger->info("Started short tree hyphenation algorithm.");
     }
 
     protected function parsePatternTree(array $patterns): array
@@ -41,7 +42,7 @@ class ShortTreeHyphenationAlgorithm extends AbstractHyphenationAlgorithm
             if ($this->begginingOrEndPatternFoundInMiddle($pattern, $reducedPattern, $inputWord, $found)) {
                 return new WordHyphenationNumbers(strlen($inputWord) - 1);
             }
-            \Edvardas\Hyphenation\App\App::$logger->info("Matched pattern $pattern");
+            App::$logger->info("Matched pattern $pattern");
             $numberPositionsInPattern = new PatternHyphenationNumbers($pattern);
             $matchedNumbers = WordHyphenationNumbers::createFromPatternNumbers(
                 $found,

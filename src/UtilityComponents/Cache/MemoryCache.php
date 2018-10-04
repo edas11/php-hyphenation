@@ -5,9 +5,9 @@
  * Date: 18.10.4
  * Time: 13.53
  */
-namespace Edvardas\Hyphenation\Cache;
+namespace Edvardas\Hyphenation\UtilityComponents\Cache;
 
-use Edvardas\Hyphenation\Cache\UnsupportedOperationException;
+use Edvardas\Hyphenation\UtilityComponents\Cache\UnsupportedOperationException;
 use Psr\SimpleCache\CacheInterface;
 
 class MemoryCache implements CacheInterface

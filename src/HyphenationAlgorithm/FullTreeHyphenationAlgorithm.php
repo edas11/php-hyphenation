@@ -11,13 +11,14 @@ use Edvardas\Hyphenation\HyphenationAlgorithm\PatternsNodeInTree;
 use Edvardas\Hyphenation\HyphenationAlgorithm\WordHyphenationNumbers;
 use Edvardas\Hyphenation\HyphenationAlgorithm\PatternHyphenationNumbers;
 use Edvardas\Hyphenation\HyphenationAlgorithm\AbstractHyphenationAlgorithm;
+use Edvardas\Hyphenation\App\App;
 
 class FullTreeHyphenationAlgorithm extends AbstractHyphenationAlgorithm
 {
     public function __construct(array $patterns)
     {
         parent::__construct($patterns);
-        \Edvardas\Hyphenation\App\App::$logger->info("Started full tree hyphenation algorithm.");
+        App::$logger->info("Started full tree hyphenation algorithm.");
     }
 
     protected function parsePatternTree(array $patterns): array
@@ -39,7 +40,7 @@ class FullTreeHyphenationAlgorithm extends AbstractHyphenationAlgorithm
         if ($this->begginingOrEndPatternFoundInMiddle($pattern, $reducedPattern, $inputWord, $wordIndex)) {
             return new WordHyphenationNumbers(strlen($inputWord) - 1);
         }
-        \Edvardas\Hyphenation\App\App::$logger->info("Matched pattern $pattern");
+        App::$logger->info("Matched pattern $pattern");
         $numberPositionsInPattern = new PatternHyphenationNumbers($pattern);
         $matchedNumbers = WordHyphenationNumbers::createFromPatternNumbers(
             $wordIndex,
@@ -74,10 +75,10 @@ class FullTreeHyphenationAlgorithm extends AbstractHyphenationAlgorithm
                     )
                 );
             } else {
-                \Edvardas\Hyphenation\App\App::$logger->info("Reached level $level in patterns tree.");
+                App::$logger->info("Reached level $level in patterns tree.");
             }
         } else {
-            \Edvardas\Hyphenation\App\App::$logger->info("Reached level $level in patterns tree.");
+            App::$logger->info("Reached level $level in patterns tree.");
         }
 
         $patternsOfThisLevel->addAll($patternsOfNextLevels->get());

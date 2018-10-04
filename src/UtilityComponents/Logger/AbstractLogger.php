@@ -6,7 +6,7 @@
  * Time: 11.50
  */
 
-namespace Edvardas\Hyphenation\Logger;
+namespace Edvardas\Hyphenation\UtilityComponents\Logger;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;

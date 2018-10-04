@@ -21,11 +21,12 @@ abstract class AbstractHyphenationAlgorithm implements HyphenationAlgorithmInter
 
     protected const REDUCE_CHARS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, '.'];
 
-    protected $patternTree;
+    //protected $patternTree;
 
     public function __construct(array $patterns)
     {
-        $this->patternTree = $this->parsePatternTree($patterns);
+        $patternTree = $this->parsePatternTree($patterns);
+        \Edvardas\Hyphenation\App\App::$cache->set('patterns-tree', $patternTree);
     }
 
     public function execute(string $inputWord): string
@@ -51,6 +52,15 @@ abstract class AbstractHyphenationAlgorithm implements HyphenationAlgorithmInter
             }
         }
         return $result;
+    }
+
+    protected function patternTree(): array
+    {
+        $tree = \Edvardas\Hyphenation\App\App::$cache->get('patterns-tree');
+        if ($tree === null) {
+            throw new \Exception('Patterns tree not founc in cache');
+        }
+        return $tree;
     }
 
     protected function beginingOrEndPatternFoundInMiddle(

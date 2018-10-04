@@ -24,7 +24,7 @@ class ShortTreeHyphenationAlgorithm extends AbstractHyphenationAlgorithm
         \Edvardas\Hyphenation\App\App::$logger->info("Hyphenation on word $inputWord.");
         $matchedNumbersAll = new WordHyphenationNumbers(strlen($inputWord) - 1);
         for ($wordIndex=0; $wordIndex<strlen($inputWord); $wordIndex++) {
-            $possiblePatterns = $this->patternTree[$inputWord[$wordIndex]];
+            $possiblePatterns = $this->patternTree()[$inputWord[$wordIndex]];
             foreach ($possiblePatterns as $pattern) {
                 $reducedPattern = str_replace(AbstractHyphenationAlgorithm::REDUCE_CHARS, '', $pattern);
                 $found = stripos($inputWord, $reducedPattern, $wordIndex);

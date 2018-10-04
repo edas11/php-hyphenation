@@ -20,16 +20,14 @@ class FullTreeHyphenationAlgorithm extends AbstractHyphenationAlgorithm
         \Edvardas\Hyphenation\App\App::$logger->info("Started full tree hyphenation algorithm.");
     }
 
-    protected function getWordHyphenationNumbers(
-        string $inputWord
-    ): WordHyphenationNumbers {
+    protected function getWordHyphenationNumbers(string $inputWord): WordHyphenationNumbers {
         \Edvardas\Hyphenation\App\App::$logger->info("Hyphenation on word $inputWord.");
         $matchedNumbersAll = new WordHyphenationNumbers(strlen($inputWord) - 1);
         for ( $wordIndex=0; $wordIndex<strlen($inputWord); $wordIndex++ ) {
             $patterns=$this->matchedPattern(
                 $inputWord,
                 $wordIndex,
-                $this->patternTree
+                $this->patternTree()
             );
             foreach ($patterns as $pattern) {
                 $reducedPattern = str_replace(

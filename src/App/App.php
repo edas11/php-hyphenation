@@ -12,12 +12,16 @@ use Edvardas\Hyphenation\Timer\Timer;
 use Edvardas\Hyphenation\Output\ConsoleOutput;
 use Edvardas\Hyphenation\HyphenationAlgorithm\FullTreeHyphenationAlgorithm;
 use Edvardas\Hyphenation\HyphenationAlgorithm\ShortTreeHyphenationAlgorithm;
+use Edvardas\Hyphenation\Logger\NullLogger;
 use Edvardas\Hyphenation\Logger\ConsoleLogger;
 use Edvardas\Hyphenation\Logger\FileLogger;
+use Edvardas\Hyphenation\Cache\MemoryCache;
 
 class App
 {
     public static $logger;
+
+    public static $cache;
 
     private $timer;
 
@@ -28,6 +32,7 @@ class App
         $this->registerAutoload();
 
         self::$logger = new FileLogger();
+        self::$cache = new MemoryCache();
 
         $this->timer = new Timer();
         $this->output = new ConsoleOutput();
@@ -89,6 +94,7 @@ class App
                 self::$logger->error("Could not read words.txt file.");
                 exit;
             }
+            self::$logger = new NullLogger();
         }
         return $inputWords;
     }

@@ -5,6 +5,7 @@
  * Date: 18.10.4
  * Time: 13.58
  */
+declare(strict_types=1);
 
 namespace Edvardas\Hyphenation\UtilityComponents\Cache;
 

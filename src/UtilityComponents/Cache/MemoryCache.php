@@ -5,6 +5,8 @@
  * Date: 18.10.4
  * Time: 13.53
  */
+declare(strict_types=1);
+
 namespace Edvardas\Hyphenation\UtilityComponents\Cache;
 
 use Edvardas\Hyphenation\UtilityComponents\Cache\UnsupportedOperationException;

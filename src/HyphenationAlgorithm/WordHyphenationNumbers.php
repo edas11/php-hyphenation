@@ -5,6 +5,7 @@
  * Date: 18.10.3
  * Time: 14.49
  */
+declare(strict_types=1);
 
 namespace Edvardas\Hyphenation\HyphenationAlgorithm;
 

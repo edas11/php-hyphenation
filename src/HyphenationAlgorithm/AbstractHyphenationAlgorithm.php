@@ -5,6 +5,7 @@
  * Date: 18.10.3
  * Time: 13.52
  */
+declare(strict_types=1);
 
 namespace Edvardas\Hyphenation\HyphenationAlgorithm;
 
@@ -72,7 +73,7 @@ abstract class AbstractHyphenationAlgorithm implements HyphenationAlgorithmInter
         $dashesNumber = 0;
         foreach ($numberInWord as $index => $number) {
             $cutPoint = $index + $dashesNumber;
-            if ($this->isOdd($number)) {
+            if ($this->isOdd((int)$number)) {
                 $hyphenatedWords = substr($hyphenatedWords, 0, $cutPoint + 1)
                     . '-'
                     . substr($hyphenatedWords, $cutPoint + 1);

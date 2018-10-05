@@ -5,6 +5,7 @@
  * Date: 18.10.4
  * Time: 16.36
  */
+declare(strict_types=1);
 
 namespace Edvardas\Hyphenation\UtilityComponents\Input;
 
@@ -27,7 +28,7 @@ class ConsoleInput
     {
         $arguments = $this->getArguments();
         if (count($arguments) > 0) {
-            foreach($arguments as $i => $argument) {
+            foreach ($arguments as $i => $argument) {
                 $inputWords[$i] = $argument;
             }
         } else {
@@ -66,7 +67,7 @@ class ConsoleInput
     private function getArguments(): array
     {
         $arguments = [];
-        for ($i=1; $i < count($this->cliArguments); $i++) {
+        for ($i = 1; $i < count($this->cliArguments); $i++) {
             if (strpos($this->cliArguments[$i], '--') !== 0) {
                 array_push($arguments, $this->cliArguments[$i]);
             }
@@ -77,7 +78,7 @@ class ConsoleInput
     private function getOptions(): array
     {
         $options = [];
-        for ($i=1; $i < count($this->cliArguments); $i++) {
+        for ($i = 1; $i < count($this->cliArguments); $i++) {
             if (strpos($this->cliArguments[$i], '--') === 0 && strlen($this->cliArguments[$i]) > 2) {
                 $optionString = substr($this->cliArguments[$i], 2);
                 $algorithmTypeOptionArray = explode('=', $optionString, 2);

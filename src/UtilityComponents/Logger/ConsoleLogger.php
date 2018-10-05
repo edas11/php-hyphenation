@@ -5,6 +5,7 @@
  * Date: 18.10.4
  * Time: 11.50
  */
+declare(strict_types=1);
 
 namespace Edvardas\Hyphenation\UtilityComponents\Logger;
 

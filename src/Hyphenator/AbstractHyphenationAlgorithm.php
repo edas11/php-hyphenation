@@ -7,10 +7,10 @@
  */
 declare(strict_types=1);
 
-namespace Edvardas\Hyphenation\HyphenationAlgorithm;
+namespace Edvardas\Hyphenation\Hyphenator;
 
-use Edvardas\Hyphenation\HyphenationAlgorithm\HyphenationAlgorithmInterface;
-use Edvardas\Hyphenation\HyphenationAlgorithm\WordHyphenationNumbers;
+use Edvardas\Hyphenation\Hyphenator\HyphenationAlgorithmInterface;
+use Edvardas\Hyphenation\Hyphenator\WordHyphenationNumbers;
 use Edvardas\Hyphenation\App\App;
 
 abstract class AbstractHyphenationAlgorithm implements HyphenationAlgorithmInterface

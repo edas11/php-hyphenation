@@ -7,9 +7,9 @@
  */
 declare(strict_types=1);
 
-namespace Edvardas\Hyphenation\HyphenationAlgorithm;
+namespace Edvardas\Hyphenation\Hyphenator;
 
-use Edvardas\Hyphenation\HyphenationAlgorithm\HyphenationNumbers;
+use Edvardas\Hyphenation\Hyphenator\HyphenationNumbers;
 
 class PatternHyphenationNumbers extends HyphenationNumbers
 {

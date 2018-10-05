@@ -8,11 +8,10 @@
 
 namespace Edvardas\Hyphenation\App;
 
+use Edvardas\Hyphenation\HyphenationAlgorithm\HyphenationAlgorithmInterface;
 use Edvardas\Hyphenation\UtilityComponents\Input\ConsoleInput;
 use Edvardas\Hyphenation\UtilityComponents\Timer\Timer;
 use Edvardas\Hyphenation\UtilityComponents\Output\ConsoleOutput;
-use Edvardas\Hyphenation\HyphenationAlgorithm\FullTreeHyphenationAlgorithm;
-use Edvardas\Hyphenation\HyphenationAlgorithm\ShortTreeHyphenationAlgorithm;
 use Edvardas\Hyphenation\UtilityComponents\Logger\NullLogger;
 use Edvardas\Hyphenation\UtilityComponents\Logger\ConsoleLogger;
 use Edvardas\Hyphenation\UtilityComponents\Logger\FileLogger;
@@ -56,7 +55,9 @@ class App
 
         $this->turnOffLoggerIfMoreWordsThanThreshold($inputWords);
 
-        $hyphenatedWords = $this->hyphenateWords($inputWords, $patterns);
+        $algorithm = $this->input->getAlgorithm($patterns);
+
+        $hyphenatedWords = $this->hyphenateWords($inputWords, $algorithm);
 
         $this->printResult($hyphenatedWords);
 
@@ -92,10 +93,9 @@ class App
         }
     }
 
-    public function hyphenateWords(array $inputWords, array $patterns): array
+    public function hyphenateWords(array $inputWords, HyphenationAlgorithmInterface $hyphAlgorithm): array
     {
         $result = [];
-        $hyphAlgorithm = new ShortTreeHyphenationAlgorithm($patterns);
         foreach ($inputWords as $inputWord) {
             array_push($result, $hyphAlgorithm->execute($inputWord));
         }

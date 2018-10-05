@@ -8,7 +8,7 @@
 
 namespace Edvardas\Hyphenation\HyphenationAlgorithm;
 
-interface HyphenationNumbers
+abstract class HyphenationNumbers
 {
-    function get(): array;
+    abstract protected function getNumbersArray(): array;
 }

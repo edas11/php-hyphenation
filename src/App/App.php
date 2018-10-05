@@ -56,9 +56,9 @@ class App
 
         $this->turnOffLoggerIfMoreWordsThanThreshold($inputWords);
 
-        $result = $this->hyphenateWords($inputWords, $patterns);
+        $hyphenatedWords = $this->hyphenateWords($inputWords, $patterns);
 
-        $this->printResult($result);
+        $this->printResult($hyphenatedWords);
 
         $this->printTime();
     }
@@ -84,7 +84,8 @@ class App
         return $patterns;
     }
 
-    public function turnOffLoggerIfMoreWordsThanThreshold(array $inputWords): void {
+    public function turnOffLoggerIfMoreWordsThanThreshold(array $inputWords): void
+    {
         if (count($inputWords) > self::WORDS_THRESHOLD) {
             self::$logger->notice('Too many words, disabling logger.');
             self::$logger = new NullLogger();
@@ -94,16 +95,16 @@ class App
     public function hyphenateWords(array $inputWords, array $patterns): array
     {
         $result = [];
-        $hyphAlgorithm = new FullTreeHyphenationAlgorithm($patterns);
-        foreach($inputWords as $inputWord) {
-            array_push($result, $hyphAlgorithm->execute($inputWord) );
+        $hyphAlgorithm = new ShortTreeHyphenationAlgorithm($patterns);
+        foreach ($inputWords as $inputWord) {
+            array_push($result, $hyphAlgorithm->execute($inputWord));
         }
         return $result;
     }
 
-    public function printResult($result)
+    public function printResult($hyphenatedWords)
     {
-        $this->output->printResult($result);
+        $this->output->printResult($hyphenatedWords);
     }
 
     public function printTime(): void

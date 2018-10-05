@@ -10,15 +10,16 @@ namespace Edvardas\Hyphenation\HyphenationAlgorithm;
 
 use Edvardas\Hyphenation\HyphenationAlgorithm\HyphenationNumbers;
 
-class PatternHyphenationNumbers implements HyphenationNumbers
+class PatternHyphenationNumbers extends HyphenationNumbers
 {
     protected $numbersArray;
 
-    public function __construct(string $pattern) {
+    public function __construct(string $pattern)
+    {
         $this->numbersArray = $this->numberPositionsInPattern($pattern);
     }
 
-    public function get(): array
+    protected function getNumbersArray(): array
     {
         return $this->numbersArray;
     }

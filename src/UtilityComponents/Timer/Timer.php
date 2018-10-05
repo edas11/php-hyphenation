@@ -5,6 +5,7 @@
  * Date: 18.10.3
  * Time: 17.15
  */
+
 namespace Edvardas\Hyphenation\UtilityComponents\Timer;
 
 class Timer

@@ -5,6 +5,7 @@
  * Date: 18.10.2
  * Time: 11.50
  */
+
 namespace Edvardas\Hyphenation\HyphenationAlgorithm;
 
 use Edvardas\Hyphenation\HyphenationAlgorithm\PatternsNodeInTree;
@@ -23,7 +24,7 @@ class ShortTreeHyphenationAlgorithm extends AbstractHyphenationAlgorithm
     protected function parsePatternTree(array $patterns): array
     {
         $shortPatternsTree = [];
-        foreach ($patterns as $index=>$pattern) {
+        foreach ($patterns as $index => $pattern) {
             $reducedPattern = str_replace(AbstractHyphenationAlgorithm::REDUCE_CHARS, '', $pattern);
             $firstLetter = $reducedPattern[0];
             if (!array_key_exists((string)$firstLetter, $shortPatternsTree)) {
@@ -34,30 +35,17 @@ class ShortTreeHyphenationAlgorithm extends AbstractHyphenationAlgorithm
         return $shortPatternsTree;
     }
 
-    protected function getPossiblePatternWordNumbers(string $inputWord, $pattern, $wordIndex): \Edvardas\Hyphenation\HyphenationAlgorithm\WordHyphenationNumbers
+    protected function matchedPattern(string $inputWord, int $wordIndex, $patternTree, int $level = 0): array
     {
-        $reducedPattern = str_replace(AbstractHyphenationAlgorithm::REDUCE_CHARS, '', $pattern);
-        $found = stripos($inputWord, $reducedPattern, $wordIndex);
-        if ($found !== false) {
-            if ($this->begginingOrEndPatternFoundInMiddle($pattern, $reducedPattern, $inputWord, $found)) {
-                return new WordHyphenationNumbers(strlen($inputWord) - 1);
+        $patterns = $patternTree[$inputWord[$wordIndex]];
+        foreach ($patterns as $index => $pattern) {
+            $reducedPattern = str_replace(AbstractHyphenationAlgorithm::REDUCE_CHARS, '', $pattern);
+            $found = stripos($inputWord, $reducedPattern, $wordIndex);
+            if ($found !== $wordIndex) {
+                unset($patterns[$index]);
             }
-            App::$logger->info("Matched pattern $pattern");
-            $numberPositionsInPattern = new PatternHyphenationNumbers($pattern);
-            $matchedNumbers = WordHyphenationNumbers::createFromPatternNumbers(
-                $found,
-                $numberPositionsInPattern,
-                strlen($inputWord) - 1
-            );
-        } else {
-            $matchedNumbers = new WordHyphenationNumbers(strlen($inputWord) - 1);
         }
-        return $matchedNumbers;
-    }
-
-    protected function matchedPattern(string $inputWord, int $wordIndex, $patternTree, int $level=0)
-    {
-        return $patternTree[$inputWord[$wordIndex]];
+        return $patterns;
     }
 
 }

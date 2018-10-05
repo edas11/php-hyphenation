@@ -69,7 +69,8 @@ class FileLogger extends AbstractLogger
         $this->writeToLogFile("Emergency: $message\n");
     }
 
-    private function writeToLogFile(string $message) {
+    private function writeToLogFile(string $message)
+    {
         $status = fwrite($this->logFile, $message);
         if ($status === false) {
             throw new \Exception('Can not write to log file');

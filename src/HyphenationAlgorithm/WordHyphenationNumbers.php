@@ -11,7 +11,7 @@ namespace Edvardas\Hyphenation\HyphenationAlgorithm;
 use Edvardas\Hyphenation\HyphenationAlgorithm\HyphenationNumbers;
 use Edvardas\Hyphenation\HyphenationAlgorithm\PatternHyphenationNumbers;
 
-class WordHyphenationNumbers implements HyphenationNumbers, \IteratorAggregate
+class WordHyphenationNumbers extends HyphenationNumbers implements \IteratorAggregate
 {
     protected $numbersArray;
 
@@ -20,14 +20,14 @@ class WordHyphenationNumbers implements HyphenationNumbers, \IteratorAggregate
         $this->numbersArray = array_fill(0, $wordGapsLength, 0);
     }
 
-    public function get(): array
+    protected function getNumbersArray(): array
     {
         return $this->numbersArray;
     }
 
     public function addWordNumbers(WordHyphenationNumbers $numbersToAdd)
     {
-        $this->addNumbersArray($numbersToAdd->get());
+        $this->addNumbersArray($numbersToAdd->getNumbersArray());
     }
 
     public function getIterator()
@@ -37,11 +37,12 @@ class WordHyphenationNumbers implements HyphenationNumbers, \IteratorAggregate
 
     public static function createFromPatternNumbers(
         int $matchIndex,
-        PatternHyphenationNumbers$numberPositionsInPattern,
+        PatternHyphenationNumbers $numberPositionsInPattern,
         int $wordGapsLength
-    ): WordHyphenationNumbers {
+    ): WordHyphenationNumbers
+    {
         $matchedNumbers = array_fill(0, $wordGapsLength, 0);
-        foreach ($numberPositionsInPattern->get() as $index => $number) {
+        foreach ($numberPositionsInPattern->getNumbersArray() as $index => $number) {
             $gapIndexInWord = $index - 1 + $matchIndex;
             $matchedNumbers[$gapIndexInWord] = $number;
         }

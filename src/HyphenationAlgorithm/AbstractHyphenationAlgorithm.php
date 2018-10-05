@@ -16,8 +16,11 @@ abstract class AbstractHyphenationAlgorithm implements HyphenationAlgorithmInter
 {
     protected const REDUCE_CHARS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, '.'];
 
+    private $patterns;
+
     public function __construct(array $patterns)
     {
+        $this->patterns = $patterns;
         $patternTree = $this->parsePatternTree($patterns);
         App::$cache->set('patterns-tree', $patternTree);
     }
@@ -27,16 +30,16 @@ abstract class AbstractHyphenationAlgorithm implements HyphenationAlgorithmInter
     public function execute(string $inputWord): string
     {
         $matchedNumbersAll = $this->getWordHyphenationNumbers($inputWord);
-        $result = $this->getResultString($inputWord, $matchedNumbersAll);
-        return $result;
+        $hyphenatedWords = $this->getHyphenatedWordsFromNumbers($inputWord, $matchedNumbersAll);
+        return $hyphenatedWords;
     }
 
-    protected function getWordHyphenationNumbers(string $inputWord): WordHyphenationNumbers
+    private function getWordHyphenationNumbers(string $inputWord): WordHyphenationNumbers
     {
         App::$logger->info("Hyphenation on word $inputWord.");
         $matchedNumbersAll = new WordHyphenationNumbers(strlen($inputWord) - 1);
-        for ( $wordIndex=0; $wordIndex<strlen($inputWord); $wordIndex++ ) {
-            $possiblePatterns=$this->matchedPattern($inputWord, $wordIndex, $this->patternTree());
+        for ($wordIndex = 0; $wordIndex < strlen($inputWord); $wordIndex++) {
+            $possiblePatterns = $this->matchedPattern($inputWord, $wordIndex, $this->patternTree());
             foreach ($possiblePatterns as $pattern) {
                 $matchedNumbers = $this->getPossiblePatternWordNumbers($inputWord, $pattern, $wordIndex);
                 $matchedNumbersAll->addWordNumbers($matchedNumbers);
@@ -45,44 +48,57 @@ abstract class AbstractHyphenationAlgorithm implements HyphenationAlgorithmInter
         return $matchedNumbersAll;
     }
 
-    abstract protected function matchedPattern(string $inputWord, int $wordIndex, $patternTree, int $level=0);
+    abstract protected function matchedPattern(string $inputWord, int $wordIndex, $patternTree, int $level = 0): array;
 
-    abstract protected function getPossiblePatternWordNumbers(
-        string $inputWord,
-        $pattern,
-        $wordIndex
-    ): WordHyphenationNumbers;
+    private function getPossiblePatternWordNumbers(string $inputWord, string $pattern, int $wordIndex): WordHyphenationNumbers
+    {
+        $reducedPattern = str_replace(AbstractHyphenationAlgorithm::REDUCE_CHARS, '', $pattern);
+        if ($this->begginingOrEndPatternFoundInMiddle($pattern, $reducedPattern, $inputWord, $wordIndex)) {
+            return new WordHyphenationNumbers(strlen($inputWord) - 1);
+        }
+        App::$logger->info("Matched pattern $pattern");
+        $numberPositionsInPattern = new PatternHyphenationNumbers($pattern);
+        $matchedNumbers = WordHyphenationNumbers::createFromPatternNumbers(
+            $wordIndex,
+            $numberPositionsInPattern,
+            strlen($inputWord) - 1
+        );
+        return $matchedNumbers;
+    }
 
-    protected function getResultString(string $inputWord, WordHyphenationNumbers $numberInWord): string {
-        $result = $inputWord;
+    private function getHyphenatedWordsFromNumbers(string $inputWord, WordHyphenationNumbers $numberInWord): string
+    {
+        $hyphenatedWords = $inputWord;
         $dashesNumber = 0;
         foreach ($numberInWord as $index => $number) {
             $cutPoint = $index + $dashesNumber;
             if ($this->isOdd($number)) {
-                $result = substr($result, 0, $cutPoint + 1)
+                $hyphenatedWords = substr($hyphenatedWords, 0, $cutPoint + 1)
                     . '-'
-                    . substr($result, $cutPoint + 1);
+                    . substr($hyphenatedWords, $cutPoint + 1);
                 $dashesNumber = $dashesNumber + 1;
             }
         }
-        return $result;
+        return $hyphenatedWords;
     }
 
-    protected function patternTree(): array
+    private function patternTree(): array
     {
         $tree = App::$cache->get('patterns-tree');
         if ($tree === null) {
-            throw new \Exception('Patterns tree not founc in cache');
+            $tree = $this->parsePatternTree($this->patterns);
+            App::$cache->set('patterns-tree', $tree);
         }
         return $tree;
     }
 
-    protected function begginingOrEndPatternFoundInMiddle(
+    private function begginingOrEndPatternFoundInMiddle(
         string $pattern,
         string $reducedPattern,
         $inputWord,
         int $matchIndex
-    ): bool {
+    ): bool
+    {
         $beginingPatternNotInBegining = false;
         $endPatternNotInEnd = false;
         if ($pattern[0] === '.' && $matchIndex !== 0) {
@@ -97,7 +113,7 @@ abstract class AbstractHyphenationAlgorithm implements HyphenationAlgorithmInter
         return $beginingPatternNotInBegining || $endPatternNotInEnd;
     }
 
-    protected function isOdd(int $number): bool
+    private function isOdd(int $number): bool
     {
         if ($number % 2 === 1) {
             return true;

@@ -8,6 +8,7 @@
 
 namespace Edvardas\Hyphenation\Hyphenator\Database;
 
+use Edvardas\Hyphenation\UtilityComponents\Database\MySqlDatabase;
 
 class HyphenationDatabase
 {
@@ -53,6 +54,49 @@ class HyphenationDatabase
         return $patterns;
     }
 
+    public function getKnownHyphenatedWordsFromDB(array $words): array
+    {
+        $query = 'SELECT word, word_h FROM words WHERE word in (';
+        foreach ($words as $index => $word) {
+            $query = $query . ":word$index, ";
+        }
+        $query = rtrim($query, ', ') . ')';
+        $statement = $this->pdo->prepare($query);
+
+        try {
+            $this->pdo->beginTransaction();
+            foreach ($words as $index => $word) {
+                $statement->bindParam("word$index", $word);
+            }
+            $statement->execute();
+            $hyphenatedWords = $statement->fetchAll();
+            $this->pdo->commit();
+        } catch (Exception $e) {
+            $this->pdo->rollback();
+            throw $e;
+        }
+        return $hyphenatedWords;
+    }
+
+    public function getWordMatchedPatterns(array $words): array
+    {
+        $inClause = $this->getSqlInFromArray($words);
+        $query = 'SELECT word, pattern FROM words, patterns, word_patterns '.
+            'WHERE words.word_id=word_patterns.word_id AND patterns.pattern_id=word_patterns.pattern_id '.
+            'AND words.word IN '.$inClause;
+        $statement = $this->pdo->prepare($query);
+        try {
+            $this->pdo->beginTransaction();
+            $statement->execute([]);
+            $result = $statement->fetchAll();
+            $this->pdo->commit();
+        }catch (Exception $e){
+            $this->pdo->rollback();
+            throw $e;
+        }
+        return $result;
+    }
+
     public function putPatternsInDB(array $patterns)
     {
         $statement = $this->pdo->prepare("INSERT INTO patterns (pattern) VALUES (?)");
@@ -70,11 +114,11 @@ class HyphenationDatabase
         }
     }
 
-    /**
-     * All arrays must have same length
-     */
     public function putWordsAndMatchedPatternsInDB(array $words, array $hyphWords, array $matchedPatternsAll)
     {
+        if (count($words) !== count($hyphWords) || count($hyphWords) !== count($matchedPatternsAll)) {
+            throw new \Exception('All 3 array must have the same length.');
+        }
         $this->getPatternsFromDB();
         $wordsStatement = $this->pdo->prepare("INSERT INTO words (word, word_h) VALUES (?, ?)");
         $patStatement = $this->pdo->prepare("INSERT INTO word_patterns (word_id, pattern_id) VALUES (?, ?)");
@@ -98,8 +142,17 @@ class HyphenationDatabase
     private function getPatternId(string $pattern): int
     {
         $row = array_search($pattern, array_column($this->patterns, 'pattern'));
-        //var_dump($this->patterns[$row]);
         return (int) $this->patterns[$row]['pattern_id'];
+    }
+
+    private function getSqlInFromArray(array $inParameters): string
+    {
+        $inClause = '(';
+        foreach ($inParameters as $param) {
+            $inClause = $inClause . "'$param',";
+        }
+        $inClause = rtrim($inClause, ',') . ')';
+        return $inClause;
     }
 
 }

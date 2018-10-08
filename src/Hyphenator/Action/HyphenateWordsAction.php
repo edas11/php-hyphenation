@@ -31,6 +31,8 @@ class HyphenateWordsAction implements Action
 
     public function execute()
     {
+        $db = new HyphenationDatabase();
+
         $wordsInput = $this->dataProvider->getWordsInput();
         $inputWords = $this->getWordsFromInput($wordsInput);
         $this->turnOffLoggerIfMoreWordsThanThreshold($inputWords);
@@ -40,17 +42,23 @@ class HyphenateWordsAction implements Action
         $algorithmInput = $this->dataProvider->getAlgorithmInput();
         $algorithm = $this->getAlgorithmFromInput($patterns, $algorithmInput);
 
+        $hyphenatedWords = $db->getKnownHyphenatedWordsFromDB($inputWords);
+        $returnedWords = array_column($hyphenatedWords, 'word');
+        $wordsNotInDb = array_diff($inputWords, $returnedWords);
+
         $resultWords = [];
         $matchedPatternsAll = [];
-        foreach ($inputWords as $inputWord) {
+        foreach ($wordsNotInDb as $inputWord) {
             $word = $algorithm->execute($inputWord);
             array_push($matchedPatternsAll, $algorithm->getMatchedPatterns());
             array_push($resultWords, $word);
         }
 
-        $db = new HyphenationDatabase();
-        $db->putWordsAndMatchedPatternsInDB($inputWords, $resultWords, $matchedPatternsAll);
+        $db->putWordsAndMatchedPatternsInDB($wordsNotInDb, $resultWords, $matchedPatternsAll);
 
+        //$wordsInDb = array_column($hyphenatedWords, 'word');
+        //$matchedPatterns = $db->getWordMatchedPatterns($wordsInDb);
+        $this->output->printResult(array_column($hyphenatedWords, 'word_h'));
         $this->output->printResult($resultWords);
     }
 

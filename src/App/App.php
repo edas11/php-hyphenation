@@ -31,8 +31,6 @@ class App
 
     public function __construct()
     {
-        $this->registerProjectSrcAutoload();
-
         self::$logger = new FileLogger();
         self::$cache = new MemoryCache();
 
@@ -52,17 +50,6 @@ class App
 
         $this->printResult($hyphenatedWords);
         $this->printTime();
-    }
-
-    public function registerProjectSrcAutoload()
-    {
-        spl_autoload_register(
-            function ($class_name) {
-                $fileName = str_replace('Edvardas\Hyphenation', './src', $class_name);
-                $fileName = str_replace('\\', '/', $fileName);
-                include $fileName . '.php';
-            }
-        );
     }
 
     public function printResult($hyphenatedWords)

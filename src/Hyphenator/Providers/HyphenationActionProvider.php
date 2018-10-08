@@ -6,11 +6,11 @@
  * Time: 09.11
  */
 
-namespace Edvardas\Hyphenation\Hyphenator;
+namespace Edvardas\Hyphenation\Hyphenator\Providers;
 
 use Edvardas\Hyphenation\Hyphenator\Action\HyphenateWordsAction;
 use Edvardas\Hyphenation\Hyphenator\Action\PutPatternsInDbAction;
-use Edvardas\Hyphenation\Hyphenator\HyphenationDataProvider;
+use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
 
 class HyphenationActionProvider
 {
@@ -28,10 +28,10 @@ class HyphenationActionProvider
         $choice = $this->dataProvider->getActionInput();
         switch ($choice) {
             case 1:
-                return new HyphenateWordsAction($this->config);
+                return new HyphenateWordsAction($this->dataProvider);
                 break;
             case 2:
-                return new PutPatternsInDbAction($this->config);
+                return new PutPatternsInDbAction($this->dataProvider);
                 break;
         }
     }

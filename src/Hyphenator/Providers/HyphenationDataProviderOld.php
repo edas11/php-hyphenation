@@ -6,14 +6,14 @@
  * Time: 09.11
  */
 
-namespace Edvardas\Hyphenation\Hyphenator;
+namespace Edvardas\Hyphenation\Hyphenator\Providers;
 
 use Edvardas\Hyphenation\App\App;
 use Edvardas\Hyphenation\UtilityComponents\Input\ConsoleInput;
 use Edvardas\Hyphenation\UtilityComponents\Logger\NullLogger;
-use Edvardas\Hyphenation\Hyphenator\Algorithm\FullTreeHyphenationAlgorithm;
-use Edvardas\Hyphenation\Hyphenator\Algorithm\ShortTreeHyphenationAlgorithm;
-use Edvardas\Hyphenation\Hyphenator\Algorithm\HyphenationAlgorithmInterface;
+use Edvardas\Hyphenation\Hyphenator\Providers\Algorithm\FullTreeHyphenationAlgorithm;
+use Edvardas\Hyphenation\Hyphenator\Providers\Algorithm\ShortTreeHyphenationAlgorithm;
+use Edvardas\Hyphenation\Hyphenator\Providers\Algorithm\HyphenationAlgorithmInterface;
 use Edvardas\Hyphenation\UtilityComponents\Output\ConsoleOutput;
 
 /**

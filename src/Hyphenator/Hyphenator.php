@@ -8,6 +8,7 @@
 
 namespace Edvardas\Hyphenation\Hyphenator;
 
+use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationActionProvider;
 use Edvardas\Hyphenation\UtilityComponents\Config\Config;
 
 class Hyphenator
@@ -21,6 +22,6 @@ class Hyphenator
 
     public function hyphenateWords() {
         $action = $this->provider->getAction();
-        return $action->execute();
+        $action->execute();
     }
 }

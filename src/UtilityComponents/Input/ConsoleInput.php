@@ -10,9 +10,9 @@ declare(strict_types=1);
 namespace Edvardas\Hyphenation\UtilityComponents\Input;
 
 use Edvardas\Hyphenation\App\App;
-use Edvardas\Hyphenation\Hyphenator\Algorithm\FullTreeHyphenationAlgorithm;
-use Edvardas\Hyphenation\Hyphenator\Algorithm\HyphenationAlgorithmInterface;
-use Edvardas\Hyphenation\Hyphenator\Algorithm\ShortTreeHyphenationAlgorithm;
+use Edvardas\Hyphenation\Hyphenator\Providers\Algorithm\FullTreeHyphenationAlgorithm;
+use Edvardas\Hyphenation\Hyphenator\Providers\Algorithm\HyphenationAlgorithmInterface;
+use Edvardas\Hyphenation\Hyphenator\Providers\Algorithm\ShortTreeHyphenationAlgorithm;
 
 class ConsoleInput
 {

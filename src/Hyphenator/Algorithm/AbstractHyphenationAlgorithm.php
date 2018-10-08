@@ -16,8 +16,8 @@ use Edvardas\Hyphenation\App\App;
 abstract class AbstractHyphenationAlgorithm implements HyphenationAlgorithmInterface
 {
     protected const REDUCE_CHARS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, '.'];
-
     private $patterns;
+    private $macthedPatterns = [];
 
     public function __construct(array $patterns)
     {
@@ -30,9 +30,15 @@ abstract class AbstractHyphenationAlgorithm implements HyphenationAlgorithmInter
 
     public function execute(string $inputWord): string
     {
+        $this->macthedPatterns = [];
         $matchedNumbersAll = $this->getWordHyphenationNumbers($inputWord);
         $hyphenatedWords = $this->getHyphenatedWordsFromNumbers($inputWord, $matchedNumbersAll);
         return $hyphenatedWords;
+    }
+
+    public function getMatchedPatterns(): array
+    {
+        return $this->macthedPatterns;
     }
 
     private function getWordHyphenationNumbers(string $inputWord): WordHyphenationNumbers
@@ -58,6 +64,7 @@ abstract class AbstractHyphenationAlgorithm implements HyphenationAlgorithmInter
             return new WordHyphenationNumbers(strlen($inputWord) - 1);
         }
         App::$logger->info("Matched pattern $pattern");
+        array_push($this->macthedPatterns, $pattern);
         $numberPositionsInPattern = new PatternHyphenationNumbers($pattern);
         $matchedNumbers = WordHyphenationNumbers::createFromPatternNumbers(
             $wordIndex,

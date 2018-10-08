@@ -12,62 +12,46 @@ use Edvardas\Hyphenation\App\App;
 use Edvardas\Hyphenation\Hyphenator\Algorithm\FullTreeHyphenationAlgorithm;
 use Edvardas\Hyphenation\Hyphenator\Algorithm\HyphenationAlgorithmInterface;
 use Edvardas\Hyphenation\Hyphenator\Algorithm\ShortTreeHyphenationAlgorithm;
+use Edvardas\Hyphenation\Hyphenator\Database\HyphenationDatabase;
+use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
 use Edvardas\Hyphenation\UtilityComponents\Input\ConsoleInput;
 use Edvardas\Hyphenation\UtilityComponents\Logger\NullLogger;
 use Edvardas\Hyphenation\UtilityComponents\Output\ConsoleOutput;
 
 class HyphenateWordsAction implements Action
 {
-    private $config;
-    private $input;
     private $output;
-    private $words;
-    private $algorithm;
+    private $dataProvider;
 
-    public function __construct($config)
+    public function __construct(HyphenationDataProvider $dataProvider)
     {
-        $this->config = $config;
-        $this->input = new ConsoleInput();
         $this->output = new ConsoleOutput();
+        $this->dataProvider = $dataProvider;
     }
 
     public function execute()
     {
-        $this->dialogHyphenateWords();
-        $inputWords = $this->words;
-        $algorithm = $this->algorithm;
-        $result = [];
+        $wordsInput = $this->dataProvider->getWordsInput();
+        $inputWords = $this->getWordsFromInput($wordsInput);
+        $this->turnOffLoggerIfMoreWordsThanThreshold($inputWords);
+
+        $patterns = $this->dataProvider->loadPatterns();
+
+        $algorithmInput = $this->dataProvider->getAlgorithmInput();
+        $algorithm = $this->getAlgorithmFromInput($patterns, $algorithmInput);
+
+        $resultWords = [];
+        $matchedPatternsAll = [];
         foreach ($inputWords as $inputWord) {
-            array_push($result, $algorithm->execute($inputWord));
+            $word = $algorithm->execute($inputWord);
+            array_push($matchedPatternsAll, $algorithm->getMatchedPatterns());
+            array_push($resultWords, $word);
         }
-        return $result;
-    }
 
-    private function dialogHyphenateWords()
-    {
-        $this->output->printLn("Write words separated by spaces or leave empty to hyphenate words in file.");
-        $wordsInput = (string)$this->input->getInput();
-        $this->words = $this->setWords($wordsInput);
-        $this->turnOffLoggerIfMoreWordsThanThreshold($this->words);
-        $this->output->printLn("Loading patterns");
-        $patterns = $this->loadPatterns();
-        $this->output->printLn("Choose algorithm:");
-        $this->output->printLn("(1) Full tree");
-        $this->output->printLn("(2) Short tree");
-        $algorithmChoice = (int)$this->input->getInput();
-        $this->algorithm = $this->setAlgorithm($patterns, $algorithmChoice);
-        $this->output->printLn("Starting execution");
-    }
+        $db = new HyphenationDatabase();
+        $db->putWordsAndMatchedPatternsInDB($inputWords, $resultWords, $matchedPatternsAll);
 
-    private function loadPatterns(): array
-    {
-        $patternsFileName = $this->config->get('patternsFileName', 'patterns');
-        $patterns = file($patternsFileName, FILE_IGNORE_NEW_LINES);
-        if ($patterns === false) {
-            App::$logger->error("Could not read patterns file.");
-            exit;
-        }
-        return $patterns;
+        $this->output->printResult($resultWords);
     }
 
     private function turnOffLoggerIfMoreWordsThanThreshold(array $inputWords): void
@@ -78,24 +62,17 @@ class HyphenateWordsAction implements Action
         }
     }
 
-    private function setWords(string $wordsInput): array
+    private function getWordsFromInput(string $wordsInput): array
     {
-        var_dump($wordsInput);
         if ($wordsInput === '') {
-            $wordsFileName = $this->config->get('wordsFileName', 'words.txt');
-            App::$logger->info("Reading words from $wordsFileName file.");
-            $words = file($wordsFileName, FILE_IGNORE_NEW_LINES);
-            if ($words === false) {
-                App::$logger->error("Could not read $wordsFileName file.");
-                exit;
-            }
+            $words = $this->dataProvider->loadWords();
         } else {
             $words = explode(' ', $wordsInput);
         }
         return $words;
     }
 
-    private function setAlgorithm(array $patterns, int $algorithmChoice): HyphenationAlgorithmInterface
+    private function getAlgorithmFromInput(array $patterns, int $algorithmChoice): HyphenationAlgorithmInterface
     {
         switch ($algorithmChoice) {
             case 1:

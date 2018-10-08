@@ -7,11 +7,11 @@
  */
 declare(strict_types=1);
 
-namespace Edvardas\Hyphenation\Hyphenator;
+namespace Edvardas\Hyphenation\Hyphenator\Algorithm;
 
-use Edvardas\Hyphenation\Hyphenator\PatternsNodeInTree;
-use Edvardas\Hyphenation\Hyphenator\AbstractHyphenationAlgorithm;
-use Edvardas\Hyphenation\Hyphenator\WordHyphenationNumbers;
+use Edvardas\Hyphenation\Hyphenator\Algorithm\PatternsNodeInTree;
+use Edvardas\Hyphenation\Hyphenator\Algorithm\AbstractHyphenationAlgorithm;
+use Edvardas\Hyphenation\Hyphenator\Algorithm\WordHyphenationNumbers;
 use Edvardas\Hyphenation\App\App;
 
 class ShortTreeHyphenationAlgorithm extends AbstractHyphenationAlgorithm

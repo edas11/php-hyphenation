@@ -10,9 +10,9 @@ declare(strict_types=1);
 namespace Edvardas\Hyphenation\UtilityComponents\Input;
 
 use Edvardas\Hyphenation\App\App;
-use Edvardas\Hyphenation\Hyphenator\FullTreeHyphenationAlgorithm;
-use Edvardas\Hyphenation\Hyphenator\HyphenationAlgorithmInterface;
-use Edvardas\Hyphenation\Hyphenator\ShortTreeHyphenationAlgorithm;
+use Edvardas\Hyphenation\Hyphenator\Algorithm\FullTreeHyphenationAlgorithm;
+use Edvardas\Hyphenation\Hyphenator\Algorithm\HyphenationAlgorithmInterface;
+use Edvardas\Hyphenation\Hyphenator\Algorithm\ShortTreeHyphenationAlgorithm;
 
 class ConsoleInput
 {
@@ -22,6 +22,14 @@ class ConsoleInput
     {
         global $argv;
         $this->cliArguments = $argv;
+    }
+
+    public function getInput()
+    {
+        $handle = fopen ("php://stdin","r");
+        $line = fgets($handle);
+        fclose($handle);
+        return trim($line);
     }
 
     public function getArguments(): array

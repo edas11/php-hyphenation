@@ -16,17 +16,11 @@ class Hyphenator
 
     public function __construct(Config $config)
     {
-        $this->provider = new HyphenationAlgorithmProvider($config);
+        $this->provider = new HyphenationActionProvider($config);
     }
 
     public function hyphenateWords() {
-        $inputWords = $this->provider->getWords();
-        $algorithm = $this->provider->getAlgorithm();
-
-        $result = [];
-        foreach ($inputWords as $inputWord) {
-            array_push($result, $algorithm->execute($inputWord));
-        }
-        return $result;
+        $action = $this->provider->getAction();
+        return $action->execute();
     }
 }

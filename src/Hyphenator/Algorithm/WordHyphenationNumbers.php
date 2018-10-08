@@ -7,10 +7,10 @@
  */
 declare(strict_types=1);
 
-namespace Edvardas\Hyphenation\Hyphenator;
+namespace Edvardas\Hyphenation\Hyphenator\Algorithm;
 
-use Edvardas\Hyphenation\Hyphenator\HyphenationNumbers;
-use Edvardas\Hyphenation\Hyphenator\PatternHyphenationNumbers;
+use Edvardas\Hyphenation\Hyphenator\Algorithm\HyphenationNumbers;
+use Edvardas\Hyphenation\Hyphenator\Algorithm\PatternHyphenationNumbers;
 
 class WordHyphenationNumbers extends HyphenationNumbers implements \IteratorAggregate
 {

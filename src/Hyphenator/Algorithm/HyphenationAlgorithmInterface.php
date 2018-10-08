@@ -7,7 +7,7 @@
  */
 declare(strict_types=1);
 
-namespace Edvardas\Hyphenation\Hyphenator;
+namespace Edvardas\Hyphenation\Hyphenator\Algorithm;
 
 interface HyphenationAlgorithmInterface
 {

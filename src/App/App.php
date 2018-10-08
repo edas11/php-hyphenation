@@ -9,7 +9,7 @@ declare(strict_types = 1);
 
 namespace Edvardas\Hyphenation\App;
 
-use Edvardas\Hyphenation\Hyphenator\HyphenationAlgorithmInterface;
+use Edvardas\Hyphenation\Hyphenator\Algorithm\HyphenationAlgorithmInterface;
 use Edvardas\Hyphenation\Hyphenator\Hyphenator;
 use Edvardas\Hyphenation\UtilityComponents\Input\ConsoleInput;
 use Edvardas\Hyphenation\UtilityComponents\Timer\Timer;
@@ -48,6 +48,7 @@ class App
         $this->hyphenator = new Hyphenator($this->config);
         $hyphenatedWords = $this->hyphenator->hyphenateWords();
 
+        if ($hyphenatedWords)
         $this->printResult($hyphenatedWords);
         $this->printTime();
     }

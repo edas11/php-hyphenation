@@ -21,4 +21,9 @@ class ConsoleOutput
         echo "Finished in $executionTime seconds.\n";
     }
 
+    public function printLn(string $line)
+    {
+        echo "$line\n";
+    }
+
 }

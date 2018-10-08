@@ -7,12 +7,12 @@
  */
 declare(strict_types=1);
 
-namespace Edvardas\Hyphenation\Hyphenator;
+namespace Edvardas\Hyphenation\Hyphenator\Algorithm;
 
-use Edvardas\Hyphenation\Hyphenator\PatternsNodeInTree;
-use Edvardas\Hyphenation\Hyphenator\WordHyphenationNumbers;
-use Edvardas\Hyphenation\Hyphenator\PatternHyphenationNumbers;
-use Edvardas\Hyphenation\Hyphenator\AbstractHyphenationAlgorithm;
+use Edvardas\Hyphenation\Hyphenator\Algorithm\PatternsNodeInTree;
+use Edvardas\Hyphenation\Hyphenator\Algorithm\WordHyphenationNumbers;
+use Edvardas\Hyphenation\Hyphenator\Algorithm\PatternHyphenationNumbers;
+use Edvardas\Hyphenation\Hyphenator\Algorithm\AbstractHyphenationAlgorithm;
 use Edvardas\Hyphenation\App\App;
 
 class FullTreeHyphenationAlgorithm extends AbstractHyphenationAlgorithm

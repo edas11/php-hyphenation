@@ -11,16 +11,25 @@ namespace Edvardas\Hyphenation\Hyphenator;
 use Edvardas\Hyphenation\App\App;
 use Edvardas\Hyphenation\UtilityComponents\Input\ConsoleInput;
 use Edvardas\Hyphenation\UtilityComponents\Logger\NullLogger;
+use Edvardas\Hyphenation\Hyphenator\Algorithm\FullTreeHyphenationAlgorithm;
+use Edvardas\Hyphenation\Hyphenator\Algorithm\ShortTreeHyphenationAlgorithm;
+use Edvardas\Hyphenation\Hyphenator\Algorithm\HyphenationAlgorithmInterface;
+use Edvardas\Hyphenation\UtilityComponents\Output\ConsoleOutput;
 
-class HyphenationAlgorithmProvider
+/**
+ * TODO change later
+ */
+class HyphenationDataProviderOld
 {
     private $config;
     private $input;
+    private $output;
 
     public function __construct($config)
     {
         $this->config = $config;
         $this->input = new ConsoleInput();
+        $this->output = new ConsoleOutput();
     }
 
     public function loadPatterns(): array

@@ -10,34 +10,37 @@ namespace Edvardas\Hyphenation\Hyphenator\Action;
 
 use Edvardas\Hyphenation\App\App;
 use Edvardas\Hyphenation\Hyphenator\Database\HyphenationDatabase;
+use Edvardas\Hyphenation\Hyphenator\Model\WordPatterns;
+use Edvardas\Hyphenation\Hyphenator\Model\Words;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
-use Edvardas\Hyphenation\UtilityComponents\Logger\NullLogger;
 use Edvardas\Hyphenation\UtilityComponents\Output\ConsoleOutput;
+use Edvardas\Hyphenation\UtilityComponents\Timer\Timer;
 
 class HyphenateWordsActionDB implements Action
 {
     private $output;
     private $dataProvider;
+    private $timer;
 
     public function __construct(HyphenationDataProvider $dataProvider)
     {
+        $this->timer = new Timer();
         $this->output = new ConsoleOutput();
         $this->dataProvider = $dataProvider;
     }
 
     public function execute()
     {
-        $db = new HyphenationDatabase();
 
         $inputWords = $this->dataProvider->getWords();
-        $patterns = $this->dataProvider->loadPatterns(true);
+        $patterns = $this->dataProvider->loadPatterns(true)->getPatterns();
         $algorithm = $this->dataProvider->getAlgorithm($patterns);
 
-        $this->turnOffLoggerIfMoreWordsThanThreshold($inputWords);
+        $this->timer->start();
 
-        $hyphenatedWords = $db->getKnownHyphenatedWords($inputWords);
-        $returnedWords = array_column($hyphenatedWords, 'word');
-        $wordsNotInDb = array_diff($inputWords, $returnedWords);
+        $dbWords = Words::getKnown($inputWords);
+        $wordsInDb = $dbWords->getOriginalWords();
+        $wordsNotInDb = array_diff($inputWords, $wordsInDb);
 
         $resultWords = [];
         $matchedPatternsAll = [];
@@ -47,19 +50,20 @@ class HyphenateWordsActionDB implements Action
             array_push($resultWords, $word);
         }
 
-        $db->putWordsAndMatchedPatterns($wordsNotInDb, $resultWords, $matchedPatternsAll);
-
-        $matchedPatterns = $db->getWordMatchedPatterns($inputWords);
-        $this->output->printResult($matchedPatterns);
-        $this->output->printResult(array_column($hyphenatedWords, 'word_h'));
+        WordPatterns::putWordsAndMatchedPatterns($wordsNotInDb, $resultWords, $matchedPatternsAll);
+        $matchedPatternsResult = WordPatterns::getKnown($inputWords)->getMatchedPatterns();
+        $this->output->printResult($matchedPatternsResult);
+        $this->output->printResult($dbWords->getHyphenatedWords());
         $this->output->printResult($resultWords);
+
+        $this->printTime();
     }
 
-    private function turnOffLoggerIfMoreWordsThanThreshold(array $inputWords): void
+    public function printTime(): void
     {
-        if (count($inputWords) > App::WORDS_THRESHOLD) {
-            App::$logger->notice('Too many words, disabling logger.');
-            App::$logger = new NullLogger();
-        }
+        $time = $this->timer->getInterval();
+        $this->output->printTime($time);
+        App::$logger->info("Finished in $time seconds.");
     }
+
 }

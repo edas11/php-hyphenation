@@ -12,13 +12,11 @@ use Edvardas\Hyphenation\App\App;
 
 class MySqlDatabase
 {
+    private $builder;
+
     public function __construct(string $host, string $db, string $user, string $pass, string $charset)
     {
-        /*$host = '127.0.0.1';
-        $db   = 'hyph';
-        $user = 'root';
-        $pass = 'password';
-        $charset = 'utf8mb4';*/
+        $this->builder = new MySqlQueryBuilder();
 
         $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
         $options = [
@@ -71,7 +69,6 @@ class MySqlDatabase
 
     public function execute(MySqlQuery $query): void
     {
-        $ids = [];
         $statement = $this->pdo->prepare($query->getQueryString());
         try {
             $this->pdo->beginTransaction();
@@ -81,5 +78,10 @@ class MySqlDatabase
             $this->pdo->rollback();
             throw $e;
         }
+    }
+
+    public function builder(): MySqlQueryBuilder
+    {
+        return $this->builder;
     }
 }

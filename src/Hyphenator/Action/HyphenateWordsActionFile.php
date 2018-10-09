@@ -10,16 +10,18 @@ namespace Edvardas\Hyphenation\Hyphenator\Action;
 
 use Edvardas\Hyphenation\App\App;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
-use Edvardas\Hyphenation\UtilityComponents\Logger\NullLogger;
 use Edvardas\Hyphenation\UtilityComponents\Output\ConsoleOutput;
+use Edvardas\Hyphenation\UtilityComponents\Timer\Timer;
 
 class HyphenateWordsActionFile implements Action
 {
     private $output;
     private $dataProvider;
+    private $timer;
 
     public function __construct(HyphenationDataProvider $dataProvider)
     {
+        $this->timer = new Timer();
         $this->output = new ConsoleOutput();
         $this->dataProvider = $dataProvider;
     }
@@ -27,10 +29,10 @@ class HyphenateWordsActionFile implements Action
     public function execute()
     {
         $inputWords = $this->dataProvider->getWords();
-        $patterns = $this->dataProvider->loadPatterns(false);
+        $patterns = $this->dataProvider->loadPatterns(false)->getPatterns();
         $algorithm = $this->dataProvider->getAlgorithm($patterns);
 
-        $this->turnOffLoggerIfMoreWordsThanThreshold($inputWords);
+        $this->timer->start();
 
         $resultWords = [];
         foreach ($inputWords as $inputWord) {
@@ -39,14 +41,14 @@ class HyphenateWordsActionFile implements Action
         }
 
         $this->output->printResult($resultWords);
+
+        $this->printTime();
     }
 
-    private function turnOffLoggerIfMoreWordsThanThreshold(array $inputWords): void
+    public function printTime(): void
     {
-        if (count($inputWords) > App::WORDS_THRESHOLD) {
-            App::$logger->notice('Too many words, disabling logger.');
-            App::$logger = new NullLogger();
-        }
+        $time = $this->timer->getInterval();
+        $this->output->printTime($time);
+        App::$logger->info("Finished in $time seconds.");
     }
-
 }

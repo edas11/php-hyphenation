@@ -12,6 +12,7 @@ namespace Edvardas\Hyphenation\App;
 use Edvardas\Hyphenation\Hyphenator\Algorithm\HyphenationAlgorithmInterface;
 use Edvardas\Hyphenation\Hyphenator\Hyphenator;
 use Edvardas\Hyphenation\UtilityComponents\Config\Config;
+use Edvardas\Hyphenation\UtilityComponents\Database\MySqlDatabase;
 use Edvardas\Hyphenation\UtilityComponents\Input\ConsoleInput;
 use Edvardas\Hyphenation\UtilityComponents\Timer\Timer;
 use Edvardas\Hyphenation\UtilityComponents\Output\ConsoleOutput;
@@ -25,37 +26,27 @@ class App
     public const WORDS_THRESHOLD = 100000;
     public static $logger;
     public static $cache;
-    private $timer;
     private $output;
     private $input;
     private static $config;
+    private static $db;
 
     public function __construct()
     {
         self::$logger = new FileLogger();
         self::$cache = new MemoryCache();
 
-        $this->timer = new Timer();
         $this->output = new ConsoleOutput();
         $this->input = new ConsoleInput();
     }
 
     public function executeCommand()
     {
-        $this->timer->start();
         self::$logger->info("Started hyphenation algorithm at " . date('Y-m-d H:i:s'));
 
         $this->hyphenator = new Hyphenator();
         $this->hyphenator->execute();
 
-        $this->printTime();
-    }
-
-    public function printTime(): void
-    {
-        $time = $this->timer->getInterval();
-        $this->output->printTime($time);
-        self::$logger->info("Finished in $time seconds.");
     }
 
     public static function getConfig(): Config
@@ -72,4 +63,16 @@ class App
         return new Config($configData);
     }
 
+    public static function getDb(): MySqlDatabase
+    {
+        if (!isset(self::$db)) {
+            $host = App::getConfig()->get(['mysql', 'host']);
+            $db = App::getConfig()->get(['mysql', 'db']);
+            $user = App::getConfig()->get(['mysql', 'user']);
+            $pass = App::getConfig()->get(['mysql', 'password']);
+            $charset = App::getConfig()->get(['mysql', 'charset']);
+            self::$db = new MySqlDatabase($host, $db, $user, $pass, $charset);
+        }
+        return self::$db;
+    }
 }

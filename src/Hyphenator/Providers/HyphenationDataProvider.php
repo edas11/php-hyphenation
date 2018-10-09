@@ -14,17 +14,22 @@ use Edvardas\Hyphenation\Hyphenator\Algorithm\FullTreeHyphenationAlgorithm;
 use Edvardas\Hyphenation\Hyphenator\Algorithm\HyphenationAlgorithmInterface;
 use Edvardas\Hyphenation\Hyphenator\Algorithm\ShortTreeHyphenationAlgorithm;
 use Edvardas\Hyphenation\Hyphenator\Database\HyphenationDatabase;
+use Edvardas\Hyphenation\Hyphenator\Model\Patterns;
 use Edvardas\Hyphenation\UtilityComponents\Input\ConsoleInput;
+use Edvardas\Hyphenation\UtilityComponents\Logger\NullLogger;
 use Edvardas\Hyphenation\UtilityComponents\Output\ConsoleOutput;
 
 class HyphenationDataProvider
 {
     private $input;
     private $output;
+
     public const HYPHENATE_ACTION = 1;
     public const PUT_PATTERNS_IN_DB_ACTION = 2;
     public const FILE_SRC = 1;
     public const DB_SRC = 2;
+    public const FULL_TREE_ALGORITHM = 1;
+    public const SHORT_TREE_ALGORITHM = 2;
 
     public function __construct()
     {
@@ -58,17 +63,26 @@ class HyphenationDataProvider
         } else {
             $words = explode(' ', $wordsInput);
         }
+        $this->turnOffLoggerIfMoreWordsThanThreshold($words);
         return $words;
+    }
+
+    private function turnOffLoggerIfMoreWordsThanThreshold(array $inputWords): void
+    {
+        if (count($inputWords) > App::WORDS_THRESHOLD) {
+            App::$logger->notice('Too many words, disabling logger.');
+            App::$logger = new NullLogger();
+        }
     }
 
     public function getAlgorithm($patterns): HyphenationAlgorithmInterface
     {
         $algorithmChoice = $this->getAlgorithmInput();
         switch ($algorithmChoice) {
-            case 1:
+            case self::FULL_TREE_ALGORITHM:
                 return new FullTreeHyphenationAlgorithm($patterns);
                 break;
-            case 2:
+            case self::SHORT_TREE_ALGORITHM:
                 return new ShortTreeHyphenationAlgorithm($patterns);
                 break;
             default:
@@ -76,11 +90,13 @@ class HyphenationDataProvider
         }
     }
 
-    public function loadPatterns(bool $isFromDb): array
+    public function loadPatterns(bool $isFromDb): Patterns
     {
         if ($isFromDb) {
-            $db = new HyphenationDatabase();
+            $patterns = Patterns::getKnown();
+            /*$db = new HyphenationDatabase();
             $patterns = $db->getPatterns();
+            */
         } else {
             $this->output->printLn("Loading patterns");
             $patternsFileName = App::getConfig()->get(['patternsFileName'], 'patterns');
@@ -89,6 +105,10 @@ class HyphenationDataProvider
                 App::$logger->error("Could not read patterns file.");
                 exit;
             }
+            $patterns = array_map(function ($pattern) {
+                return ['pattern' => $pattern];
+            }, $patterns);
+            $patterns = new Patterns($patterns);
         }
         return $patterns;
     }

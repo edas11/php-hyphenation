@@ -10,6 +10,7 @@ namespace Edvardas\Hyphenation\Hyphenator\Action;
 
 
 use Edvardas\Hyphenation\Hyphenator\Database\HyphenationDatabase;
+use Edvardas\Hyphenation\Hyphenator\Model\Patterns;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
 
 class PutPatternsInDbAction implements Action
@@ -23,8 +24,7 @@ class PutPatternsInDbAction implements Action
 
     public function execute()
     {
-        $db = new HyphenationDatabase();
-        $db->putPatterns($this->dataProvider->loadPatterns(false));
+        $patterns = $this->dataProvider->loadPatterns(false)->persist();
     }
 
 }

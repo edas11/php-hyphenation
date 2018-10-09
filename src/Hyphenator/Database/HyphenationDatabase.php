@@ -9,14 +9,19 @@
 namespace Edvardas\Hyphenation\Hyphenator\Database;
 
 use Edvardas\Hyphenation\UtilityComponents\Database\MySqlDatabase;
+use Edvardas\Hyphenation\UtilityComponents\Database\MySqlQueryBuilder;
 
 class HyphenationDatabase
 {
     private $pdo;
+    private $db;
+    private $builder;
     private $patterns;
 
     public function __construct()
     {
+        $this->builder = new MySqlQueryBuilder();
+        $this->db = new MySqlDatabase();
         $host = '127.0.0.1';
         $db   = 'hyph';
         $user = 'root';
@@ -38,15 +43,8 @@ class HyphenationDatabase
 
     public function getPatternsFromDB()
     {
-        try {
-            $this->pdo->beginTransaction();
-            $stmt = $this->pdo->query('SELECT pattern_id, pattern FROM patterns');
-            $patterns = $stmt->fetchAll();
-            $this->pdo->commit();
-        }catch (Exception $e){
-            $this->pdo->rollback();
-            throw $e;
-        }
+        $query = $this->builder->select()->columns(['pattern_id', 'pattern'])->from('patterns')->build();
+        $patterns = $this->db->executeAndFetch($query);
         $this->patterns = $patterns;
         $patterns = array_map(function($value){
             return $value['pattern'];
@@ -56,62 +54,29 @@ class HyphenationDatabase
 
     public function getKnownHyphenatedWordsFromDB(array $words): array
     {
-        $query = 'SELECT word, word_h FROM words WHERE word in (';
-        foreach ($words as $index => $word) {
-            $query = $query . ":word$index, ";
-        }
-        $query = rtrim($query, ', ') . ')';
-        $statement = $this->pdo->prepare($query);
-
-        try {
-            $this->pdo->beginTransaction();
-            foreach ($words as $index => $word) {
-                $statement->bindParam("word$index", $word);
-            }
-            $statement->execute();
-            $hyphenatedWords = $statement->fetchAll();
-            $this->pdo->commit();
-        } catch (Exception $e) {
-            $this->pdo->rollback();
-            throw $e;
-        }
+        $query = $this->builder->select()->columns(['word', 'word_h'])->from('words')
+            ->where()->in('word', $words)->build();
+        $hyphenatedWords = $this->db->executeAndFetch($query);
         return $hyphenatedWords;
     }
 
     public function getWordMatchedPatterns(array $words): array
     {
-        $inClause = $this->getSqlInFromArray($words);
-        $query = 'SELECT word, pattern FROM words, patterns, word_patterns '.
-            'WHERE words.word_id=word_patterns.word_id AND patterns.pattern_id=word_patterns.pattern_id '.
-            'AND words.word IN '.$inClause;
-        $statement = $this->pdo->prepare($query);
-        try {
-            $this->pdo->beginTransaction();
-            $statement->execute([]);
-            $result = $statement->fetchAll();
-            $this->pdo->commit();
-        }catch (Exception $e){
-            $this->pdo->rollback();
-            throw $e;
-        }
-        return $result;
+        $query = $this->builder->select()->columns(['word', 'pattern'])->from('word_patterns')
+            ->join('words', 'word_patterns.word_id', 'words.word_id')
+            ->join('patterns', 'word_patterns.pattern_id', 'patterns.patter_id')
+            ->where()->in('words.word', $words);
+        $wordMatchedPatterns = $this->db->executeAndFetch($query);
+        return $wordMatchedPatterns;
     }
 
     public function putPatternsInDB(array $patterns)
     {
-        $statement = $this->pdo->prepare("INSERT INTO patterns (pattern) VALUES (?)");
-        try {
-            $this->pdo->beginTransaction();
-            $this->pdo->query('DELETE FROM patterns');
-            foreach ($patterns as $pattern)
-            {
-                $statement->execute([$pattern]);
-            }
-            $this->pdo->commit();
-        }catch (Exception $e){
-            $this->pdo->rollback();
-            throw $e;
-        }
+        $patternsMatrix = array_map(function ($pattern) {
+            return [$pattern];
+        }, $patterns);
+        $query = $this->builder->insert()->into('patterns', ['pattern'])->values($patternsMatrix)->build();
+        $this->db->execute($query);
     }
 
     public function putWordsAndMatchedPatternsInDB(array $words, array $hyphWords, array $matchedPatternsAll)

@@ -8,6 +8,8 @@
 
 namespace Edvardas\Hyphenation\UtilityComponents\Database;
 
+use Edvardas\Hyphenation\App\App;
+
 class MySqlDatabase
 {
     public function __construct()
@@ -31,17 +33,32 @@ class MySqlDatabase
         }
     }
 
-    public function select(array $selectColumns, string $selectTables, array $where)
+    public function executeAndFetch(MySqlQuery $query): array
     {
-        $query = '';
-        foreach ($selectColumns as $column) {
-            $query = $query . "$column, ";
+        $statement = $this->pdo->prepare($query->getQueryString());
+        try {
+            $this->pdo->beginTransaction();
+            $statement->execute($query->getBindParams());
+            $fetchedData = $statement->fetchAll();
+            $this->pdo->commit();
+        } catch (Exception $e) {
+            $this->pdo->rollback();
+            throw $e;
         }
-        $query = rtrim($query, ', ') . ')';
-        $query = $query . " FROM $selectTables";
-        $query = $query . " WHERE";
-        foreach ($where as $whereClause) {
+        return $fetchedData;
+    }
 
+    public function execute(MySqlQuery $query)
+    {
+        $statement = $this->pdo->prepare($query->getQueryString());
+        try {
+            $this->pdo->beginTransaction();
+            //$this->pdo->query('DELETE FROM patterns');
+            $statement->execute($query->getBindParams());
+            $this->pdo->commit();
+        }catch (Exception $e){
+            $this->pdo->rollback();
+            throw $e;
         }
     }
 }

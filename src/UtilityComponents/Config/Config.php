@@ -15,22 +15,32 @@ class Config
 
     public function __construct(array $configData)
     {
-        foreach ($configData as $configKey => $configItem) {
-            $this->config[(string)$configKey] = (string)$configItem;
-        }
+        array_walk_recursive($configData, function ($item) {
+            if (!is_string($item)) {
+                throw new \Exception('Config must have only strings');
+            }
+        });
+        $this->config = $configData;
     }
 
-    public function get(string $key, string $default = ''): string
+    /**
+     * @param string[] $key
+     */
+    public function get(array $key, string $default = ''): string
     {
-        if (array_key_exists($key, $this->config)) {
-            return $this->config[$key];
+        $configData = $this->config;
+        foreach ($key as $keyPart) {
+            if (array_key_exists($keyPart, $configData)) {
+                $configData = $configData[$keyPart];
+            } else {
+                return $default;
+            }
+        }
+
+        if (is_string($configData)) {
+            return $configData;
         } else {
             return $default;
         }
-    }
-
-    public function set(string $key, string $val): void
-    {
-        $this->config[$key] = $val;
     }
 }

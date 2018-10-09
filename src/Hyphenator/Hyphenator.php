@@ -9,18 +9,17 @@
 namespace Edvardas\Hyphenation\Hyphenator;
 
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationActionProvider;
-use Edvardas\Hyphenation\UtilityComponents\Config\Config;
 
 class Hyphenator
 {
     private $provider;
 
-    public function __construct(Config $config)
+    public function __construct()
     {
-        $this->provider = new HyphenationActionProvider($config);
+        $this->provider = new HyphenationActionProvider;
     }
 
-    public function hyphenateWords() {
+    public function execute(): void {
         $action = $this->provider->getAction();
         $action->execute();
     }

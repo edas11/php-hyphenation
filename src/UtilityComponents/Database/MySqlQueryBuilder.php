@@ -60,8 +60,8 @@ class MySqlQueryBuilder
 
     public function equals(string $column, string $value)
     {
-        $paramName = ":value$this->counter";
-        $this->counter++;
+        $nextCounter = $this->nextCounter();
+        $paramName = ":value$nextCounter";
         $this->queryString = $this->queryString . "$column=$paramName ";
         $this->bindParams[$paramName] = $value;
         return $this;
@@ -77,8 +77,8 @@ class MySqlQueryBuilder
     {
         $namedParams = [];
         foreach ($values as $val) {
-            $namedParams[":value$this->counter"] = $val;
-            $this->counter++;
+            $nextCounter = $this->nextCounter();
+            $namedParams[":value$nextCounter"] = $val;
         }
         $this->bindParams = array_merge($this->bindParams, $namedParams);
         $inParams = $this->getSqlInParamString($namedParams);
@@ -117,6 +117,12 @@ class MySqlQueryBuilder
         return $this;
     }
 
+    private function nextCounter()
+    {
+        $this->counter++;
+        return $this->counter;
+    }
+
     private function getSqlInParamString(array $namedParams): string
     {
         $namedParamsKeys = array_keys($namedParams);
@@ -136,8 +142,8 @@ class MySqlQueryBuilder
         $namesMatrix = [];
         foreach ($valuesMatrix as $valuesArray) {
             $namesArray = array_map(function ($val) {
-                $name = ":value$this->counter";
-                $this->counter++;
+                $nextCounter = $this->nextCounter();
+                $name = ":value$nextCounter";
                 return $name;
             }, $valuesArray);
             array_push($namesMatrix, $namesArray);

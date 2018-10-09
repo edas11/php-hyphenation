@@ -11,6 +11,7 @@ namespace Edvardas\Hyphenation\App;
 
 use Edvardas\Hyphenation\Hyphenator\Algorithm\HyphenationAlgorithmInterface;
 use Edvardas\Hyphenation\Hyphenator\Hyphenator;
+use Edvardas\Hyphenation\UtilityComponents\Config\Config;
 use Edvardas\Hyphenation\UtilityComponents\Input\ConsoleInput;
 use Edvardas\Hyphenation\UtilityComponents\Timer\Timer;
 use Edvardas\Hyphenation\UtilityComponents\Output\ConsoleOutput;
@@ -27,14 +28,13 @@ class App
     private $timer;
     private $output;
     private $input;
-    private $config;
+    private static $config;
 
     public function __construct()
     {
         self::$logger = new FileLogger();
         self::$cache = new MemoryCache();
 
-        $this->config = AppConfigReader::read('config.php');
         $this->timer = new Timer();
         $this->output = new ConsoleOutput();
         $this->input = new ConsoleInput();
@@ -45,17 +45,10 @@ class App
         $this->timer->start();
         self::$logger->info("Started hyphenation algorithm at " . date('Y-m-d H:i:s'));
 
-        $this->hyphenator = new Hyphenator($this->config);
-        $hyphenatedWords = $this->hyphenator->hyphenateWords();
+        $this->hyphenator = new Hyphenator();
+        $this->hyphenator->execute();
 
-        if ($hyphenatedWords)
-        $this->printResult($hyphenatedWords);
         $this->printTime();
-    }
-
-    public function printResult($hyphenatedWords)
-    {
-        $this->output->printResult($hyphenatedWords);
     }
 
     public function printTime(): void
@@ -63,6 +56,20 @@ class App
         $time = $this->timer->getInterval();
         $this->output->printTime($time);
         self::$logger->info("Finished in $time seconds.");
+    }
+
+    public static function getConfig(): Config
+    {
+        if (!isset(self::$config)) {
+            self::$config = self::readConfig('config.php');
+        }
+        return self::$config;
+    }
+
+    private static function readConfig(string $pathToConfig): Config
+    {
+        $configData = require($pathToConfig);
+        return new Config($configData);
     }
 
 }

@@ -8,6 +8,7 @@
 
 namespace Edvardas\Hyphenation\Hyphenator\Database;
 
+use Edvardas\Hyphenation\App\App;
 use Edvardas\Hyphenation\UtilityComponents\Database\MySqlDatabase;
 use Edvardas\Hyphenation\UtilityComponents\Database\MySqlQueryBuilder;
 
@@ -20,14 +21,18 @@ class HyphenationDatabase
     public function __construct()
     {
         $this->builder = new MySqlQueryBuilder();
-        $this->db = new MySqlDatabase();
+        $host = App::getConfig()->get(['mysql', 'host']);
+        $db = App::getConfig()->get(['mysql', 'db']);
+        $user = App::getConfig()->get(['mysql', 'user']);
+        $pass = App::getConfig()->get(['mysql', 'password']);
+        $charset = App::getConfig()->get(['mysql', 'charset']);
+        $this->db = new MySqlDatabase($host, $db, $user, $pass, $charset);
     }
 
     public function getPatterns()
     {
         $query = $this->builder->select()->columns(['pattern_id', 'pattern'])->from('patterns')->build();
         $patterns = $this->db->executeAndFetch($query);
-        $this->patterns = $patterns;
         $patterns = array_map(function($value){
             return $value['pattern'];
         }, $patterns);
@@ -85,11 +90,4 @@ class HyphenationDatabase
             $this->db->execute($querry);
         }
     }
-
-    private function getPatternId(string $pattern): int
-    {
-        $row = array_search($pattern, array_column($this->patterns, 'pattern'));
-        return (int) $this->patterns[$row]['pattern_id'];
-    }
-
 }

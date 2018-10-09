@@ -10,6 +10,9 @@ namespace Edvardas\Hyphenation\Hyphenator\Providers;
 
 
 use Edvardas\Hyphenation\App\App;
+use Edvardas\Hyphenation\Hyphenator\Algorithm\FullTreeHyphenationAlgorithm;
+use Edvardas\Hyphenation\Hyphenator\Algorithm\HyphenationAlgorithmInterface;
+use Edvardas\Hyphenation\Hyphenator\Algorithm\ShortTreeHyphenationAlgorithm;
 use Edvardas\Hyphenation\Hyphenator\Database\HyphenationDatabase;
 use Edvardas\Hyphenation\UtilityComponents\Input\ConsoleInput;
 use Edvardas\Hyphenation\UtilityComponents\Output\ConsoleOutput;
@@ -18,10 +21,13 @@ class HyphenationDataProvider
 {
     private $input;
     private $output;
+    public const HYPHENATE_ACTION = 1;
+    public const PUT_PATTERNS_IN_DB_ACTION = 2;
+    public const FILE_SRC = 1;
+    public const DB_SRC = 2;
 
-    public function __construct($config)
+    public function __construct()
     {
-        $this->config = $config;
         $this->input = new ConsoleInput();
         $this->output = new ConsoleOutput();
     }
@@ -44,29 +50,40 @@ class HyphenationDataProvider
         return (int)$this->input->getInput();
     }
 
-    public function getWordsInput(): string
+    public function getWords(): array
     {
-        $this->output->printLn("Write words separated by spaces or leave empty to hyphenate words in file.");
-        return (string)$this->input->getInput();
+        $wordsInput = $this->getWordsInput();
+        if ($wordsInput === '') {
+            $words = $this->loadWords();
+        } else {
+            $words = explode(' ', $wordsInput);
+        }
+        return $words;
     }
 
-    public function getAlgorithmInput(): int
+    public function getAlgorithm($patterns): HyphenationAlgorithmInterface
     {
-        $this->output->printLn("Choose algorithm:");
-        $this->output->printLn("(1) Full tree");
-        $this->output->printLn("(2) Short tree");
-        return (int)$this->input->getInput();
+        $algorithmChoice = $this->getAlgorithmInput();
+        switch ($algorithmChoice) {
+            case 1:
+                return new FullTreeHyphenationAlgorithm($patterns);
+                break;
+            case 2:
+                return new ShortTreeHyphenationAlgorithm($patterns);
+                break;
+            default:
+                return new FullTreeHyphenationAlgorithm($patterns);
+        }
     }
 
-    public function loadPatterns(): array
+    public function loadPatterns(bool $isFromDb): array
     {
-        $sourceInput = 2;
-        if ($sourceInput === 2) {
+        if ($isFromDb) {
             $db = new HyphenationDatabase();
             $patterns = $db->getPatterns();
         } else {
             $this->output->printLn("Loading patterns");
-            $patternsFileName = $this->config->get('patternsFileName', 'patterns');
+            $patternsFileName = App::getConfig()->get(['patternsFileName'], 'patterns');
             $patterns = file($patternsFileName, FILE_IGNORE_NEW_LINES);
             if ($patterns === false) {
                 App::$logger->error("Could not read patterns file.");
@@ -76,9 +93,23 @@ class HyphenationDataProvider
         return $patterns;
     }
 
-    public function loadWords(): array
+    private function getWordsInput(): string
     {
-        $wordsFileName = $this->config->get('wordsFileName', 'words.txt');
+        $this->output->printLn("Write words separated by spaces or leave empty to hyphenate words in file.");
+        return (string)$this->input->getInput();
+    }
+
+    private function getAlgorithmInput(): int
+    {
+        $this->output->printLn("Choose algorithm:");
+        $this->output->printLn("(1) Full tree");
+        $this->output->printLn("(2) Short tree");
+        return (int)$this->input->getInput();
+    }
+
+    private function loadWords(): array
+    {
+        $wordsFileName = App::getConfig()->get(['wordsFileName'], 'words.txt');
         App::$logger->info("Reading words from $wordsFileName file.");
         $words = file($wordsFileName, FILE_IGNORE_NEW_LINES);
         if ($words === false) {

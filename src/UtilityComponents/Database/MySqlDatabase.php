@@ -12,13 +12,13 @@ use Edvardas\Hyphenation\App\App;
 
 class MySqlDatabase
 {
-    public function __construct()
+    public function __construct(string $host, string $db, string $user, string $pass, string $charset)
     {
-        $host = '127.0.0.1';
+        /*$host = '127.0.0.1';
         $db   = 'hyph';
         $user = 'root';
         $pass = 'password';
-        $charset = 'utf8mb4';
+        $charset = 'utf8mb4';*/
 
         $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
         $options = [

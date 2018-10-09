@@ -17,22 +17,20 @@ use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
 class HyphenationActionProvider
 {
     private $dataProvider;
-    private $config;
 
-    public function __construct($config)
+    public function __construct()
     {
-        $this->config = $config;
-        $this->dataProvider = new HyphenationDataProvider($config);
+        $this->dataProvider = new HyphenationDataProvider();
     }
 
     public function getAction(): Action
     {
         $choice = $this->dataProvider->getActionInput();
         switch ($choice) {
-            case 1:
+            case HyphenationDataProvider::HYPHENATE_ACTION:
                 return $this->getHyphenationAction();
                 break;
-            case 2:
+            case HyphenationDataProvider::PUT_PATTERNS_IN_DB_ACTION:
                 return new PutPatternsInDbAction($this->dataProvider);
                 break;
         }
@@ -42,10 +40,10 @@ class HyphenationActionProvider
     {
         $source = $this->dataProvider->getSourceInput();
         switch ($source) {
-            case 1:
+            case HyphenationDataProvider::FILE_SRC:
                 return new HyphenateWordsActionFile($this->dataProvider);
                 break;
-            case 2:
+            case HyphenationDataProvider::DB_SRC:
                 return new HyphenateWordsActionDB($this->dataProvider);
                 break;
         }

@@ -9,12 +9,8 @@
 namespace Edvardas\Hyphenation\Hyphenator\Action;
 
 use Edvardas\Hyphenation\App\App;
-use Edvardas\Hyphenation\Hyphenator\Algorithm\FullTreeHyphenationAlgorithm;
-use Edvardas\Hyphenation\Hyphenator\Algorithm\HyphenationAlgorithmInterface;
-use Edvardas\Hyphenation\Hyphenator\Algorithm\ShortTreeHyphenationAlgorithm;
 use Edvardas\Hyphenation\Hyphenator\Database\HyphenationDatabase;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
-use Edvardas\Hyphenation\UtilityComponents\Input\ConsoleInput;
 use Edvardas\Hyphenation\UtilityComponents\Logger\NullLogger;
 use Edvardas\Hyphenation\UtilityComponents\Output\ConsoleOutput;
 
@@ -33,14 +29,11 @@ class HyphenateWordsActionDB implements Action
     {
         $db = new HyphenationDatabase();
 
-        $wordsInput = $this->dataProvider->getWordsInput();
-        $inputWords = $this->getWordsFromInput($wordsInput);
+        $inputWords = $this->dataProvider->getWords();
+        $patterns = $this->dataProvider->loadPatterns(true);
+        $algorithm = $this->dataProvider->getAlgorithm($patterns);
+
         $this->turnOffLoggerIfMoreWordsThanThreshold($inputWords);
-
-        $patterns = $this->dataProvider->loadPatterns();
-
-        $algorithmInput = $this->dataProvider->getAlgorithmInput();
-        $algorithm = $this->getAlgorithmFromInput($patterns, $algorithmInput);
 
         $hyphenatedWords = $db->getKnownHyphenatedWords($inputWords);
         $returnedWords = array_column($hyphenatedWords, 'word');
@@ -67,30 +60,6 @@ class HyphenateWordsActionDB implements Action
         if (count($inputWords) > App::WORDS_THRESHOLD) {
             App::$logger->notice('Too many words, disabling logger.');
             App::$logger = new NullLogger();
-        }
-    }
-
-    private function getWordsFromInput(string $wordsInput): array
-    {
-        if ($wordsInput === '') {
-            $words = $this->dataProvider->loadWords();
-        } else {
-            $words = explode(' ', $wordsInput);
-        }
-        return $words;
-    }
-
-    private function getAlgorithmFromInput(array $patterns, int $algorithmChoice): HyphenationAlgorithmInterface
-    {
-        switch ($algorithmChoice) {
-            case 1:
-                return new FullTreeHyphenationAlgorithm($patterns);
-                break;
-            case 2:
-                return new ShortTreeHyphenationAlgorithm($patterns);
-                break;
-            default:
-                return new FullTreeHyphenationAlgorithm($patterns);
         }
     }
 }

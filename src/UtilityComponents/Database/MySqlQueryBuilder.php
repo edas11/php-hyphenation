@@ -58,6 +58,21 @@ class MySqlQueryBuilder
         return $this;
     }
 
+    public function equals(string $column, string $value)
+    {
+        $paramName = ":value$this->counter";
+        $this->counter++;
+        $this->queryString = $this->queryString . "$column=$paramName ";
+        $this->bindParams[$paramName] = $value;
+        return $this;
+    }
+
+    public function and()
+    {
+        $this->queryString = $this->queryString . 'AND ';
+        return $this;
+    }
+
     public function in(string $column, array $values)
     {
         $namedParams = [];
@@ -93,6 +108,12 @@ class MySqlQueryBuilder
         }, $namesMatrix);
         $insertNamesString = implode(',', $insertRowsArray);
         $this->queryString = $this->queryString . "VALUES $insertNamesString ";
+        return $this;
+    }
+
+    public function delete()
+    {
+        $this->queryString = $this->queryString . 'DELETE ';
         return $this;
     }
 

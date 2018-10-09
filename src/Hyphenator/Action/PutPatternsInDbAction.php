@@ -24,7 +24,7 @@ class PutPatternsInDbAction implements Action
     public function execute()
     {
         $db = new HyphenationDatabase();
-        $db->putPatternsInDB($this->dataProvider->loadPatterns());
+        $db->putPatterns($this->dataProvider->loadPatterns());
     }
 
 }

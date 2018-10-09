@@ -18,7 +18,7 @@ use Edvardas\Hyphenation\UtilityComponents\Input\ConsoleInput;
 use Edvardas\Hyphenation\UtilityComponents\Logger\NullLogger;
 use Edvardas\Hyphenation\UtilityComponents\Output\ConsoleOutput;
 
-class HyphenateWordsAction implements Action
+class HyphenateWordsActionDB implements Action
 {
     private $output;
     private $dataProvider;
@@ -42,7 +42,7 @@ class HyphenateWordsAction implements Action
         $algorithmInput = $this->dataProvider->getAlgorithmInput();
         $algorithm = $this->getAlgorithmFromInput($patterns, $algorithmInput);
 
-        $hyphenatedWords = $db->getKnownHyphenatedWordsFromDB($inputWords);
+        $hyphenatedWords = $db->getKnownHyphenatedWords($inputWords);
         $returnedWords = array_column($hyphenatedWords, 'word');
         $wordsNotInDb = array_diff($inputWords, $returnedWords);
 
@@ -54,10 +54,10 @@ class HyphenateWordsAction implements Action
             array_push($resultWords, $word);
         }
 
-        $db->putWordsAndMatchedPatternsInDB($wordsNotInDb, $resultWords, $matchedPatternsAll);
+        $db->putWordsAndMatchedPatterns($wordsNotInDb, $resultWords, $matchedPatternsAll);
 
-        //$wordsInDb = array_column($hyphenatedWords, 'word');
-        //$matchedPatterns = $db->getWordMatchedPatterns($wordsInDb);
+        $matchedPatterns = $db->getWordMatchedPatterns($inputWords);
+        $this->output->printResult($matchedPatterns);
         $this->output->printResult(array_column($hyphenatedWords, 'word_h'));
         $this->output->printResult($resultWords);
     }

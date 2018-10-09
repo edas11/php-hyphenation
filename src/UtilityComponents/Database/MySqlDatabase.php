@@ -33,6 +33,27 @@ class MySqlDatabase
         }
     }
 
+    /*
+    public function beginTransaction()
+    {
+        try {
+            $this->pdo->beginTransaction();
+        } catch (Exception $e) {
+            $this->pdo->rollback();
+            throw $e;
+        }
+    }
+
+    public function commit()
+    {
+        try {
+            $this->pdo->commit();
+        } catch (Exception $e) {
+            $this->pdo->rollback();
+            throw $e;
+        }
+    }
+*/
     public function executeAndFetch(MySqlQuery $query): array
     {
         $statement = $this->pdo->prepare($query->getQueryString());
@@ -48,12 +69,12 @@ class MySqlDatabase
         return $fetchedData;
     }
 
-    public function execute(MySqlQuery $query)
+    public function execute(MySqlQuery $query): void
     {
+        $ids = [];
         $statement = $this->pdo->prepare($query->getQueryString());
         try {
             $this->pdo->beginTransaction();
-            //$this->pdo->query('DELETE FROM patterns');
             $statement->execute($query->getBindParams());
             $this->pdo->commit();
         }catch (Exception $e){

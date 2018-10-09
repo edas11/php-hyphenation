@@ -36,6 +36,14 @@ class HyphenationDataProvider
         return $choice;
     }
 
+    public function getSourceInput(): int
+    {
+        $this->output->printLn("Choose hyphenation source:");
+        $this->output->printLn("(1) File");
+        $this->output->printLn("(2) Database");
+        return (int)$this->input->getInput();
+    }
+
     public function getWordsInput(): string
     {
         $this->output->printLn("Write words separated by spaces or leave empty to hyphenate words in file.");
@@ -52,13 +60,10 @@ class HyphenationDataProvider
 
     public function loadPatterns(): array
     {
-        $this->output->printLn("Choose patterns source:");
-        $this->output->printLn("(1) File");
-        $this->output->printLn("(2) Database");
-        $sourceInput = (int)$this->input->getInput();
+        $sourceInput = 2;
         if ($sourceInput === 2) {
             $db = new HyphenationDatabase();
-            $patterns = $db->getPatternsFromDB();
+            $patterns = $db->getPatterns();
         } else {
             $this->output->printLn("Loading patterns");
             $patternsFileName = $this->config->get('patternsFileName', 'patterns');

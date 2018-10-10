@@ -14,6 +14,8 @@ use Edvardas\Hyphenation\Hyphenator\Hyphenator;
 use Edvardas\Hyphenation\UtilityComponents\Config\Config;
 use Edvardas\Hyphenation\UtilityComponents\Database\MySqlDatabase;
 use Edvardas\Hyphenation\UtilityComponents\Input\ConsoleInput;
+use Edvardas\Hyphenation\UtilityComponents\Output\JsonOuput;
+use Edvardas\Hyphenation\UtilityComponents\Output\Ouput;
 use Edvardas\Hyphenation\UtilityComponents\Timer\Timer;
 use Edvardas\Hyphenation\UtilityComponents\Output\ConsoleOutput;
 use Edvardas\Hyphenation\UtilityComponents\Logger\NullLogger;
@@ -26,8 +28,7 @@ class App
     public const WORDS_THRESHOLD = 100000;
     public static $logger;
     public static $cache;
-    private $output;
-    private $input;
+    private static $output;
     private static $config;
     private static $db;
 
@@ -35,15 +36,11 @@ class App
     {
         self::$logger = new FileLogger();
         self::$cache = new MemoryCache();
-
-        $this->output = new ConsoleOutput();
-        $this->input = new ConsoleInput();
     }
 
     public function executeCommand()
     {
         self::$logger->info("Started hyphenation algorithm at " . date('Y-m-d H:i:s'));
-
         $this->hyphenator = new Hyphenator();
         $this->hyphenator->execute();
 
@@ -74,5 +71,17 @@ class App
             self::$db = new MySqlDatabase($host, $db, $user, $pass, $charset);
         }
         return self::$db;
+    }
+
+    public static function getOutput(): Ouput
+    {
+        if (!isset(self::$output)) {
+            if (php_sapi_name() === 'cli') {
+                self::$output = new ConsoleOutput();
+            } else {
+                self::$output = new JsonOuput();
+            }
+        }
+        return self::$output;
     }
 }

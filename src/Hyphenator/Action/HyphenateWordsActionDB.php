@@ -26,7 +26,7 @@ class HyphenateWordsActionDB implements Action
     public function __construct(HyphenationDataProvider $dataProvider)
     {
         $this->timer = new Timer();
-        $this->output = new ConsoleOutput();
+        $this->output = App::getOutput();
         $this->dataProvider = $dataProvider;
     }
 
@@ -42,8 +42,8 @@ class HyphenateWordsActionDB implements Action
         $wordsInDb = $dbWords->getOriginalWords();
         $wordsNotInDb = array_diff($inputWords, $wordsInDb);
 
+        $resultWords = [];
         if (count($wordsNotInDb) > 0) {
-            $resultWords = [];
             $matchedPatternsAll = [];
             foreach ($wordsNotInDb as $inputWord) {
                 $word = $algorithm->execute($inputWord);

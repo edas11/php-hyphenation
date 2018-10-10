@@ -8,7 +8,8 @@
 
 namespace Edvardas\Hyphenation\Hyphenator;
 
-use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationActionProvider;
+use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationConsoleDataProvider;
+use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationWebApiDataProvider;
 
 class Hyphenator
 {
@@ -16,7 +17,15 @@ class Hyphenator
 
     public function __construct()
     {
-        $this->provider = new HyphenationActionProvider;
+        if (php_sapi_name() === 'cli') {
+            $this->provider = new HyphenationConsoleDataProvider();
+        } else {
+            header('content-type: application/json');
+            $this->provider = new HyphenationWebApiDataProvider();
+            /*echo json_encode('string');
+            flush();
+            exit();*/
+        }
     }
 
     public function execute(): void {

@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Edvardas\Hyphenation\UtilityComponents\Output;
 
-class ConsoleOutput
+class ConsoleOutput implements Ouput
 {
     public function printResult(array $result)
     {

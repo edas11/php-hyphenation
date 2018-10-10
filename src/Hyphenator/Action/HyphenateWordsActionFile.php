@@ -22,7 +22,7 @@ class HyphenateWordsActionFile implements Action
     public function __construct(HyphenationDataProvider $dataProvider)
     {
         $this->timer = new Timer();
-        $this->output = new ConsoleOutput();
+        $this->output = App::getOutput();
         $this->dataProvider = $dataProvider;
     }
 

@@ -64,7 +64,7 @@ abstract class AbstractHyphenationAlgorithm implements HyphenationAlgorithmInter
             return new WordHyphenationNumbers(strlen($inputWord) - 1);
         }
         App::$logger->info("Matched pattern $pattern");
-        array_push($this->macthedPatterns, $pattern);
+        array_push($this->macthedPatterns, ['word' => $inputWord, 'pattern' => $pattern]);
         $numberPositionsInPattern = new PatternHyphenationNumbers($pattern);
         $matchedNumbers = WordHyphenationNumbers::createFromPatternNumbers(
             $wordIndex,

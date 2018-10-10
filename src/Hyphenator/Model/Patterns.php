@@ -10,7 +10,7 @@ namespace Edvardas\Hyphenation\Hyphenator\Model;
 
 use Edvardas\Hyphenation\App\App;
 
-class Patterns
+class Patterns implements PersistentModel
 {
     private $patterns = [];
 
@@ -33,11 +33,21 @@ class Patterns
             ->columns(['pattern'])
             ->from('patterns')
             ->build();
+        $db->beginTransaction();
         $patterns = $db->executeAndFetch($query);
+        $db->commit();
         return new Patterns($patterns);
     }
 
     public function persist(): void
+    {
+        $db = App::getDb();
+        $db->beginTransaction();
+        $this->persistNoTransaction();
+        $db->commit();
+    }
+
+    public function persistNoTransaction(): void
     {
         $db = App::getDb();
         $builder = $db->builder();

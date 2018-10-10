@@ -10,6 +10,7 @@ namespace Edvardas\Hyphenation\Hyphenator\Action;
 
 use Edvardas\Hyphenation\App\App;
 use Edvardas\Hyphenation\Hyphenator\Database\HyphenationDatabase;
+use Edvardas\Hyphenation\Hyphenator\Model\CompositeModel;
 use Edvardas\Hyphenation\Hyphenator\Model\WordPatterns;
 use Edvardas\Hyphenation\Hyphenator\Model\Words;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
@@ -31,7 +32,6 @@ class HyphenateWordsActionDB implements Action
 
     public function execute()
     {
-
         $inputWords = $this->dataProvider->getWords();
         $patterns = $this->dataProvider->loadPatterns(true)->getPatterns();
         $algorithm = $this->dataProvider->getAlgorithm($patterns);
@@ -42,15 +42,25 @@ class HyphenateWordsActionDB implements Action
         $wordsInDb = $dbWords->getOriginalWords();
         $wordsNotInDb = array_diff($inputWords, $wordsInDb);
 
-        $resultWords = [];
-        $matchedPatternsAll = [];
-        foreach ($wordsNotInDb as $inputWord) {
-            $word = $algorithm->execute($inputWord);
-            array_push($matchedPatternsAll, $algorithm->getMatchedPatterns());
-            array_push($resultWords, $word);
+        if (count($wordsNotInDb) > 0) {
+            $resultWords = [];
+            $matchedPatternsAll = [];
+            foreach ($wordsNotInDb as $inputWord) {
+                $word = $algorithm->execute($inputWord);
+                $matchedPatternsAll = array_merge($matchedPatternsAll, $algorithm->getMatchedPatterns());
+                array_push($resultWords, $word);
+            }
+
+            $wordsNotInDb = array_values($wordsNotInDb);
+            $wordsMatrix = [];
+            foreach ($wordsNotInDb as $index => $word) {
+                array_push($wordsMatrix, ['word' => $word, 'word_h' => $resultWords[$index]]);
+            }
+            $hyphnatedWords = new Words($wordsMatrix);
+            $wordPatterns = new WordPatterns($matchedPatternsAll);
+            (new CompositeModel([$hyphnatedWords, $wordPatterns]))->persist();
         }
 
-        WordPatterns::putWordsAndMatchedPatterns($wordsNotInDb, $resultWords, $matchedPatternsAll);
         $matchedPatternsResult = WordPatterns::getKnown($inputWords)->getMatchedPatterns();
         $this->output->printResult($matchedPatternsResult);
         $this->output->printResult($dbWords->getHyphenatedWords());

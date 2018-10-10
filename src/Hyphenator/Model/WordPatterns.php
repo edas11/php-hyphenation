@@ -11,7 +11,7 @@ namespace Edvardas\Hyphenation\Hyphenator\Model;
 
 use Edvardas\Hyphenation\App\App;
 
-class WordPatterns
+class WordPatterns implements PersistentModel
 {
     private $wordPatterns;
 
@@ -37,6 +37,7 @@ class WordPatterns
     {
         $db = App::getDb();
         $builder = $db->builder();
+        $db->beginTransaction();
         $query = $builder
             ->select()
             ->columns(['word', 'pattern'])
@@ -47,43 +48,35 @@ class WordPatterns
             ->in('words.word', $words)
             ->build();
         $wordMatchedPatterns = $db->executeAndFetch($query);
+        $db->commit();
         return new WordPatterns($wordMatchedPatterns);
     }
 
-    public static function putWordsAndMatchedPatterns(array $words, array $hyphWords, array $matchedPatternsAll)
+    public function persist(): void
     {
-        if (count($words) !== count($hyphWords) || count($hyphWords) !== count($matchedPatternsAll)) {
-            throw new \Exception('All 3 array must have the same length.');
-        }
-        if (count($words) === 0) {
-            return;
-        }
+        $db = App::getDb();
+        $db->beginTransaction();
+        $this->persistNoTransaction();
+        $db->commit();
+    }
+
+    public function persistNoTransaction(): void
+    {
         $db = App::getDb();
         $builder = $db->builder();
-        $words = array_values($words);
-        $wordsMatrix = [];
-        foreach ($words as $index => $word) {
-            array_push($wordsMatrix, [$word, $hyphWords[$index]]);
-        }
-        $querry = $builder
-            ->insert()
-            ->into('words', ['word, word_h'])
-            ->values($wordsMatrix)
-            ->build();
-        $db->execute($querry);
-
-        foreach ($words as $index => $word) {
+        foreach ($this->wordPatterns as $matchedPatternsRow) {
             $querry = $builder
                 ->insert()
                 ->into('word_patterns', ['word_id', 'pattern_id'])
                 ->select()
                 ->columns(['word_id', 'pattern_id'])
                 ->from('words, patterns')->where()
-                ->equals('word', $word)
+                ->equals('word', $matchedPatternsRow['word'])
                 ->and()
-                ->in('pattern', $matchedPatternsAll[$index])
+                ->equals('pattern', $matchedPatternsRow['pattern'])
                 ->build();
             $db->execute($querry);
         }
     }
+
 }

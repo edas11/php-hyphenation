@@ -31,7 +31,6 @@ class MySqlDatabase
         }
     }
 
-    /*
     public function beginTransaction()
     {
         try {
@@ -51,15 +50,15 @@ class MySqlDatabase
             throw $e;
         }
     }
-*/
+
     public function executeAndFetch(MySqlQuery $query): array
     {
         $statement = $this->pdo->prepare($query->getQueryString());
         try {
-            $this->pdo->beginTransaction();
+            //$this->pdo->beginTransaction();
             $statement->execute($query->getBindParams());
             $fetchedData = $statement->fetchAll();
-            $this->pdo->commit();
+            //$this->pdo->commit();
         } catch (Exception $e) {
             $this->pdo->rollback();
             throw $e;
@@ -71,9 +70,11 @@ class MySqlDatabase
     {
         $statement = $this->pdo->prepare($query->getQueryString());
         try {
-            $this->pdo->beginTransaction();
-            $statement->execute($query->getBindParams());
-            $this->pdo->commit();
+            //$this->pdo->beginTransaction();
+            $statement->execute(
+                $query->getBindParams()
+            );
+            //$this->pdo->commit();
         }catch (Exception $e){
             $this->pdo->rollback();
             throw $e;

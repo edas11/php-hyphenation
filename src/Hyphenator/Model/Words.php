@@ -10,7 +10,7 @@ namespace Edvardas\Hyphenation\Hyphenator\Model;
 
 use Edvardas\Hyphenation\App\App;
 
-class Words
+class Words implements PersistentModel
 {
     private $words = [];
 
@@ -43,7 +43,29 @@ class Words
             ->where()
             ->in('word', $words)
             ->build();
+        $db->beginTransaction();
         $hyphenatedWords = $db->executeAndFetch($query);
+        $db->commit();
         return new Words($hyphenatedWords);
+    }
+
+    public function persist(): void
+    {
+        $db = App::getDb();
+        $db->beginTransaction();
+        $this->persistNoTransaction();
+        $db->commit();
+    }
+
+    public function persistNoTransaction(): void
+    {
+        $db = App::getDb();
+        $builder = $db->builder();
+        $querry = $builder
+            ->insert()
+            ->into('words', ['word, word_h'])
+            ->values($this->words)
+            ->build();
+        $db->execute($querry);
     }
 }

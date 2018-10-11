@@ -15,15 +15,18 @@ use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
 class WebHyphenator
 {
     private $provider;
+    private $output;
 
     public function __construct()
     {
         header('content-type: application/json');
-        $this->provider = new HyphenationDataProvider(new HttpInput(), new JsonHyphenationOutput());
+        $this->output = new JsonHyphenationOutput();
+        $this->provider = new HyphenationDataProvider(new HttpInput(), $this->output);
     }
 
     public function execute(): void {
         $action = $this->provider->getAction();
         $action->execute();
+        $this->output->flush();
     }
 }

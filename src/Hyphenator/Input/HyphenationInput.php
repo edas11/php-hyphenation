@@ -16,5 +16,7 @@ interface HyphenationInput
 
     public function getWordsInput(): string;
 
+    public function getHyphenatedWordsInput(): string;
+
     public function getAlgorithmInput(): int;
 }

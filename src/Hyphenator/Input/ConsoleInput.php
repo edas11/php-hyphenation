@@ -50,6 +50,11 @@ class ConsoleInput implements HyphenationInput
         return $this->sourceInput;
     }
 
+    public function getHyphenatedWordsInput(): string
+    {
+        return '';
+    }
+
     public function getWordsInput(): string
     {
         if (is_null($this->wordsInput)) {

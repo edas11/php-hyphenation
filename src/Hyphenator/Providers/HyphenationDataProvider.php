@@ -11,9 +11,14 @@ namespace Edvardas\Hyphenation\Hyphenator\Providers;
 
 use Edvardas\Hyphenation\App\App;
 use Edvardas\Hyphenation\Hyphenator\Action\Action;
+use Edvardas\Hyphenation\Hyphenator\Action\BadRequestAction;
+use Edvardas\Hyphenation\Hyphenator\Action\DeleteWordAction;
+use Edvardas\Hyphenation\Hyphenator\Action\GetKnownWordsAction;
+use Edvardas\Hyphenation\Hyphenator\Action\HyphenateAndAddToDbAction;
 use Edvardas\Hyphenation\Hyphenator\Action\HyphenateWordsActionDB;
 use Edvardas\Hyphenation\Hyphenator\Action\HyphenateWordsActionFile;
 use Edvardas\Hyphenation\Hyphenator\Action\PutPatternsInDbAction;
+use Edvardas\Hyphenation\Hyphenator\Action\PutWordAction;
 use Edvardas\Hyphenation\Hyphenator\Algorithm\FullTreeHyphenationAlgorithm;
 use Edvardas\Hyphenation\Hyphenator\Algorithm\HyphenationAlgorithmInterface;
 use Edvardas\Hyphenation\Hyphenator\Algorithm\ShortTreeHyphenationAlgorithm;
@@ -55,6 +60,17 @@ class HyphenationDataProvider
             case InputCodes::PUT_PATTERNS_IN_DB_ACTION:
                 return new PutPatternsInDbAction($this);
                 break;
+            case InputCodes::BAD_REQUEST_ACTION:
+                return new BadRequestAction($this);
+                break;
+            case InputCodes::GET_KNOWN_WORDS_ACTION:
+                return new GetKnownWordsAction($this);
+                break;
+            case InputCodes::PUT_WORD_ACTION:
+                return new PutWordAction($this);
+                break;
+            case InputCodes::DELETE_WORD_ACTION:
+                return new DeleteWordAction($this);
         }
     }
 
@@ -82,6 +98,12 @@ class HyphenationDataProvider
         }
         $this->turnOffLoggerIfMoreWordsThanThreshold($words);
         return $words;
+    }
+
+    public function getHyphenatedWords(): array
+    {
+        $hyphenatedWordsInput = $this->input->getHyphenatedWordsInput();
+        return explode(' ', $hyphenatedWordsInput);
     }
 
     private function turnOffLoggerIfMoreWordsThanThreshold(array $inputWords): void

@@ -32,7 +32,7 @@ class Words implements PersistentModel
     /**
      * @param string[] $words
      */
-    public static function getKnown(array $words): Words
+    public static function getKnownIn(array $words): Words
     {
         $db = App::getDb();
         $builder = $db->builder();
@@ -49,6 +49,21 @@ class Words implements PersistentModel
         return new Words($hyphenatedWords);
     }
 
+    public static function getKnown(): Words
+    {
+        $db = App::getDb();
+        $builder = $db->builder();
+        $query = $builder
+            ->select()
+            ->columns(['word', 'word_h'])
+            ->from('words')
+            ->build();
+        $db->beginTransaction();
+        $hyphenatedWords = $db->executeAndFetch($query);
+        $db->commit();
+        return new Words($hyphenatedWords);
+    }
+
     public static function newFromColumnArrays(array $originalWords, array $hyphenatedWords)
     {
         $wordsTable = [];
@@ -56,6 +71,40 @@ class Words implements PersistentModel
             array_push($wordsTable, ['word' => $word, 'word_h' => $hyphenatedWords[$index]]);
         }
         return new Words($wordsTable);
+    }
+
+    public function update(): void
+    {
+        $db = App::getDb();
+        $builder = $db->builder();
+        $db->beginTransaction();
+        foreach ($this->words as $wordRow) {
+            $querry = $builder
+                ->update('words')
+                ->set(['word_h' => $wordRow['word_h']])
+                ->where()
+                ->equals('word', $wordRow['word'])
+                ->build();
+            $db->execute($querry);
+        }
+        $db->commit();
+    }
+
+    public function delete(): void
+    {
+        $db = App::getDb();
+        $builder = $db->builder();
+        $db->beginTransaction();
+        foreach ($this->words as $wordRow) {
+            $querry = $builder
+                ->delete()
+                ->from('words')
+                ->where()
+                ->equals('word', $wordRow['word'])
+                ->build();
+            $db->execute($querry);
+        }
+        $db->commit();
     }
 
     public function persist(): void

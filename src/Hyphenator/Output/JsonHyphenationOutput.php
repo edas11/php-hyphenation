@@ -11,13 +11,29 @@ namespace Edvardas\Hyphenation\Hyphenator\Output;
 
 class JsonHyphenationOutput implements HyphenationOutput
 {
+    private $outputData = [];
+
     public function printResult(array $result)
     {
-        echo json_encode(['hyphenatedWords' => $result]);
+        if (array_key_exists('hyphenatedWords', $this->outputData)) {
+            array_push($this->outputData['hyphenatedWords'], $result);
+        } else {
+            $this->outputData['hyphenatedWords'] = $result;
+        }
     }
 
     public function printTime(float $executionTime)
     {
-        //echo json_encode(['executionTimeInSeconds' => $executionTime]);
+        $this->outputData['executionTimeInSeconds'] = $executionTime;
+    }
+
+    public function printError(string $msg)
+    {
+        $this->outputData['error'] = $msg;
+    }
+
+    public function flush()
+    {
+        echo json_encode($this->outputData);
     }
 }

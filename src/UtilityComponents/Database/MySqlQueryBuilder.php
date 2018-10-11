@@ -117,6 +117,28 @@ class MySqlQueryBuilder
         return $this;
     }
 
+    public function update(string $table)
+    {
+        $this->queryString = $this->queryString . "UPDATE $table ";
+        return $this;
+    }
+
+    /**
+     * @param string[] $newValues indexes are column names
+     */
+    public function set(array $newValues)
+    {
+        $this->queryString = $this->queryString . 'SET ';
+        $setClauses = [];
+        foreach ($newValues as $column => $value) {
+            $paramName = ":value" . $this->nextCounter();
+            $this->bindParams[$paramName] = $value;
+            array_push($setClauses, "$column=$paramName");
+        }
+        $this->queryString = $this->queryString . implode(',', $setClauses) . " ";
+        return $this;
+    }
+
     private function nextCounter()
     {
         $this->counter++;

@@ -13,4 +13,6 @@ interface HyphenationOutput
     public function printResult(array $result);
 
     public function printTime(float $executionTime);
+
+    public function printError(string $msg);
 }

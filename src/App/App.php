@@ -21,7 +21,6 @@ class App
     public const WORDS_THRESHOLD = 100000;
     public static $logger;
     public static $cache;
-    private static $output;
     private static $config;
     private static $db;
 

@@ -39,7 +39,7 @@ class HyphenateWordsActionDB implements Action
 
         $this->timer->start();
 
-        $dbWords = Words::getKnown($inputWords);
+        $dbWords = Words::getKnownIn($inputWords);
         $wordsInDb = $dbWords->getOriginalWords();
         $wordsNotInDb = array_values(array_diff($inputWords, $wordsInDb));
 

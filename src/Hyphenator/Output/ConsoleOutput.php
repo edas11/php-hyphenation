@@ -33,4 +33,9 @@ class ConsoleOutput implements HyphenationOutput
     {
         echo "Finished in $executionTime seconds.\n";
     }
+
+    public function printError(string $msg)
+    {
+        echo "Error: $msg";
+    }
 }

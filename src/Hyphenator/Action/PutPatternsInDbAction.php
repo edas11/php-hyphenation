@@ -24,7 +24,7 @@ class PutPatternsInDbAction implements Action
 
     public function execute()
     {
-        $patterns = $this->dataProvider->loadPatterns(false)->persist();
+        $patterns = $this->dataProvider->loadPatterns()->persist();
     }
 
 }

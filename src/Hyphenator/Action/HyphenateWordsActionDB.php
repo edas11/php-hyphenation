@@ -9,12 +9,12 @@
 namespace Edvardas\Hyphenation\Hyphenator\Action;
 
 use Edvardas\Hyphenation\App\App;
+use Edvardas\Hyphenation\Hyphenator\Algorithm\AlgorithmRunner;
 use Edvardas\Hyphenation\Hyphenator\Database\HyphenationDatabase;
 use Edvardas\Hyphenation\Hyphenator\Model\CompositeModel;
 use Edvardas\Hyphenation\Hyphenator\Model\WordPatterns;
 use Edvardas\Hyphenation\Hyphenator\Model\Words;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
-use Edvardas\Hyphenation\UtilityComponents\Output\ConsoleOutput;
 use Edvardas\Hyphenation\UtilityComponents\Timer\Timer;
 
 class HyphenateWordsActionDB implements Action
@@ -26,38 +26,29 @@ class HyphenateWordsActionDB implements Action
     public function __construct(HyphenationDataProvider $dataProvider)
     {
         $this->timer = new Timer();
-        $this->output = App::getOutput();
+        $this->output = $dataProvider->getOutput();
         $this->dataProvider = $dataProvider;
     }
 
     public function execute()
     {
         $inputWords = $this->dataProvider->getWords();
-        $patterns = $this->dataProvider->loadPatterns(true)->getPatterns();
+        $patterns = $this->dataProvider->loadPatterns()->getPatterns();
         $algorithm = $this->dataProvider->getAlgorithm($patterns);
+        $runner = new AlgorithmRunner($algorithm);
 
         $this->timer->start();
 
         $dbWords = Words::getKnown($inputWords);
         $wordsInDb = $dbWords->getOriginalWords();
-        $wordsNotInDb = array_diff($inputWords, $wordsInDb);
+        $wordsNotInDb = array_values(array_diff($inputWords, $wordsInDb));
 
         $resultWords = [];
         if (count($wordsNotInDb) > 0) {
-            $matchedPatternsAll = [];
-            foreach ($wordsNotInDb as $inputWord) {
-                $word = $algorithm->execute($inputWord);
-                $matchedPatternsAll = array_merge($matchedPatternsAll, $algorithm->getMatchedPatterns());
-                array_push($resultWords, $word);
-            }
-
-            $wordsNotInDb = array_values($wordsNotInDb);
-            $wordsMatrix = [];
-            foreach ($wordsNotInDb as $index => $word) {
-                array_push($wordsMatrix, ['word' => $word, 'word_h' => $resultWords[$index]]);
-            }
-            $hyphnatedWords = new Words($wordsMatrix);
-            $wordPatterns = new WordPatterns($matchedPatternsAll);
+            $runner->run($wordsNotInDb);
+            $resultWords = $runner->getHyphenatedWords();
+            $hyphnatedWords = Words::newFromColumnArrays($wordsNotInDb, $resultWords);
+            $wordPatterns = new WordPatterns($runner->getMatchedPatterns());
             (new CompositeModel([$hyphnatedWords, $wordPatterns]))->persist();
         }
 

@@ -6,10 +6,10 @@
  * Time: 16.20
  */
 
-namespace Edvardas\Hyphenation\UtilityComponents\Output;
+namespace Edvardas\Hyphenation\Hyphenator\Output;
 
 
-class JsonOuput implements Ouput
+class JsonHyphenationOutput implements HyphenationOutput
 {
     public function printResult(array $result)
     {

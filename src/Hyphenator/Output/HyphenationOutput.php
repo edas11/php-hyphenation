@@ -6,9 +6,9 @@
  * Time: 16.23
  */
 
-namespace Edvardas\Hyphenation\UtilityComponents\Output;
+namespace Edvardas\Hyphenation\Hyphenator\Output;
 
-interface Ouput
+interface HyphenationOutput
 {
     public function printResult(array $result);
 

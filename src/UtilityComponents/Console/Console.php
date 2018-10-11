@@ -2,19 +2,13 @@
 /**
  * Created by PhpStorm.
  * User: edvardas
- * Date: 18.10.4
- * Time: 16.36
+ * Date: 18.10.11
+ * Time: 09.42
  */
-declare(strict_types=1);
 
-namespace Edvardas\Hyphenation\UtilityComponents\Input;
+namespace Edvardas\Hyphenation\UtilityComponents\Console;
 
-use Edvardas\Hyphenation\App\App;
-use Edvardas\Hyphenation\Hyphenator\Providers\Algorithm\FullTreeHyphenationAlgorithm;
-use Edvardas\Hyphenation\Hyphenator\Providers\Algorithm\HyphenationAlgorithmInterface;
-use Edvardas\Hyphenation\Hyphenator\Providers\Algorithm\ShortTreeHyphenationAlgorithm;
-
-class ConsoleInput
+class Console
 {
     private $cliArguments;
 
@@ -59,5 +53,10 @@ class ConsoleInput
             }
         }
         return $options;
+    }
+
+    public function printLn(string $line)
+    {
+        echo "$line\n";
     }
 }

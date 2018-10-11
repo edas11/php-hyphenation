@@ -49,6 +49,15 @@ class Words implements PersistentModel
         return new Words($hyphenatedWords);
     }
 
+    public static function newFromColumnArrays(array $originalWords, array $hyphenatedWords)
+    {
+        $wordsTable = [];
+        foreach ($originalWords as $index => $word) {
+            array_push($wordsTable, ['word' => $word, 'word_h' => $hyphenatedWords[$index]]);
+        }
+        return new Words($wordsTable);
+    }
+
     public function persist(): void
     {
         $db = App::getDb();

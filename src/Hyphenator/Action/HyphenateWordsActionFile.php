@@ -9,8 +9,8 @@
 namespace Edvardas\Hyphenation\Hyphenator\Action;
 
 use Edvardas\Hyphenation\App\App;
+use Edvardas\Hyphenation\Hyphenator\Algorithm\AlgorithmRunner;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
-use Edvardas\Hyphenation\UtilityComponents\Output\ConsoleOutput;
 use Edvardas\Hyphenation\UtilityComponents\Timer\Timer;
 
 class HyphenateWordsActionFile implements Action
@@ -22,25 +22,21 @@ class HyphenateWordsActionFile implements Action
     public function __construct(HyphenationDataProvider $dataProvider)
     {
         $this->timer = new Timer();
-        $this->output = App::getOutput();
+        $this->output = $dataProvider->getOutput();
         $this->dataProvider = $dataProvider;
     }
 
     public function execute()
     {
         $inputWords = $this->dataProvider->getWords();
-        $patterns = $this->dataProvider->loadPatterns(false)->getPatterns();
+        $patterns = $this->dataProvider->loadPatterns()->getPatterns();
         $algorithm = $this->dataProvider->getAlgorithm($patterns);
+        $runner = new AlgorithmRunner($algorithm);
 
         $this->timer->start();
 
-        $resultWords = [];
-        foreach ($inputWords as $inputWord) {
-            $word = $algorithm->execute($inputWord);
-            array_push($resultWords, $word);
-        }
-
-        $this->output->printResult($resultWords);
+        $runner->run($inputWords);
+        $this->output->printResult($runner->getHyphenatedWords());
 
         $this->printTime();
     }

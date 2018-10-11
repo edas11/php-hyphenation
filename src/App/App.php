@@ -9,17 +9,10 @@ declare(strict_types = 1);
 
 namespace Edvardas\Hyphenation\App;
 
-use Edvardas\Hyphenation\Hyphenator\Algorithm\HyphenationAlgorithmInterface;
-use Edvardas\Hyphenation\Hyphenator\Hyphenator;
+use Edvardas\Hyphenation\Hyphenator\ConsoleHyphenator;
+use Edvardas\Hyphenation\Hyphenator\WebHyphenator;
 use Edvardas\Hyphenation\UtilityComponents\Config\Config;
 use Edvardas\Hyphenation\UtilityComponents\Database\MySqlDatabase;
-use Edvardas\Hyphenation\UtilityComponents\Input\ConsoleInput;
-use Edvardas\Hyphenation\UtilityComponents\Output\JsonOuput;
-use Edvardas\Hyphenation\UtilityComponents\Output\Ouput;
-use Edvardas\Hyphenation\UtilityComponents\Timer\Timer;
-use Edvardas\Hyphenation\UtilityComponents\Output\ConsoleOutput;
-use Edvardas\Hyphenation\UtilityComponents\Logger\NullLogger;
-use Edvardas\Hyphenation\UtilityComponents\Logger\ConsoleLogger;
 use Edvardas\Hyphenation\UtilityComponents\Logger\FileLogger;
 use Edvardas\Hyphenation\UtilityComponents\Cache\MemoryCache;
 
@@ -41,7 +34,11 @@ class App
     public function executeCommand()
     {
         self::$logger->info("Started hyphenation algorithm at " . date('Y-m-d H:i:s'));
-        $this->hyphenator = new Hyphenator();
+        if (php_sapi_name() === 'cli') {
+            $this->hyphenator = new ConsoleHyphenator();
+        } else {
+            $this->hyphenator = new WebHyphenator();
+        }
         $this->hyphenator->execute();
 
     }
@@ -73,15 +70,4 @@ class App
         return self::$db;
     }
 
-    public static function getOutput(): Ouput
-    {
-        if (!isset(self::$output)) {
-            if (php_sapi_name() === 'cli') {
-                self::$output = new ConsoleOutput();
-            } else {
-                self::$output = new JsonOuput();
-            }
-        }
-        return self::$output;
-    }
 }

@@ -15,10 +15,10 @@ class JsonHyphenationOutput implements HyphenationOutput
 
     public function printResult(array $result)
     {
-        if (array_key_exists('hyphenatedWords', $this->outputData)) {
-            array_push($this->outputData['hyphenatedWords'], $result);
+        if (array_key_exists('result', $this->outputData)) {
+            array_push($this->outputData['result'], $result);
         } else {
-            $this->outputData['hyphenatedWords'] = $result;
+            $this->outputData['result'] = $result;
         }
     }
 

@@ -22,6 +22,7 @@ class BadRequestAction implements Action
 
     public function execute()
     {
+        http_response_code(400);
         $this->dataProvider->getOutput()->printError('Bad request');
     }
 }

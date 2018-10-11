@@ -8,7 +8,6 @@
 
 namespace Edvardas\Hyphenation\Hyphenator\Input;
 
-
 class InputCodes
 {
     public const HYPHENATE_ACTION = 1;

@@ -3,23 +3,60 @@
  * Created by PhpStorm.
  * User: edvardas
  * Date: 18.10.11
- * Time: 10.31
+ * Time: 16.43
  */
 
-namespace Edvardas\Hyphenation\Hyphenator\Input;
+namespace Edvardas\Hyphenation\Hyphenator\Controller;
 
-use Edvardas\Hyphenation\UtilityComponents\Http\HttpRequest;
-use Edvardas\Hyphenation\UtilityComponents\Http\Route;
+use Edvardas\Hyphenation\Hyphenator\Action\Action;
 
-class HttpInput implements HyphenationInput
+class HttpController implements Controller
 {
-
+    private $input;
     private $route;
-    private $words = '';
 
-    public function __construct()
+    public function __construct(ConsoleInput $input)
     {
+        $this->input = $input;
         $this->route = HttpRequest::getRoute();
+    }
+
+    public function getAction(): Action
+    {
+        $choice = $this->input->getActionInput();
+        switch ($choice) {
+            case InputCodes::HYPHENATE_ACTION:
+                return $this->getHyphenationAction();
+                break;
+            case InputCodes::PUT_PATTERNS_IN_DB_ACTION:
+                return new PutPatternsInDbAction($this);
+                break;
+            case InputCodes::BAD_REQUEST_ACTION:
+                return new BadRequestAction($this);
+                break;
+            case InputCodes::GET_KNOWN_WORDS_ACTION:
+                return new GetKnownWordsAction($this);
+                break;
+            case InputCodes::PUT_WORD_ACTION:
+                return new PutWordAction($this);
+                break;
+            case InputCodes::DELETE_WORD_ACTION:
+                return new DeleteWordAction($this);
+        }
+    }
+
+    private function getHyphenationAction(): Action
+    {
+        $source = $this->input->getSourceInput();
+        $this->sourceInput = $source;
+        switch ($source) {
+            case InputCodes::FILE_SRC:
+                return new HyphenateWordsActionFile($this);
+                break;
+            case InputCodes::DB_SRC:
+                return new HyphenateWordsActionDB($this);
+                break;
+        }
     }
 
     public function getActionInput(): int
@@ -43,16 +80,6 @@ class HttpInput implements HyphenationInput
     public function getSourceInput(): int
     {
         return InputCodes::DB_SRC;
-    }
-
-    public function getWordsInput(): string
-    {
-        return $this->words;
-    }
-
-    public function getAlgorithmInput(): int
-    {
-        return InputCodes::FULL_TREE_ALGORITHM;
     }
 
     private function getMethodActionInput(): int
@@ -115,15 +142,6 @@ class HttpInput implements HyphenationInput
         } else {
             return InputCodes::BAD_REQUEST_ACTION;
         }
-    }
-
-    public function getHyphenatedWordsInput(): string
-    {
-        $body = HttpRequest::getBody();
-        if (!array_key_exists('hyphenatedWord', $body) || !is_string($body['hyphenatedWord'])) {
-            return '';
-        }
-        return $body['hyphenatedWord'];
     }
 
     private function preparePutWords()

@@ -9,80 +9,50 @@
 namespace Edvardas\Hyphenation\Hyphenator\Controller;
 
 use Edvardas\Hyphenation\Hyphenator\Action\Action;
+use Edvardas\Hyphenation\Hyphenator\Action\BadRequestAction;
+use Edvardas\Hyphenation\Hyphenator\Action\DeleteWordAction;
+use Edvardas\Hyphenation\Hyphenator\Action\GetKnownWordsAction;
+use Edvardas\Hyphenation\Hyphenator\Action\HyphenateWordsActionDB;
+use Edvardas\Hyphenation\Hyphenator\Action\HyphenateWordsActionFile;
+use Edvardas\Hyphenation\Hyphenator\Action\PutPatternsInDbAction;
+use Edvardas\Hyphenation\Hyphenator\Action\PutWordAction;
+use Edvardas\Hyphenation\Hyphenator\Input\HttpInput;
+use Edvardas\Hyphenation\Hyphenator\Output\HyphenationOutput;
+use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationHttpDataProvider;
+use Edvardas\Hyphenation\UtilityComponents\Http\HttpRequest;
 
 class HttpController implements Controller
 {
+    private $provider;
     private $input;
     private $route;
 
-    public function __construct(ConsoleInput $input)
+    public function __construct(HyphenationOutput $output)
     {
-        $this->input = $input;
+        $this->input = new HttpInput();
+        $this->provider = new HyphenationHttpDataProvider($this->input, $output);
         $this->route = HttpRequest::getRoute();
     }
 
     public function getAction(): Action
     {
-        $choice = $this->input->getActionInput();
-        switch ($choice) {
-            case InputCodes::HYPHENATE_ACTION:
-                return $this->getHyphenationAction();
-                break;
-            case InputCodes::PUT_PATTERNS_IN_DB_ACTION:
-                return new PutPatternsInDbAction($this);
-                break;
-            case InputCodes::BAD_REQUEST_ACTION:
-                return new BadRequestAction($this);
-                break;
-            case InputCodes::GET_KNOWN_WORDS_ACTION:
-                return new GetKnownWordsAction($this);
-                break;
-            case InputCodes::PUT_WORD_ACTION:
-                return new PutWordAction($this);
-                break;
-            case InputCodes::DELETE_WORD_ACTION:
-                return new DeleteWordAction($this);
-        }
-    }
-
-    private function getHyphenationAction(): Action
-    {
-        $source = $this->input->getSourceInput();
-        $this->sourceInput = $source;
-        switch ($source) {
-            case InputCodes::FILE_SRC:
-                return new HyphenateWordsActionFile($this);
-                break;
-            case InputCodes::DB_SRC:
-                return new HyphenateWordsActionDB($this);
-                break;
-        }
-    }
-
-    public function getActionInput(): int
-    {
         switch (HttpRequest::getMethod()) {
             case 'GET':
-                return $this->getMethodActionInput();
+                return $this->getMethodAction();
                 break;
             case 'POST':
-                return $this->postMethodActionInput();
+                return $this->postMethodAction();
                 break;
             case 'PUT':
-                return $this->putMethodActionInput();
+                return $this->putMethodAction();
                 break;
             case 'DELETE':
-                return $this->deleteMethodActionInput();
+                return $this->deleteMethodAction();
                 break;
         }
     }
 
-    public function getSourceInput(): int
-    {
-        return InputCodes::DB_SRC;
-    }
-
-    private function getMethodActionInput(): int
+    private function getMethodAction(): Action
     {
         if (
             $this->route->pathAt(0) === 'hyphenation'
@@ -90,29 +60,28 @@ class HttpController implements Controller
             && !is_null($this->route->pathAt(2))
         ) {
             $this->prepareGetWords();
-            return InputCodes::GET_KNOWN_WORDS_ACTION;
+            return new GetKnownWordsAction($this->provider);
         } else {
-            return InputCodes::BAD_REQUEST_ACTION;
+            return new BadRequestAction($this->provider);
         }
     }
 
     private function prepareGetWords()
     {
-        $this->words = (string) $this->route->pathAt(2);
+        $this->provider->setWordsInput((string) $this->route->pathAt(2));
     }
 
-    private function postMethodActionInput(): int
+    private function postMethodAction(): Action
     {
         $this->preparePostWords();
         if (
             $this->route->pathAt(0) === 'hyphenation'
             && $this->route->pathAt(1) === 'words'
             && is_null($this->route->pathAt(2))
-            && $this->words !== ''
         ) {
-            return InputCodes::HYPHENATE_ACTION;
+            return new HyphenateWordsActionDB($this->provider);
         } else {
-            return InputCodes::BAD_REQUEST_ACTION;
+            return new BadRequestAction($this->provider);
         }
     }
 
@@ -126,11 +95,11 @@ class HttpController implements Controller
             foreach ($body['words'] as $word) {
                 $wordsString = $wordsString . " $word";
             }
-            $this->words = trim($wordsString);
+            $this->provider->setWordsInput(trim($wordsString));
         }
     }
 
-    private function putMethodActionInput(): int
+    private function putMethodAction(): Action
     {
         if (
             $this->route->pathAt(0) === 'hyphenation'
@@ -138,18 +107,18 @@ class HttpController implements Controller
             && !is_null($this->route->pathAt(2))
         ) {
             $this->preparePutWords();
-            return InputCodes::PUT_WORD_ACTION;
+            return new PutWordAction($this->provider);
         } else {
-            return InputCodes::BAD_REQUEST_ACTION;
+            return new BadRequestAction($this->provider);
         }
     }
 
     private function preparePutWords()
     {
-        $this->words = (string) $this->route->pathAt(2);
+        $this->provider->setWordsInput((string) $this->route->pathAt(2));
     }
 
-    private function deleteMethodActionInput(): int
+    private function deleteMethodAction(): Action
     {
         if (
             $this->route->pathAt(0) === 'hyphenation'
@@ -157,14 +126,14 @@ class HttpController implements Controller
             && !is_null($this->route->pathAt(2))
         ) {
             $this->prepareDeleteWords();
-            return InputCodes::DELETE_WORD_ACTION;
+            return new DeleteWordAction($this->provider);
         } else {
-            return InputCodes::BAD_REQUEST_ACTION;
+            return new BadRequestAction($this->provider);
         }
     }
 
     private function prepareDeleteWords()
     {
-        $this->words = (string) $this->route->pathAt(2);
+        $this->provider->setWordsInput((string) $this->route->pathAt(2));
     }
 }

@@ -8,21 +8,20 @@
 
 namespace Edvardas\Hyphenation\Hyphenator;
 
-use Edvardas\Hyphenation\Hyphenator\Input\ConsoleInput;
+use Edvardas\Hyphenation\Hyphenator\Controller\ConsoleController;
 use Edvardas\Hyphenation\Hyphenator\Output\ConsoleOutput;
-use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
 
 class ConsoleHyphenator
 {
-    private $provider;
+    private $controller;
 
     public function __construct()
     {
-        $this->provider = new HyphenationDataProvider(new ConsoleInput(), new ConsoleOutput());
+        $this->controller = new ConsoleController(new ConsoleOutput());
     }
 
     public function execute(): void {
-        $action = $this->provider->getAction();
+        $action = $this->controller->getAction();
         $action->execute();
     }
 }

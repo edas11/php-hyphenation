@@ -11,7 +11,7 @@ namespace Edvardas\Hyphenation\Hyphenator\Input;
 
 use Edvardas\Hyphenation\UtilityComponents\Console\Console;
 
-class ConsoleInput implements HyphenationInput
+class ConsoleInput
 {
     private $console;
     private $actionInput;

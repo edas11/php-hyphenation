@@ -8,24 +8,25 @@
 
 namespace Edvardas\Hyphenation\Hyphenator;
 
+use Edvardas\Hyphenation\Hyphenator\Controller\HttpController;
 use Edvardas\Hyphenation\Hyphenator\Input\HttpInput;
 use Edvardas\Hyphenation\Hyphenator\Output\JsonHyphenationOutput;
-use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
+use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationConsoleDataProvider;
 
 class WebHyphenator
 {
-    private $provider;
     private $output;
+    private $controller;
 
     public function __construct()
     {
         header('content-type: application/json');
         $this->output = new JsonHyphenationOutput();
-        $this->provider = new HyphenationDataProvider(new HttpInput(), $this->output);
+        $this->controller = new HttpController($this->output);
     }
 
     public function execute(): void {
-        $action = $this->provider->getAction();
+        $action = $this->controller->getAction();
         $action->execute();
         $this->output->flush();
     }

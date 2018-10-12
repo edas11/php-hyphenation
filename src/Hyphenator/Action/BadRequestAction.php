@@ -8,7 +8,6 @@
 
 namespace Edvardas\Hyphenation\Hyphenator\Action;
 
-
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
 
 class BadRequestAction implements Action

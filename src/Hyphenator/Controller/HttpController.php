@@ -52,6 +52,10 @@ class HttpController implements Controller
     {
         $this->route->match(['hyphenation', 'words']);
         if ($this->route->matches()) {
+            $queryParams = $this->route->getQueryParams();
+            if (array_key_exists('for', $queryParams)) {
+                $this->provider->setWords([$queryParams['for']]);
+            }
             return new GetKnownWordsAction($this->provider);
         } else {
             return new BadRequestAction($this->provider);

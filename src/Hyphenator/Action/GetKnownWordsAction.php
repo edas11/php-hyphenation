@@ -25,7 +25,12 @@ class GetKnownWordsAction implements Action
 
     public function execute()
     {
-        $words = Words::getKnown();
+        $words = $this->dataProvider->getWords();
+        if (count($words) > 0) {
+            $words = Words::getKnownIn($words);
+        } else {
+            $words = Words::getKnown();
+        }
         $this->output->printResult(array_combine($words->getOriginalWords(), $words->getHyphenatedWords()));
     }
 }

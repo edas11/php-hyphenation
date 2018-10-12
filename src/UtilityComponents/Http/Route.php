@@ -11,25 +11,26 @@ namespace Edvardas\Hyphenation\UtilityComponents\Http;
 
 class Route
 {
-    private $routeArray;
+    private $routeArray = [];
+    private $queryParams = [];
     private $pathParam;
     private $matches;
 
-    public function __construct(string $routeString)
+    public function __construct(string $pathString)
     {
-        $this->routeArray = $route = explode('/', trim($routeString, '/'));
-    }
-
-    /**
-     * @return string|null
-     */
-    public function pathAt(int $pathIndex)
-    {
-        if (array_key_exists($pathIndex, $this->routeArray)) {
-            return $this->routeArray[$pathIndex];
+        $queryPos = strpos($pathString, '?');
+        if ($queryPos === false) {
+            $routeString = $pathString;
         } else {
-            return null;
+            $routeString = substr($pathString, 0, $queryPos);
+            if (strlen($pathString) === $queryPos + 1) {
+                $queryString = '';
+            } else {
+                $queryString = substr($pathString, $queryPos + 1);
+            }
+            $this->parseQueryParams($queryString);
         }
+        $this->routeArray = $route = explode('/', trim($routeString, '/'));
     }
 
     /**
@@ -66,5 +67,26 @@ class Route
     public function getPathParam(): string
     {
         return $this->pathParam;
+    }
+
+    public function getQueryParams()
+    {
+        return $this->queryParams;
+    }
+
+    private function parseQueryParams(string $queryString): void
+    {
+        $queryClauses = explode('&', $queryString);
+        if (count($queryClauses) > 0) {
+            foreach ($queryClauses as $clause) {
+                $paramAndValueArray = explode('=', $clause);
+                if (count($paramAndValueArray) !== 2) {
+                    continue;
+                }
+                $param = $paramAndValueArray[0];
+                $value = $paramAndValueArray[1];
+                $this->queryParams[$param] = $value;
+            }
+        }
     }
 }

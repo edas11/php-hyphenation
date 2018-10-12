@@ -15,9 +15,26 @@ class WordPatterns implements PersistentModel
 {
     private $wordPatterns;
 
+    /**
+     * @param string[][] $wordPatterns\
+     */
     public function __construct(array $wordPatterns)
     {
         $this->wordPatterns = $wordPatterns;
+    }
+
+    /**
+     * @param string[][] $wordPatterns
+     */
+    public static function newFromList(array $wordPatterns): WordPatterns
+    {
+        $wordPatternsTable = [];
+        foreach ($wordPatterns as $word => $patterns) {
+            foreach ($patterns as $pattern) {
+                array_push($wordPatternsTable, ['word' => $word, 'pattern' => $pattern]);
+            }
+        }
+        return new WordPatterns($wordPatternsTable);
     }
 
     public function getMatchedPatterns()

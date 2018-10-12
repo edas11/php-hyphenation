@@ -18,6 +18,7 @@ abstract class AbstractHyphenationAlgorithm implements HyphenationAlgorithmInter
     protected const REDUCE_CHARS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, '.'];
     private $patterns;
     private $macthedPatterns = [];
+    private $saveMatchedPatterns = false;
 
     public function __construct(array $patterns)
     {
@@ -28,8 +29,9 @@ abstract class AbstractHyphenationAlgorithm implements HyphenationAlgorithmInter
 
     abstract protected function parsePatternTree(array $patterns);
 
-    public function execute(string $inputWord): string
+    public function execute(string $inputWord, bool $saveMatchedPatterns = false): string
     {
+        $this->saveMatchedPatterns = $saveMatchedPatterns;
         $this->macthedPatterns = [];
         $matchedNumbersAll = $this->getWordHyphenationNumbers($inputWord);
         $hyphenatedWords = $this->getHyphenatedWordsFromNumbers($inputWord, $matchedNumbersAll);
@@ -64,7 +66,9 @@ abstract class AbstractHyphenationAlgorithm implements HyphenationAlgorithmInter
             return new WordHyphenationNumbers(strlen($inputWord) - 1);
         }
         App::$logger->info("Matched pattern $pattern");
-        array_push($this->macthedPatterns, ['word' => $inputWord, 'pattern' => $pattern]);
+        if ($this->saveMatchedPatterns) {
+            array_push($this->macthedPatterns, $pattern);
+        }
         $numberPositionsInPattern = new PatternHyphenationNumbers($pattern);
         $matchedNumbers = WordHyphenationNumbers::createFromPatternNumbers(
             $wordIndex,

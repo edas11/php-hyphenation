@@ -20,13 +20,13 @@ class AlgorithmRunner
         $this->algorithm = $algorithm;
     }
 
-    public function run(array $words)
+    public function run(array $words, bool $saveMatchedPatterns = false)
     {
         $hyphenatedWords = [];
         $matchedPatternsAll = [];
         foreach ($words as $inputWord) {
-            $word = $this->algorithm->execute($inputWord);
-            $matchedPatternsAll = array_merge($matchedPatternsAll, $this->algorithm->getMatchedPatterns());
+            $word = $this->algorithm->execute($inputWord, $saveMatchedPatterns);
+            $matchedPatternsAll[$inputWord] = $this->algorithm->getMatchedPatterns();
             array_push($hyphenatedWords, $word);
         }
         $this->hyphenatedWords = $hyphenatedWords;

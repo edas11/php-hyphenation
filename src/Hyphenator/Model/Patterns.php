@@ -14,9 +14,23 @@ class Patterns implements PersistentModel
 {
     private $patterns = [];
 
+    /**
+     * @param string[][] $patterns
+     */
     public function __construct(array $patterns)
     {
         $this->patterns = $patterns;
+    }
+
+    /**
+     * @param string[] $patterns
+     */
+    public static function newFromList(array $patterns): Patterns
+    {
+        $patternsTable = array_map(function ($pattern) {
+            return ['pattern' => $pattern];
+        }, $patterns);
+        return new Patterns($patternsTable);
     }
 
     public function getPatterns()

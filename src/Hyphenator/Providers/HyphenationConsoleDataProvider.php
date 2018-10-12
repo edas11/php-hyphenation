@@ -15,6 +15,8 @@ use Edvardas\Hyphenation\Hyphenator\Algorithm\FullTreeHyphenationAlgorithm;
 use Edvardas\Hyphenation\Hyphenator\Algorithm\HyphenationAlgorithmInterface;
 use Edvardas\Hyphenation\Hyphenator\Algorithm\ShortTreeHyphenationAlgorithm;
 use Edvardas\Hyphenation\Hyphenator\Database\HyphenationDatabase;
+use Edvardas\Hyphenation\Hyphenator\File\PatternsFile;
+use Edvardas\Hyphenation\Hyphenator\File\WordsFile;
 use Edvardas\Hyphenation\Hyphenator\Input\ConsoleInput;
 use Edvardas\Hyphenation\Hyphenator\Input\HyphenationInput;
 use Edvardas\Hyphenation\Hyphenator\Input\InputCodes;
@@ -42,7 +44,9 @@ class HyphenationConsoleDataProvider implements HyphenationDataProvider
     {
         $wordsInput = $this->input->getWordsInput();
         if ($wordsInput === '') {
-            $words = $this->loadWords();
+            $wordsFileName = App::getConfig()->get(['wordsFileName'], 'words.txt');
+            App::$logger->info("Reading words from $wordsFileName file.");
+            $words = WordsFile::getContentsAsArray($wordsFileName);
         } else {
             $words = explode(' ', $wordsInput);
         }
@@ -85,28 +89,8 @@ class HyphenationConsoleDataProvider implements HyphenationDataProvider
             $patterns = Patterns::getKnown();
         } else {
             $patternsFileName = App::getConfig()->get(['patternsFileName'], 'patterns');
-            $patterns = file($patternsFileName, FILE_IGNORE_NEW_LINES);
-            if ($patterns === false) {
-                App::$logger->error("Could not read patterns file.");
-                exit;
-            }
-            $patterns = array_map(function ($pattern) {
-                return ['pattern' => $pattern];
-            }, $patterns);
-            $patterns = new Patterns($patterns);
+            $patterns = Patterns::newFromList(PatternsFile::getContentsAsArray($patternsFileName));
         }
         return $patterns;
-    }
-
-    private function loadWords(): array
-    {
-        $wordsFileName = App::getConfig()->get(['wordsFileName'], 'words.txt');
-        App::$logger->info("Reading words from $wordsFileName file.");
-        $words = file($wordsFileName, FILE_IGNORE_NEW_LINES);
-        if ($words === false) {
-            App::$logger->error("Could not read $wordsFileName file.");
-            exit;
-        }
-        return $words;
     }
 }

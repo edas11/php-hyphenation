@@ -45,10 +45,11 @@ class HyphenateWordsActionDB implements Action
 
         $resultWords = [];
         if (count($wordsNotInDb) > 0) {
-            $runner->run($wordsNotInDb);
+            $runner->run($wordsNotInDb, true);
             $resultWords = $runner->getHyphenatedWords();
             $hyphnatedWords = Words::newFromColumnArrays($wordsNotInDb, $resultWords);
-            $wordPatterns = new WordPatterns($runner->getMatchedPatterns());
+            var_dump($runner->getMatchedPatterns());
+            $wordPatterns = WordPatterns::newFromList($runner->getMatchedPatterns());
             (new CompositeModel([$hyphnatedWords, $wordPatterns]))->persist();
         }
 

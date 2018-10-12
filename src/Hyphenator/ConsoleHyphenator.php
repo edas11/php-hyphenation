@@ -11,7 +11,7 @@ namespace Edvardas\Hyphenation\Hyphenator;
 use Edvardas\Hyphenation\Hyphenator\Controller\ConsoleController;
 use Edvardas\Hyphenation\Hyphenator\Output\ConsoleOutput;
 
-class ConsoleHyphenator
+class ConsoleHyphenator implements Hyphenator
 {
     private $controller;
 

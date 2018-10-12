@@ -43,7 +43,7 @@ class HyphenationConsoleDataProvider implements HyphenationDataProvider
     {
         $wordsInput = $this->input->getWordsInput();
         if ($wordsInput === '') {
-            $wordsFileName = App::getConfig()->get(['wordsFileName'], 'words.txt');
+            $wordsFileName = App::getConfig(['wordsFileName'], 'words.txt');
             App::$logger->info("Reading words from $wordsFileName file.");
             $words = WordsFile::getContentsAsArray($wordsFileName);
         } else {
@@ -79,7 +79,7 @@ class HyphenationConsoleDataProvider implements HyphenationDataProvider
         if ($this->input->getSourceInput() === InputCodes::DB_SRC) {
             $patterns = Patterns::getKnown();
         } else {
-            $patternsFileName = App::getConfig()->get(['patternsFileName'], 'patterns');
+            $patternsFileName = App::getConfig(['patternsFileName'], 'patterns');
             $patterns = Patterns::newFromList(PatternsFile::getContentsAsArray($patternsFileName));
         }
         return $patterns;

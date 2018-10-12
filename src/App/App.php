@@ -10,6 +10,7 @@ declare(strict_types = 1);
 namespace Edvardas\Hyphenation\App;
 
 use Edvardas\Hyphenation\Hyphenator\ConsoleHyphenator;
+use Edvardas\Hyphenation\Hyphenator\Hyphenator;
 use Edvardas\Hyphenation\Hyphenator\WebHyphenator;
 use Edvardas\Hyphenation\UtilityComponents\Config\Config;
 use Edvardas\Hyphenation\UtilityComponents\Database\MySqlDatabase;
@@ -24,6 +25,11 @@ class App
     public static $cache;
     private static $config;
     private static $db;
+
+    /**
+     * @var Hyphenator
+     */
+    private $hyphenator;
 
     public function __construct()
     {
@@ -51,12 +57,12 @@ class App
         }
     }
 
-    public static function getConfig(): Config
+    public static function getConfig(array $keys, string $default = ''): string
     {
         if (!isset(self::$config)) {
             self::$config = self::readConfig('config.php');
         }
-        return self::$config;
+        return self::$config->get($keys, $default);
     }
 
     private static function readConfig(string $pathToConfig): Config
@@ -68,11 +74,11 @@ class App
     public static function getDb(): MySqlDatabase
     {
         if (!isset(self::$db)) {
-            $host = App::getConfig()->get(['mysql', 'host']);
-            $db = App::getConfig()->get(['mysql', 'db']);
-            $user = App::getConfig()->get(['mysql', 'user']);
-            $pass = App::getConfig()->get(['mysql', 'password']);
-            $charset = App::getConfig()->get(['mysql', 'charset']);
+            $host = App::getConfig(['mysql', 'host']);
+            $db = App::getConfig(['mysql', 'db']);
+            $user = App::getConfig(['mysql', 'user']);
+            $pass = App::getConfig(['mysql', 'password']);
+            $charset = App::getConfig(['mysql', 'charset']);
             self::$db = new MySqlDatabase($host, $db, $user, $pass, $charset);
         }
         return self::$db;

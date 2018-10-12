@@ -24,12 +24,12 @@ class Config
     }
 
     /**
-     * @param string[] $key
+     * @param string[] $keys
      */
-    public function get(array $key, string $default = ''): string
+    public function get(array $keys, string $default = ''): string
     {
         $configData = $this->config;
-        foreach ($key as $keyPart) {
+        foreach ($keys as $keyPart) {
             if (array_key_exists($keyPart, $configData)) {
                 $configData = $configData[$keyPart];
             } else {

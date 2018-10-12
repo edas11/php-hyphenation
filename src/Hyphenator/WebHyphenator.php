@@ -11,9 +11,8 @@ namespace Edvardas\Hyphenation\Hyphenator;
 use Edvardas\Hyphenation\Hyphenator\Controller\HttpController;
 use Edvardas\Hyphenation\Hyphenator\Input\HttpInput;
 use Edvardas\Hyphenation\Hyphenator\Output\JsonHyphenationOutput;
-use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationConsoleDataProvider;
 
-class WebHyphenator
+class WebHyphenator implements Hyphenator
 {
     private $output;
     private $controller;

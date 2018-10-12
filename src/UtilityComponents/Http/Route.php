@@ -28,7 +28,7 @@ class Route
             } else {
                 $queryString = substr($pathString, $queryPos + 1);
             }
-            $this->parseQueryParams($queryString);
+            parse_str($queryString, $this->queryParams);
         }
         $this->routeArray = $route = explode('/', trim($routeString, '/'));
     }
@@ -72,21 +72,5 @@ class Route
     public function getQueryParams()
     {
         return $this->queryParams;
-    }
-
-    private function parseQueryParams(string $queryString): void
-    {
-        $queryClauses = explode('&', $queryString);
-        if (count($queryClauses) > 0) {
-            foreach ($queryClauses as $clause) {
-                $paramAndValueArray = explode('=', $clause);
-                if (count($paramAndValueArray) !== 2) {
-                    continue;
-                }
-                $param = $paramAndValueArray[0];
-                $value = $paramAndValueArray[1];
-                $this->queryParams[$param] = $value;
-            }
-        }
     }
 }

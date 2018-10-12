@@ -73,19 +73,36 @@ class Words implements PersistentModel
         return new Words($wordsTable);
     }
 
-    public function update(): void
+    public function addOrUpdate(): void
     {
         $db = App::getDb();
         $builder = $db->builder();
         $db->beginTransaction();
         foreach ($this->words as $wordRow) {
             $querry = $builder
-                ->update('words')
-                ->set(['word_h' => $wordRow['word_h']])
+                ->select()
+                ->columns(['*'])
+                ->from('words')
                 ->where()
                 ->equals('word', $wordRow['word'])
                 ->build();
-            $db->execute($querry);
+            $result = $db->executeAndFetch($querry);
+            if (count($result) > 0) {
+                $querry = $builder
+                    ->update('words')
+                    ->set(['word_h' => $wordRow['word_h']])
+                    ->where()
+                    ->equals('word', $wordRow['word'])
+                    ->build();
+                $db->execute($querry);
+            } else {
+                $querry = $builder
+                    ->insert()
+                    ->into('words', ['word, word_h'])
+                    ->values([$wordRow])
+                    ->build();
+                $db->execute($querry);
+            }
         }
         $db->commit();
     }

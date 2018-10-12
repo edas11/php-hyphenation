@@ -27,7 +27,7 @@ class PutWordAction implements Action
     {
         $word = implode('', $this->dataProvider->getWords());
         $hyphenatedWord = implode('', $this->dataProvider->getHyphenatedWords());
-        Words::newFromColumnArrays([$word], [$hyphenatedWord])->update();
+        Words::newFromColumnArrays([$word], [$hyphenatedWord])->addOrUpdate();
         $this->output->printResult(['Success']);
     }
 }

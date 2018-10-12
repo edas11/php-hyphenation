@@ -80,8 +80,8 @@ class HttpController implements Controller
         if ($this->route->matches()) {
 
             $body = HttpRequest::getBody();
-            if (array_key_exists('hyphenatedWord', $body) && is_string($body['hyphenatedWord'])) {
-                $this->provider->setHyphenatedWords([$body['hyphenatedWord']]);
+            if (array_key_exists('newHyphenatedWord', $body) && is_string($body['newHyphenatedWord'])) {
+                $this->provider->setHyphenatedWords([$body['newHyphenatedWord']]);
             }
             $this->provider->setWords([$this->route->getPathParam()]);
 

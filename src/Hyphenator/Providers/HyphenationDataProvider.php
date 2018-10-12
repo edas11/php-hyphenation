@@ -22,5 +22,5 @@ interface HyphenationDataProvider
 
     public function getAlgorithm($patterns): HyphenationAlgorithmInterface;
 
-    public function loadPatterns(): Patterns;
+    public function getPatterns(): Patterns;
 }

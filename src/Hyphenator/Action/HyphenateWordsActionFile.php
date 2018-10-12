@@ -29,7 +29,7 @@ class HyphenateWordsActionFile implements Action
     public function execute()
     {
         $inputWords = $this->dataProvider->getWords();
-        $patterns = $this->dataProvider->loadPatterns()->getPatterns();
+        $patterns = $this->dataProvider->getPatterns()->getPatterns();
         $algorithm = $this->dataProvider->getAlgorithm($patterns);
         $runner = new AlgorithmRunner($algorithm);
 

@@ -11,14 +11,13 @@ namespace Edvardas\Hyphenation\UtilityComponents\Http;
 
 class Route
 {
-    private $routeString;
     private $routeArray;
+    private $pathParam;
+    private $matches;
 
     public function __construct(string $routeString)
     {
-        //$this->routeString = $routeString;
-        $this->routeArray = $route = explode('/', $routeString);
-        array_shift($this->routeArray);
+        $this->routeArray = $route = explode('/', trim($routeString, '/'));
     }
 
     /**
@@ -31,5 +30,39 @@ class Route
         } else {
             return null;
         }
+    }
+
+    /**
+     * @param string[] $match
+     */
+    public function match(array $match): void
+    {
+        if (count($this->routeArray) !== count($match)) {
+            $this->matches = false;
+        }
+        foreach($match as $pathIndex => $matchString)
+        {
+            if (!array_key_exists($pathIndex, $this->routeArray)) {
+                $this->matches = false;
+            }
+            if ($matchString === '{param}') {
+                $this->pathParam = $this->routeArray[$pathIndex];
+                continue;
+            }
+            if ($this->routeArray[$pathIndex] !== $matchString) {
+                $this->matches = false;
+            }
+        }
+        $this->matches = true;
+    }
+
+    public function matches(): bool
+    {
+        return $this->matches;
+    }
+
+    public function getPathParam(): string
+    {
+        return $this->pathParam;
     }
 }

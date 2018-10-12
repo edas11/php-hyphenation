@@ -10,15 +10,7 @@ namespace Edvardas\Hyphenation\Hyphenator\Providers;
 
 
 use Edvardas\Hyphenation\App\App;
-use Edvardas\Hyphenation\Hyphenator\Action\Action;
-use Edvardas\Hyphenation\Hyphenator\Action\BadRequestAction;
-use Edvardas\Hyphenation\Hyphenator\Action\DeleteWordAction;
-use Edvardas\Hyphenation\Hyphenator\Action\GetKnownWordsAction;
 use Edvardas\Hyphenation\Hyphenator\Action\HyphenateAndAddToDbAction;
-use Edvardas\Hyphenation\Hyphenator\Action\HyphenateWordsActionDB;
-use Edvardas\Hyphenation\Hyphenator\Action\HyphenateWordsActionFile;
-use Edvardas\Hyphenation\Hyphenator\Action\PutPatternsInDbAction;
-use Edvardas\Hyphenation\Hyphenator\Action\PutWordAction;
 use Edvardas\Hyphenation\Hyphenator\Algorithm\FullTreeHyphenationAlgorithm;
 use Edvardas\Hyphenation\Hyphenator\Algorithm\HyphenationAlgorithmInterface;
 use Edvardas\Hyphenation\Hyphenator\Algorithm\ShortTreeHyphenationAlgorithm;
@@ -87,7 +79,7 @@ class HyphenationConsoleDataProvider implements HyphenationDataProvider
         }
     }
 
-    public function loadPatterns(): Patterns
+    public function getPatterns(): Patterns
     {
         if ($this->input->getSourceInput() === InputCodes::DB_SRC) {
             $patterns = Patterns::getKnown();

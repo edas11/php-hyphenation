@@ -13,8 +13,6 @@ use Edvardas\Hyphenation\Hyphenator\Action\BadRequestAction;
 use Edvardas\Hyphenation\Hyphenator\Action\DeleteWordAction;
 use Edvardas\Hyphenation\Hyphenator\Action\GetKnownWordsAction;
 use Edvardas\Hyphenation\Hyphenator\Action\HyphenateWordsActionDB;
-use Edvardas\Hyphenation\Hyphenator\Action\HyphenateWordsActionFile;
-use Edvardas\Hyphenation\Hyphenator\Action\PutPatternsInDbAction;
 use Edvardas\Hyphenation\Hyphenator\Action\PutWordAction;
 use Edvardas\Hyphenation\Hyphenator\Input\HttpInput;
 use Edvardas\Hyphenation\Hyphenator\Output\HyphenationOutput;
@@ -24,13 +22,11 @@ use Edvardas\Hyphenation\UtilityComponents\Http\HttpRequest;
 class HttpController implements Controller
 {
     private $provider;
-    private $input;
     private $route;
 
     public function __construct(HyphenationOutput $output)
     {
-        $this->input = new HttpInput();
-        $this->provider = new HyphenationHttpDataProvider($this->input, $output);
+        $this->provider = new HyphenationHttpDataProvider($output);
         $this->route = HttpRequest::getRoute();
     }
 
@@ -54,86 +50,55 @@ class HttpController implements Controller
 
     private function getMethodAction(): Action
     {
-        if (
-            $this->route->pathAt(0) === 'hyphenation'
-            && $this->route->pathAt(1) === 'words'
-            && !is_null($this->route->pathAt(2))
-        ) {
-            $this->prepareGetWords();
+        $this->route->match(['hyphenation', 'words']);
+        if ($this->route->matches()) {
             return new GetKnownWordsAction($this->provider);
         } else {
             return new BadRequestAction($this->provider);
         }
     }
 
-    private function prepareGetWords()
-    {
-        $this->provider->setWordsInput((string) $this->route->pathAt(2));
-    }
-
     private function postMethodAction(): Action
     {
-        $this->preparePostWords();
-        if (
-            $this->route->pathAt(0) === 'hyphenation'
-            && $this->route->pathAt(1) === 'words'
-            && is_null($this->route->pathAt(2))
-        ) {
+        $this->route->match(['hyphenation', 'words']);
+        if ($this->route->matches()) {
+
+            $body = HttpRequest::getBody();
+            if (array_key_exists('words', $body) && is_array($body['words'])) {
+                $this->provider->setWords(array_values($body['words']));
+            }
+
             return new HyphenateWordsActionDB($this->provider);
         } else {
             return new BadRequestAction($this->provider);
         }
     }
 
-    private function preparePostWords()
-    {
-        $body = HttpRequest::getBody();
-        if (!array_key_exists('words', $body) || !is_array($body['words'])) {
-            return;
-        } else {
-            $wordsString = '';
-            foreach ($body['words'] as $word) {
-                $wordsString = $wordsString . " $word";
-            }
-            $this->provider->setWordsInput(trim($wordsString));
-        }
-    }
-
     private function putMethodAction(): Action
     {
-        if (
-            $this->route->pathAt(0) === 'hyphenation'
-            && $this->route->pathAt(1) === 'words'
-            && !is_null($this->route->pathAt(2))
-        ) {
-            $this->preparePutWords();
+        $this->route->match(['hyphenation', 'words', '{param}']);
+        if ($this->route->matches()) {
+
+            $body = HttpRequest::getBody();
+            if (array_key_exists('hyphenatedWord', $body) && is_string($body['hyphenatedWord'])) {
+                $this->provider->setHyphenatedWords([$body['hyphenatedWord']]);
+            }
+            $this->provider->setWords([$this->route->getPathParam()]);
+
             return new PutWordAction($this->provider);
         } else {
             return new BadRequestAction($this->provider);
         }
     }
 
-    private function preparePutWords()
-    {
-        $this->provider->setWordsInput((string) $this->route->pathAt(2));
-    }
-
     private function deleteMethodAction(): Action
     {
-        if (
-            $this->route->pathAt(0) === 'hyphenation'
-            && $this->route->pathAt(1) === 'words'
-            && !is_null($this->route->pathAt(2))
-        ) {
-            $this->prepareDeleteWords();
+        $this->route->match(['hyphenation', 'words', '{param}']);
+        if ($this->route->matches()) {
+            $this->provider->setWords([$this->route->getPathParam()]);
             return new DeleteWordAction($this->provider);
         } else {
             return new BadRequestAction($this->provider);
         }
-    }
-
-    private function prepareDeleteWords()
-    {
-        $this->provider->setWordsInput((string) $this->route->pathAt(2));
     }
 }

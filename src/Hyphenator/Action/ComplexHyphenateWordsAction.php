@@ -17,7 +17,7 @@ use Edvardas\Hyphenation\Hyphenator\Model\Words;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
 use Edvardas\Hyphenation\UtilityComponents\Timer\Timer;
 
-class HyphenateWordsActionDB implements Action
+class ComplexHyphenateWordsAction implements Action
 {
     private $output;
     private $dataProvider;

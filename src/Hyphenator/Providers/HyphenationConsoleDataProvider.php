@@ -22,7 +22,6 @@ use Edvardas\Hyphenation\Hyphenator\Input\HyphenationInput;
 use Edvardas\Hyphenation\Hyphenator\Input\InputCodes;
 use Edvardas\Hyphenation\Hyphenator\Model\Patterns;
 use Edvardas\Hyphenation\Hyphenator\Output\HyphenationOutput;
-use Edvardas\Hyphenation\UtilityComponents\Logger\NullLogger;
 
 class HyphenationConsoleDataProvider implements HyphenationDataProvider
 {
@@ -50,7 +49,7 @@ class HyphenationConsoleDataProvider implements HyphenationDataProvider
         } else {
             $words = explode(' ', $wordsInput);
         }
-        $this->turnOffLoggerIfMoreWordsThanThreshold($words);
+        App::wordsReadEvent(count($words));
         return $words;
     }
 
@@ -58,14 +57,6 @@ class HyphenationConsoleDataProvider implements HyphenationDataProvider
     {
         $hyphenatedWordsInput = $this->input->getHyphenatedWordsInput();
         return explode(' ', $hyphenatedWordsInput);
-    }
-
-    private function turnOffLoggerIfMoreWordsThanThreshold(array $inputWords): void
-    {
-        if (count($inputWords) > App::WORDS_THRESHOLD) {
-            App::$logger->notice('Too many words, disabling logger.');
-            App::$logger = new NullLogger();
-        }
     }
 
     public function getAlgorithm($patterns): HyphenationAlgorithmInterface

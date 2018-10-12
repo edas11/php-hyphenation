@@ -15,6 +15,7 @@ use Edvardas\Hyphenation\UtilityComponents\Config\Config;
 use Edvardas\Hyphenation\UtilityComponents\Database\MySqlDatabase;
 use Edvardas\Hyphenation\UtilityComponents\Logger\FileLogger;
 use Edvardas\Hyphenation\UtilityComponents\Cache\MemoryCache;
+use Edvardas\Hyphenation\UtilityComponents\Logger\NullLogger;
 
 class App
 {
@@ -40,6 +41,14 @@ class App
         }
         $this->hyphenator->execute();
 
+    }
+
+    public static function wordsReadEvent(int $numberOfWords): void
+    {
+        if ($numberOfWords > self::WORDS_THRESHOLD) {
+            self::$logger->notice('Too many words, disabling logger.');
+            self::$logger = new NullLogger();
+        }
     }
 
     public static function getConfig(): Config

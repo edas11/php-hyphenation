@@ -13,7 +13,7 @@ use Edvardas\Hyphenation\Hyphenator\Algorithm\AlgorithmRunner;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
 use Edvardas\Hyphenation\UtilityComponents\Timer\Timer;
 
-class HyphenateWordsActionFile implements Action
+class SimpleHyphenateWordsAction implements Action
 {
     private $output;
     private $dataProvider;

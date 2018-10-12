@@ -25,8 +25,14 @@ class PutWordAction implements Action
 
     public function execute()
     {
-        $word = implode('', $this->dataProvider->getWords());
-        $hyphenatedWord = implode('', $this->dataProvider->getHyphenatedWords());
+        $words = $this->dataProvider->getWords();
+        $hyphenatedWords = $this->dataProvider->getHyphenatedWords();
+        if (count($words) < 1 || count($hyphenatedWords) < 1) {
+            $this->output->printResult(['Error']);
+            return;
+        }
+        $word = $words[0];
+        $hyphenatedWord = $hyphenatedWords[0];
         Words::newFromColumnArrays([$word], [$hyphenatedWord])->addOrUpdate();
         $this->output->printResult(['Success']);
     }

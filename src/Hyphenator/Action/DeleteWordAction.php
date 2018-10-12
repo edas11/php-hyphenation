@@ -25,7 +25,12 @@ class DeleteWordAction implements Action
 
     public function execute()
     {
-        $word = implode('', $this->dataProvider->getWords());
+        $words = $this->dataProvider->getWords();
+        if (count($words) < 1) {
+            $this->output->printResult(['Error']);
+            return;
+        }
+        $word = $words[0];
         Words::newFromColumnArrays([$word], [$word])->delete();
         $this->output->printResult(['Success']);
     }

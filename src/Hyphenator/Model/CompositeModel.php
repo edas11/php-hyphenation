@@ -35,7 +35,7 @@ class CompositeModel implements PersistentModel
 
     public function persistNoTransaction(): void
     {
-        // TODO: Implement persistNoTransaction() method.
+        throw new \Exception('Unsupported operation');
     }
 
 }

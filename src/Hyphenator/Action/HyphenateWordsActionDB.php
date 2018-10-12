@@ -48,16 +48,16 @@ class HyphenateWordsActionDB implements Action
             $runner->run($wordsNotInDb, true);
             $resultWords = $runner->getHyphenatedWords();
             $hyphnatedWords = Words::newFromColumnArrays($wordsNotInDb, $resultWords);
-            var_dump($runner->getMatchedPatterns());
             $wordPatterns = WordPatterns::newFromList($runner->getMatchedPatterns());
             (new CompositeModel([$hyphnatedWords, $wordPatterns]))->persist();
         }
 
         $matchedPatternsResult = WordPatterns::getKnown($inputWords)->getMatchedPatterns();
-        $this->output->printResult($matchedPatternsResult);
-        $this->output->printResult($dbWords->getHyphenatedWords());
-        $this->output->printResult($resultWords);
-
+        $this->output->printMatchedPatterns($matchedPatternsResult);
+        $this->output->printHyphenatedWords(
+            array_combine($wordsNotInDb, $resultWords),
+            array_combine($wordsInDb, $dbWords->getHyphenatedWords())
+        );
         $this->printTime();
     }
 

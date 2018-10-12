@@ -19,23 +19,35 @@ class ConsoleOutput implements HyphenationOutput
         $this->console = new Console();
     }
 
-    public function printLn(string $lineToPrint)
-    {
-        $this->console->printLn($lineToPrint);
-    }
-
     public function printResult(array $result)
     {
+        $this->console->printLn("Result:");
         print_r($result);
     }
 
     public function printTime(float $executionTime)
     {
-        echo "Finished in $executionTime seconds.\n";
+        $this->console->printLn("Finished in $executionTime seconds.");
     }
 
     public function printError(string $msg)
     {
-        echo "Error: $msg";
+        $this->console->printLn("Error: $msg");
+    }
+
+    public function printMatchedPatterns(array $matchedPatterns)
+    {
+        $this->console->printLn("Matched patterns:");
+        print_r($matchedPatterns);
+    }
+
+    public function printHyphenatedWords(array $hyphenatedWords, array $skippedWords)
+    {
+        $this->console->printLn("Hyphenated words:");
+        print_r($hyphenatedWords);
+        if (count($skippedWords) > 0) {
+            $this->console->printLn("Skipped words:");
+            print_r($skippedWords);
+        }
     }
 }

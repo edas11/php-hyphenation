@@ -39,11 +39,12 @@ class Route
     {
         if (count($this->routeArray) !== count($match)) {
             $this->matches = false;
+            return;
         }
-        foreach($match as $pathIndex => $matchString)
-        {
+        foreach ($match as $pathIndex => $matchString) {
             if (!array_key_exists($pathIndex, $this->routeArray)) {
                 $this->matches = false;
+                return;
             }
             if ($matchString === '{param}') {
                 $this->pathParam = $this->routeArray[$pathIndex];
@@ -51,6 +52,7 @@ class Route
             }
             if ($this->routeArray[$pathIndex] !== $matchString) {
                 $this->matches = false;
+                return;
             }
         }
         $this->matches = true;

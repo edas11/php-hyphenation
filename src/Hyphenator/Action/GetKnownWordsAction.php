@@ -26,6 +26,6 @@ class GetKnownWordsAction implements Action
     public function execute()
     {
         $words = Words::getKnown();
-        $this->output->printResult($words->getHyphenatedWords());
+        $this->output->printResult(array_combine($words->getOriginalWords(), $words->getHyphenatedWords()));
     }
 }

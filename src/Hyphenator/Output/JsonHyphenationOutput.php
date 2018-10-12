@@ -13,6 +13,11 @@ class JsonHyphenationOutput implements HyphenationOutput
 {
     private $outputData = [];
 
+    public function flush()
+    {
+        echo json_encode($this->outputData);
+    }
+
     public function printResult(array $result)
     {
         if (array_key_exists('result', $this->outputData)) {
@@ -32,8 +37,15 @@ class JsonHyphenationOutput implements HyphenationOutput
         $this->outputData['error'] = $msg;
     }
 
-    public function flush()
+    public function printMatchedPatterns(array $matchedPatterns)
     {
-        echo json_encode($this->outputData);
+    }
+
+    public function printHyphenatedWords(array $hyphenatedWords, array $skippedWords = [])
+    {
+        $this->outputData['hyphenatedWords'] = $hyphenatedWords;
+        if (count($skippedWords) > 0) {
+            $this->outputData['skippedWords'] = $skippedWords;
+        }
     }
 }

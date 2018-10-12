@@ -15,4 +15,8 @@ interface HyphenationOutput
     public function printTime(float $executionTime);
 
     public function printError(string $msg);
+
+    public function printMatchedPatterns(array $matchedPatterns);
+
+    public function printHyphenatedWords(array $hyphenatedWords, array $skippedWords);
 }

@@ -9,15 +9,14 @@
 namespace Edvardas\Hyphenation\Hyphenator;
 
 use Edvardas\Hyphenation\Hyphenator\Controller\ConsoleController;
-use Edvardas\Hyphenation\Hyphenator\Output\ConsoleOutput;
 
 class ConsoleHyphenator implements Hyphenator
 {
     private $controller;
 
-    public function __construct()
+    public function __construct(ConsoleController $controller)
     {
-        $this->controller = new ConsoleController(new ConsoleOutput());
+        $this->controller = $controller;
     }
 
     public function execute(): void {

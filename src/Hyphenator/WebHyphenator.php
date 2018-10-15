@@ -14,14 +14,14 @@ use Edvardas\Hyphenation\Hyphenator\Output\JsonHyphenationOutput;
 
 class WebHyphenator implements Hyphenator
 {
-    private $output;
     private $controller;
+    private $output;
 
-    public function __construct()
+    public function __construct(HttpController $controller, JsonHyphenationOutput $output)
     {
         header('content-type: application/json');
-        $this->output = new JsonHyphenationOutput();
-        $this->controller = new HttpController($this->output);
+        $this->controller = $controller;
+        $this->output = $output;
     }
 
     public function execute(): void {

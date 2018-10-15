@@ -22,10 +22,10 @@ class ConsoleController implements Controller
     private $provider;
     private $input;
 
-    public function __construct(HyphenationOutput $output)
+    public function __construct(ConsoleInput $input, HyphenationConsoleDataProvider $provider)
     {
-        $this->input = new ConsoleInput();
-        $this->provider = new HyphenationConsoleDataProvider($this->input, $output);
+        $this->input = $input;
+        $this->provider = $provider;
     }
 
     public function getAction(): Action

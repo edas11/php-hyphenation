@@ -15,19 +15,19 @@ use Edvardas\Hyphenation\Hyphenator\Action\GetKnownWordsAction;
 use Edvardas\Hyphenation\Hyphenator\Action\ComplexHyphenateWordsAction;
 use Edvardas\Hyphenation\Hyphenator\Action\PutWordAction;
 use Edvardas\Hyphenation\Hyphenator\Input\HttpInput;
-use Edvardas\Hyphenation\Hyphenator\Output\HyphenationOutput;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationHttpDataProvider;
 use Edvardas\Hyphenation\UtilityComponents\Http\HttpRequest;
+use Edvardas\Hyphenation\UtilityComponents\Http\Route;
 
 class HttpController implements Controller
 {
     private $provider;
     private $route;
 
-    public function __construct(HyphenationOutput $output)
+    public function __construct(HyphenationHttpDataProvider $provider, Route $route)
     {
-        $this->provider = new HyphenationHttpDataProvider($output);
-        $this->route = HttpRequest::getRoute();
+        $this->provider = $provider;
+        $this->route = $route;
     }
 
     public function getAction(): Action

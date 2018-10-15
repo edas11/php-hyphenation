@@ -10,7 +10,7 @@ namespace Edvardas\Hyphenation\UtilityComponents\Database;
 
 use Edvardas\Hyphenation\App\App;
 
-class MySqlDatabase
+class MySqlDatabase implements SqlDatabase
 {
     private $builder;
 
@@ -55,10 +55,8 @@ class MySqlDatabase
     {
         $statement = $this->pdo->prepare($query->getQueryString());
         try {
-            //$this->pdo->beginTransaction();
             $statement->execute($query->getBindParams());
             $fetchedData = $statement->fetchAll();
-            //$this->pdo->commit();
         } catch (Exception $e) {
             $this->pdo->rollback();
             throw $e;
@@ -70,11 +68,9 @@ class MySqlDatabase
     {
         $statement = $this->pdo->prepare($query->getQueryString());
         try {
-            //$this->pdo->beginTransaction();
             $statement->execute(
                 $query->getBindParams()
             );
-            //$this->pdo->commit();
         }catch (Exception $e){
             $this->pdo->rollback();
             throw $e;

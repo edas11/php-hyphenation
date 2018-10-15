@@ -11,7 +11,7 @@ namespace Edvardas\Hyphenation\UtilityComponents\Database;
 
 use Edvardas\Hyphenation\App\App;
 
-class MySqlQueryBuilder
+class MySqlQueryBuilder implements SqlQueryBuilder
 {
     private $queryString = '';
     private $bindParams = [];

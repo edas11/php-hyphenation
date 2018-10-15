@@ -10,10 +10,12 @@ declare(strict_types = 1);
 namespace Edvardas\Hyphenation\App;
 
 use Edvardas\Hyphenation\Hyphenator\ConsoleHyphenator;
+use Edvardas\Hyphenation\Hyphenator\Database\MySqlDatabaseProxy;
 use Edvardas\Hyphenation\Hyphenator\Hyphenator;
 use Edvardas\Hyphenation\Hyphenator\WebHyphenator;
 use Edvardas\Hyphenation\UtilityComponents\Config\Config;
 use Edvardas\Hyphenation\UtilityComponents\Database\MySqlDatabase;
+use Edvardas\Hyphenation\UtilityComponents\Database\SqlDatabase;
 use Edvardas\Hyphenation\UtilityComponents\Logger\FileLogger;
 use Edvardas\Hyphenation\UtilityComponents\Cache\MemoryCache;
 use Edvardas\Hyphenation\UtilityComponents\Logger\NullLogger;
@@ -71,17 +73,11 @@ class App
         return new Config($configData);
     }
 
-    public static function getDb(): MySqlDatabase
+    public static function getDb(): SqlDatabase
     {
         if (!isset(self::$db)) {
-            $host = App::getConfig(['mysql', 'host']);
-            $db = App::getConfig(['mysql', 'db']);
-            $user = App::getConfig(['mysql', 'user']);
-            $pass = App::getConfig(['mysql', 'password']);
-            $charset = App::getConfig(['mysql', 'charset']);
-            self::$db = new MySqlDatabase($host, $db, $user, $pass, $charset);
+            self::$db = new MySqlDatabaseProxy();
         }
         return self::$db;
     }
-
 }

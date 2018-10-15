@@ -33,7 +33,7 @@ class PutWordAction implements Action
         }
         $word = $words[0];
         $hyphenatedWord = $hyphenatedWords[0];
-        Words::newFromColumnArrays([$word], [$hyphenatedWord])->addOrUpdate();
+        (new Words([$word], [$hyphenatedWord]))->addOrUpdate();
         $this->output->printResult(['Success']);
     }
 }

@@ -31,7 +31,7 @@ class DeleteWordAction implements Action
             return;
         }
         $word = $words[0];
-        Words::newFromColumnArrays([$word], [$word])->delete();
+        (new Words([$word], [$word]))->delete();
         $this->output->printResult(['Success']);
     }
 }

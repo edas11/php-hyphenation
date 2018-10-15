@@ -5,6 +5,7 @@
  * Date: 18.10.9
  * Time: 15.44
  */
+declare(strict_types = 1);
 
 namespace Edvardas\Hyphenation\Hyphenator\Model;
 
@@ -13,20 +14,30 @@ use Edvardas\Hyphenation\App\App;
 class Words implements PersistentModel
 {
     private $words = [];
+    private const WORD_COLUMN = 'word';
+    private const HYPHENATED_WORD_COLUMN = 'word_h';
 
-    public function __construct(array $words)
+    public function __construct(array $originalWords, array $hyphenatedWords)
     {
-        $this->words = $words;
+        $this->words = self::createTable($originalWords, $hyphenatedWords);
+    }
+
+    private static function createFromDbData(array $dbWords)
+    {
+        return new Words(
+            array_column($dbWords, self::WORD_COLUMN),
+            array_column($dbWords, self::HYPHENATED_WORD_COLUMN)
+        );
     }
 
     public function getOriginalWords(): array
     {
-        return array_column($this->words, 'word');
+        return array_column($this->words, self::WORD_COLUMN);
     }
 
     public function getHyphenatedWords(): array
     {
-        return array_column($this->words, 'word_h');
+        return array_column($this->words, self::HYPHENATED_WORD_COLUMN);
     }
 
     /**
@@ -38,15 +49,15 @@ class Words implements PersistentModel
         $builder = $db->builder();
         $query = $builder
             ->select()
-            ->columns(['word', 'word_h'])
+            ->columns([self::WORD_COLUMN, self::HYPHENATED_WORD_COLUMN])
             ->from('words')
             ->where()
-            ->in('word', $words)
+            ->in(self::WORD_COLUMN, $words)
             ->build();
         $db->beginTransaction();
         $hyphenatedWords = $db->executeAndFetch($query);
         $db->commit();
-        return new Words($hyphenatedWords);
+        return self::createFromDbData($hyphenatedWords);
     }
 
     public static function getKnown(): Words
@@ -55,22 +66,13 @@ class Words implements PersistentModel
         $builder = $db->builder();
         $query = $builder
             ->select()
-            ->columns(['word', 'word_h'])
+            ->columns([self::WORD_COLUMN, self::HYPHENATED_WORD_COLUMN])
             ->from('words')
             ->build();
         $db->beginTransaction();
         $hyphenatedWords = $db->executeAndFetch($query);
         $db->commit();
-        return new Words($hyphenatedWords);
-    }
-
-    public static function newFromColumnArrays(array $originalWords, array $hyphenatedWords)
-    {
-        $wordsTable = [];
-        foreach ($originalWords as $index => $word) {
-            array_push($wordsTable, ['word' => $word, 'word_h' => $hyphenatedWords[$index]]);
-        }
-        return new Words($wordsTable);
+        return self::createFromDbData($hyphenatedWords);
     }
 
     public function addOrUpdate(): void
@@ -84,15 +86,15 @@ class Words implements PersistentModel
                 ->columns(['*'])
                 ->from('words')
                 ->where()
-                ->equals('word', $wordRow['word'])
+                ->equals(self::WORD_COLUMN, $wordRow['word'])
                 ->build();
             $result = $db->executeAndFetch($querry);
             if (count($result) > 0) {
                 $querry = $builder
                     ->update('words')
-                    ->set(['word_h' => $wordRow['word_h']])
+                    ->set([self::HYPHENATED_WORD_COLUMN => $wordRow[self::HYPHENATED_WORD_COLUMN]])
                     ->where()
-                    ->equals('word', $wordRow['word'])
+                    ->equals(self::WORD_COLUMN, $wordRow['word'])
                     ->build();
                 $db->execute($querry);
             } else {
@@ -117,7 +119,7 @@ class Words implements PersistentModel
                 ->delete()
                 ->from('words')
                 ->where()
-                ->equals('word', $wordRow['word'])
+                ->equals(self::WORD_COLUMN, $wordRow['word'])
                 ->build();
             $db->execute($querry);
         }
@@ -142,5 +144,17 @@ class Words implements PersistentModel
             ->values($this->words)
             ->build();
         $db->execute($querry);
+    }
+
+    private static function createTable(array $originalWords, array $hyphenatedWords): array
+    {
+        $wordsTable = [];
+        foreach ($originalWords as $index => $word) {
+            array_push(
+                $wordsTable,
+                [self::WORD_COLUMN => $word, self::HYPHENATED_WORD_COLUMN => $hyphenatedWords[$index]]
+            );
+        }
+        return $wordsTable;
     }
 }

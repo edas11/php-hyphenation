@@ -5,7 +5,7 @@
  * Date: 18.10.9
  * Time: 16.39
  */
-
+declare(strict_types = 1);
 namespace Edvardas\Hyphenation\Hyphenator\Model;
 
 
@@ -16,38 +16,16 @@ class WordPatterns implements PersistentModel
     private $wordPatterns;
 
     /**
-     * @param string[][] $wordPatterns\
+     * @param string[][] $wordPatterns
      */
     public function __construct(array $wordPatterns)
     {
         $this->wordPatterns = $wordPatterns;
     }
 
-    /**
-     * @param string[][] $wordPatterns
-     */
-    public static function newFromList(array $wordPatterns): WordPatterns
-    {
-        $wordPatternsTable = [];
-        foreach ($wordPatterns as $word => $patterns) {
-            foreach ($patterns as $pattern) {
-                array_push($wordPatternsTable, ['word' => $word, 'pattern' => $pattern]);
-            }
-        }
-        return new WordPatterns($wordPatternsTable);
-    }
-
     public function getMatchedPatterns()
     {
-        $matchedPatternsResult = [];
-        foreach ($this->wordPatterns as $match) {
-            if (array_key_exists($match['word'], $matchedPatternsResult)) {
-                array_push($matchedPatternsResult[$match['word']], $match['pattern']);
-            } else {
-                $matchedPatternsResult[$match['word']] = [$match['pattern']];
-            }
-        }
-        return $matchedPatternsResult;
+        return $this->wordPatterns;
     }
 
     public static function getKnown(array $words): WordPatterns
@@ -66,7 +44,8 @@ class WordPatterns implements PersistentModel
             ->build();
         $wordMatchedPatterns = $db->executeAndFetch($query);
         $db->commit();
-        return new WordPatterns($wordMatchedPatterns);
+
+        return new WordPatterns(self::mapTableToApplication($wordMatchedPatterns));
     }
 
     public function persist(): void
@@ -81,19 +60,33 @@ class WordPatterns implements PersistentModel
     {
         $db = App::getDb();
         $builder = $db->builder();
-        foreach ($this->wordPatterns as $matchedPatternsRow) {
-            $querry = $builder
-                ->insert()
-                ->into('word_patterns', ['word_id', 'pattern_id'])
-                ->select()
-                ->columns(['word_id', 'pattern_id'])
-                ->from('words, patterns')->where()
-                ->equals('word', $matchedPatternsRow['word'])
-                ->and()
-                ->equals('pattern', $matchedPatternsRow['pattern'])
-                ->build();
-            $db->execute($querry);
+        foreach ($this->wordPatterns as $word => $matchedPatterns) {
+            foreach ($matchedPatterns as $pattern) {
+                $querry = $builder
+                    ->insert()
+                    ->into('word_patterns', ['word_id', 'pattern_id'])
+                    ->select()
+                    ->columns(['word_id', 'pattern_id'])
+                    ->from('words, patterns')->where()
+                    ->equals('word', $word)
+                    ->and()
+                    ->equals('pattern', $pattern)
+                    ->build();
+                $db->execute($querry);
+            }
         }
     }
 
+    private static function mapTableToApplication(array $wordMatchedPatterns): array
+    {
+        $matchedPatternsResult = [];
+        foreach ($wordMatchedPatterns as $match) {
+            if (array_key_exists($match['word'], $matchedPatternsResult)) {
+                array_push($matchedPatternsResult[$match['word']], $match['pattern']);
+            } else {
+                $matchedPatternsResult[$match['word']] = [$match['pattern']];
+            }
+        }
+        return $matchedPatternsResult;
+    }
 }

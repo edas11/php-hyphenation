@@ -47,8 +47,8 @@ class ComplexHyphenateWordsAction implements Action
         if (count($wordsNotInDb) > 0) {
             $runner->run($wordsNotInDb, true);
             $resultWords = $runner->getHyphenatedWords();
-            $hyphnatedWords = Words::newFromColumnArrays($wordsNotInDb, $resultWords);
-            $wordPatterns = WordPatterns::newFromList($runner->getMatchedPatterns());
+            $hyphnatedWords = new Words($wordsNotInDb, $resultWords);
+            $wordPatterns = new WordPatterns($runner->getMatchedPatterns());
             (new CompositeModel([$hyphnatedWords, $wordPatterns]))->persist();
         }
 

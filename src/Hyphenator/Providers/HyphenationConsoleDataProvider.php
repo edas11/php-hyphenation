@@ -80,7 +80,7 @@ class HyphenationConsoleDataProvider implements HyphenationDataProvider
             $patterns = Patterns::getKnown();
         } else {
             $patternsFileName = App::getConfig(['patternsFileName'], 'patterns');
-            $patterns = Patterns::newFromList(PatternsFile::getContentsAsArray($patternsFileName));
+            $patterns = new Patterns(PatternsFile::getContentsAsArray($patternsFileName));
         }
         return $patterns;
     }

@@ -5,7 +5,7 @@
  * Date: 18.10.9
  * Time: 16.32
  */
-
+declare(strict_types = 1);
 namespace Edvardas\Hyphenation\Hyphenator\Model;
 
 use Edvardas\Hyphenation\App\App;
@@ -19,23 +19,12 @@ class Patterns implements PersistentModel
      */
     public function __construct(array $patterns)
     {
-        $this->patterns = $patterns;
-    }
-
-    /**
-     * @param string[] $patterns
-     */
-    public static function newFromList(array $patterns): Patterns
-    {
-        $patternsTable = array_map(function ($pattern) {
-            return ['pattern' => $pattern];
-        }, $patterns);
-        return new Patterns($patternsTable);
+        $this->patterns = self::mapApplicationToDb($patterns);
     }
 
     public function getPatterns()
     {
-        return array_column($this->patterns, 'pattern');
+        return self::mapDbToApplication($this->patterns);
     }
 
     public static function getKnown(): Patterns
@@ -50,7 +39,7 @@ class Patterns implements PersistentModel
         $db->beginTransaction();
         $patterns = $db->executeAndFetch($query);
         $db->commit();
-        return new Patterns($patterns);
+        return new Patterns(self::mapDbToApplication($patterns));
     }
 
     public function persist(): void
@@ -75,5 +64,18 @@ class Patterns implements PersistentModel
             ->into('patterns', ['pattern'])
             ->values($this->patterns)->build();
         $db->execute($query);
+    }
+
+    private static function mapDbToApplication(array $patterns): array
+    {
+        return array_column($patterns, 'pattern');
+    }
+
+    private static function mapApplicationToDb(array $patterns): array
+    {
+        $patternsTable = array_map(function ($pattern) {
+            return ['pattern' => $pattern];
+        }, $patterns);
+        return $patternsTable;
     }
 }

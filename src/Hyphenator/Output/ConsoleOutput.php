@@ -41,13 +41,15 @@ class ConsoleOutput implements HyphenationOutput
         print_r($matchedPatterns);
     }
 
-    public function printHyphenatedWords(array $hyphenatedWords, array $skippedWords)
+    public function printSkippedWords(array $skippedWords)
+    {
+        $this->console->printLn("Skipped words:");
+        print_r($skippedWords);
+    }
+
+    public function printHyphenatedWords(array $hyphenatedWords)
     {
         $this->console->printLn("Hyphenated words:");
         print_r($hyphenatedWords);
-        if (count($skippedWords) > 0) {
-            $this->console->printLn("Skipped words:");
-            print_r($skippedWords);
-        }
     }
 }

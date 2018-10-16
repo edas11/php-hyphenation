@@ -8,36 +8,33 @@
 
 namespace Edvardas\Hyphenation\Hyphenator\Action;
 
-use Edvardas\Hyphenation\App\App;
 use Edvardas\Hyphenation\Hyphenator\Algorithm\AlgorithmRunner;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
 use Edvardas\Hyphenation\UtilityComponents\Timer\Timer;
-use Psr\Log\LoggerInterface;
 
-class SimpleHyphenateWordsAction implements Action
+class WordsHyphenationAction implements Action
 {
     private $output;
-    private $dataProvider;
     private $timer;
     private $logger;
+    private $inputWords;
+    private $algorithm;
 
     public function __construct(HyphenationDataProvider $dataProvider)
     {
         $this->timer = new Timer();
         $this->output = $dataProvider->getOutput();
-        $this->dataProvider = $dataProvider;
         $this->logger = $dataProvider->getLogger();
+        $this->inputWords = $dataProvider->getWordsInput();
+        $this->algorithm = $dataProvider->getAlgorithm();
     }
 
     public function execute(): void
     {
-        $inputWords = $this->dataProvider->getWordsInput();
-        $algorithm = $this->dataProvider->getAlgorithm();
-        $runner = new AlgorithmRunner($algorithm);
-
         $this->timer->start();
 
-        $runner->run($inputWords);
+        $runner = new AlgorithmRunner($this->algorithm);
+        $runner->run($this->inputWords);
         $this->output->printResult($runner->getHyphenatedWords());
 
         $this->printTime();

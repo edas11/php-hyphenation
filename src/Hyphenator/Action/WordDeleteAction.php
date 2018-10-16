@@ -16,24 +16,23 @@ use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
 class WordDeleteAction implements Action
 {
     private $output;
-    private $dataProvider;
     private $modelFactory;
+    private $inputWords;
 
     public function __construct(HyphenationDataProvider $dataProvider)
     {
         $this->output = $dataProvider->getOutput();
-        $this->dataProvider = $dataProvider;
         $this->modelFactory = $dataProvider->getModelFactory();
+        $this->inputWords = $dataProvider->getWordsInput();
     }
 
     public function execute(): void
     {
-        $words = $this->dataProvider->getWordsInput();
-        if (count($words) < 1) {
+        if (count($this->inputWords) < 1) {
             $this->output->printResult(['Error']);
             return;
         }
-        $word = $words[0];
+        $word = $this->inputWords[0];
         $this->modelFactory->createHyphenatedWords([$word => ''])->delete();
         $this->output->printResult(['Success']);
     }

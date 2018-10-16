@@ -12,7 +12,7 @@ use Edvardas\Hyphenation\Hyphenator\Action\Action;
 use Edvardas\Hyphenation\Hyphenator\Action\BadRequestAction;
 use Edvardas\Hyphenation\Hyphenator\Action\WordDeleteAction;
 use Edvardas\Hyphenation\Hyphenator\Action\WordsGetKnownAction;
-use Edvardas\Hyphenation\Hyphenator\Action\ComplexHyphenateWordsAction;
+use Edvardas\Hyphenation\Hyphenator\Action\WordsHyphenationWithDbAction;
 use Edvardas\Hyphenation\Hyphenator\Action\WordPutAction;
 use Edvardas\Hyphenation\Hyphenator\Input\HttpInput;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationHttpDataProvider;
@@ -72,7 +72,7 @@ class HttpController implements Controller
                 $this->provider->setWords(array_values($body['words']));
             }
 
-            return new ComplexHyphenateWordsAction($this->provider);
+            return new WordsHyphenationWithDbAction($this->provider);
         } else {
             return new BadRequestAction($this->provider);
         }

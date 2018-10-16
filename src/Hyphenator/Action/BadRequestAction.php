@@ -12,16 +12,16 @@ use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
 
 class BadRequestAction implements Action
 {
-    private $dataProvider;
+    private $output;
 
     public function __construct(HyphenationDataProvider $dataProvider)
     {
-        $this->dataProvider = $dataProvider;
+        $this->output = $dataProvider->getOutput();
     }
 
-    public function execute()
+    public function execute(): void
     {
         http_response_code(400);
-        $this->dataProvider->getOutput()->printError('Bad request');
+        $this->output->printError('Bad request');
     }
 }

@@ -90,7 +90,7 @@ class HyphenationConsoleDataProvider implements HyphenationDataProvider
         }
     }
 
-    public function getHyphenatedWords(): array
+    public function getHyphenatedWordsInput(): array
     {
         $hyphenatedWordsInput = $this->input->getHyphenatedWordsInput();
         return explode(' ', $hyphenatedWordsInput);

@@ -1,0 +1,72 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: edvardas
+ * Date: 18.10.8
+ * Time: 13.25
+ */
+declare(strict_types = 1);
+
+namespace Edvardas\Hyphenation\Hyphenator\Action;
+
+use Edvardas\Hyphenation\Hyphenator\Algorithm\AlgorithmRunner;
+use Edvardas\Hyphenation\Hyphenator\Database\HyphenationDatabase;
+use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
+use Edvardas\Hyphenation\UtilityComponents\Timer\Timer;
+
+class WordsHyphenationWithDbAction implements Action
+{
+    private $output;
+    private $timer;
+    private $modelFactory;
+    private $logger;
+    private $inputWords;
+    private $algorithm;
+
+    public function __construct(HyphenationDataProvider $dataProvider)
+    {
+        $this->timer = new Timer();
+        $this->output = $dataProvider->getOutput();
+        $this->modelFactory = $dataProvider->getModelFactory();
+        $this->logger = $dataProvider->getLogger();
+        $this->inputWords = $dataProvider->getWordsInput();
+        $this->algorithm = $dataProvider->getAlgorithm();
+    }
+
+    public function execute(): void
+    {
+        $this->timer->start();
+
+        $dbWordsModel = $this->modelFactory->getKnownHyphenatedWords($this->inputWords);
+        $this->output->printSkippedWords($dbWordsModel->getWords());
+        $wordsNotInDb = $dbWordsModel->filterUnknownWords($this->inputWords);
+
+        if (count($wordsNotInDb) > 0) {
+            $runner = new AlgorithmRunner($this->algorithm);
+            $runner->run($wordsNotInDb, true);
+            $hyphenatedWords = $runner->getHyphenatedWords();
+            $this->output->printHyphenatedWords($hyphenatedWords);
+
+            $this->saveHyphenationResults($hyphenatedWords, $runner->getMatchedPatterns());
+        }
+
+        $matchedPatternsResult = $this->modelFactory->getKnownWordPatterns($this->inputWords)->getMatchedPatterns();
+        $this->output->printMatchedPatterns($matchedPatternsResult);
+
+        $this->printTime();
+    }
+
+    private function printTime(): void
+    {
+        $time = $this->timer->getInterval();
+        $this->output->printTime($time);
+        $this->logger->info("Finished in $time seconds.");
+    }
+
+    protected function saveHyphenationResults(array $hyphenatedWords, array $matchedPatterns): void
+    {
+        $hyphenatedWordsModel = $this->modelFactory->createHyphenatedWords($hyphenatedWords);
+        $wordPatternsModel = $this->modelFactory->createWordPatterns($matchedPatterns);
+        $this->modelFactory->createCompositeModel([$hyphenatedWordsModel, $wordPatternsModel])->persist();
+    }
+}

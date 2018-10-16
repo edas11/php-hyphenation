@@ -41,11 +41,13 @@ class JsonHyphenationOutput implements HyphenationOutput
     {
     }
 
-    public function printHyphenatedWords(array $hyphenatedWords, array $skippedWords = [])
+    public function printSkippedWords(array $skippedWords)
+    {
+        $this->outputData['skippedWords'] = $skippedWords;
+    }
+
+    public function printHyphenatedWords(array $hyphenatedWords)
     {
         $this->outputData['hyphenatedWords'] = $hyphenatedWords;
-        if (count($skippedWords) > 0) {
-            $this->outputData['skippedWords'] = $skippedWords;
-        }
     }
 }

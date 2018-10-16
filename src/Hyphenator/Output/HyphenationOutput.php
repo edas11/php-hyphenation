@@ -18,5 +18,7 @@ interface HyphenationOutput
 
     public function printMatchedPatterns(array $matchedPatterns);
 
-    public function printHyphenatedWords(array $hyphenatedWords, array $skippedWords);
+    public function printHyphenatedWords(array $hyphenatedWords);
+
+    public function printSkippedWords(array $skippedWords);
 }

@@ -24,7 +24,7 @@ interface HyphenationDataProvider
 
     public function getWordsInput(): array;
 
-    public function getHyphenatedWords(): array;
+    public function getHyphenatedWordsInput(): array;
 
     public function getAlgorithm(): HyphenationAlgorithmInterface;
 

@@ -16,26 +16,26 @@ use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
 class WordPutAction implements Action
 {
     private $output;
-    private $dataProvider;
     private $modelFactory;
+    private $inputWords;
+    private $inputHyphenatedWords;
 
     public function __construct(HyphenationDataProvider $dataProvider)
     {
         $this->output = $dataProvider->getOutput();
-        $this->dataProvider = $dataProvider;
         $this->modelFactory = $dataProvider->getModelFactory();
+        $this->inputWords = $dataProvider->getWordsInput();
+        $this->inputHyphenatedWords = $dataProvider->getHyphenatedWordsInput();
     }
 
     public function execute(): void
     {
-        $words = $this->dataProvider->getWordsInput();
-        $hyphenatedWords = $this->dataProvider->getHyphenatedWords();
-        if (count($words) < 1 || count($hyphenatedWords) < 1) {
+        if (count($this->inputWords) < 1 || count($this->inputHyphenatedWords) < 1) {
             $this->output->printResult(['Error']);
             return;
         }
-        $word = $words[0];
-        $hyphenatedWord = $hyphenatedWords[0];
+        $word = $this->inputWords[0];
+        $hyphenatedWord = $this->inputHyphenatedWords[0];
         $this->modelFactory->createHyphenatedWords([$word => $hyphenatedWord])->persist();
         $this->output->printResult(['Success']);
     }

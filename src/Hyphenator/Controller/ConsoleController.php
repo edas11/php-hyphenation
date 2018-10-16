@@ -9,8 +9,8 @@
 namespace Edvardas\Hyphenation\Hyphenator\Controller;
 
 use Edvardas\Hyphenation\Hyphenator\Action\Action;
-use Edvardas\Hyphenation\Hyphenator\Action\ComplexHyphenateWordsAction;
-use Edvardas\Hyphenation\Hyphenator\Action\SimpleHyphenateWordsAction;
+use Edvardas\Hyphenation\Hyphenator\Action\WordsHyphenationWithDbAction;
+use Edvardas\Hyphenation\Hyphenator\Action\WordsHyphenationAction;
 use Edvardas\Hyphenation\Hyphenator\Action\PatternsSaveInDbAction;
 use Edvardas\Hyphenation\Hyphenator\Input\ConsoleInput;
 use Edvardas\Hyphenation\Hyphenator\Input\InputCodes;
@@ -47,10 +47,10 @@ class ConsoleController implements Controller
         $this->sourceInput = $source;
         switch ($source) {
             case InputCodes::FILE_SRC:
-                return new SimpleHyphenateWordsAction($this->provider);
+                return new WordsHyphenationAction($this->provider);
                 break;
             case InputCodes::DB_SRC:
-                return new ComplexHyphenateWordsAction($this->provider);
+                return new WordsHyphenationWithDbAction($this->provider);
                 break;
         }
     }

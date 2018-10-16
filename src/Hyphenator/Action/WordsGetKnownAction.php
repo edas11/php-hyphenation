@@ -13,20 +13,19 @@ use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
 class WordsGetKnownAction implements Action
 {
     private $output;
-    private $dataProvider;
     private $modelFactory;
+    private $filterWords;
 
     public function __construct(HyphenationDataProvider $dataProvider)
     {
         $this->output = $dataProvider->getOutput();
-        $this->dataProvider = $dataProvider;
         $this->modelFactory = $dataProvider->getModelFactory();
+        $this->filterWords = $dataProvider->getWordsInput();
     }
 
     public function execute(): void
     {
-        $filterWords = $this->dataProvider->getWordsInput();
-        $words = $this->modelFactory->getKnownHyphenatedWords($filterWords);
+        $words = $this->modelFactory->getKnownHyphenatedWords($this->filterWords);
         $this->output->printResult($words->getWords());
     }
 }

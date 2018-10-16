@@ -61,7 +61,7 @@ class HyphenationHttpDataProvider implements HyphenationDataProvider
         return $this->wordsArray;
     }
 
-    public function getHyphenatedWords(): array
+    public function getHyphenatedWordsInput(): array
     {
         return $this->hyphenatedWordsArray;
     }

@@ -14,18 +14,18 @@ use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
 
 class PatternsSaveInDbAction implements Action
 {
-    private $dataProvider;
     private $modelFactory;
+    private $patternsInput;
 
     public function __construct(HyphenationDataProvider $dataProvider)
     {
-        $this->dataProvider = $dataProvider;
         $this->modelFactory = $dataProvider->getModelFactory();
+        $this->patternsInput = $dataProvider->getPatternsInput();
     }
 
     public function execute(): void
     {
-        $this->modelFactory->createPatternsModel($this->dataProvider->getPatternsInput())->persist();
+        $this->modelFactory->createPatternsModel($this->patternsInput)->persist();
     }
 
 }

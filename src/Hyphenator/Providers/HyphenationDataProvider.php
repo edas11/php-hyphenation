@@ -12,12 +12,15 @@ use Edvardas\Hyphenation\Hyphenator\Algorithm\HyphenationAlgorithmInterface;
 use Edvardas\Hyphenation\Hyphenator\Model\ModelFactory;
 use Edvardas\Hyphenation\Hyphenator\Model\Patterns;
 use Edvardas\Hyphenation\Hyphenator\Output\HyphenationOutput;
+use Psr\Log\LoggerInterface;
 
 interface HyphenationDataProvider
 {
     public function getOutput(): HyphenationOutput;
 
     public function getModelFactory(): ModelFactory;
+
+    public function getLogger(): LoggerInterface;
 
     public function getWords(): array;
 

@@ -9,13 +9,15 @@
 namespace Edvardas\Hyphenation\Hyphenator\File;
 
 
+use Psr\Log\LoggerInterface;
+
 class WordsFile
 {
-    public static function getContentsAsArray(string $wordsFileName): array
+    public static function getContentsAsArray(string $wordsFileName, LoggerInterface $logger): array
     {
         $words = file($wordsFileName, FILE_IGNORE_NEW_LINES);
         if ($words === false) {
-            App::$logger->error("Could not read $wordsFileName file.");
+            $logger->error("Could not read $wordsFileName file.");
             exit;
         }
         return $words;

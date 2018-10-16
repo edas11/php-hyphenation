@@ -11,9 +11,6 @@ namespace Edvardas\Hyphenation\Hyphenator\Action;
 use Edvardas\Hyphenation\App\App;
 use Edvardas\Hyphenation\Hyphenator\Algorithm\AlgorithmRunner;
 use Edvardas\Hyphenation\Hyphenator\Database\HyphenationDatabase;
-use Edvardas\Hyphenation\Hyphenator\Model\CompositeModel;
-use Edvardas\Hyphenation\Hyphenator\Model\WordPatterns;
-use Edvardas\Hyphenation\Hyphenator\Model\Words;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
 use Edvardas\Hyphenation\UtilityComponents\Timer\Timer;
 
@@ -23,6 +20,7 @@ class ComplexHyphenateWordsAction implements Action
     private $dataProvider;
     private $timer;
     private $modelFactory;
+    private $logger;
 
     public function __construct(HyphenationDataProvider $dataProvider)
     {
@@ -30,6 +28,7 @@ class ComplexHyphenateWordsAction implements Action
         $this->output = $dataProvider->getOutput();
         $this->dataProvider = $dataProvider;
         $this->modelFactory = $this->dataProvider->getModelFactory();
+        $this->logger = $dataProvider->getLogger();
     }
 
     public function execute()
@@ -67,7 +66,7 @@ class ComplexHyphenateWordsAction implements Action
     {
         $time = $this->timer->getInterval();
         $this->output->printTime($time);
-        App::$logger->info("Finished in $time seconds.");
+        $this->logger->info("Finished in $time seconds.");
     }
 
 }

@@ -14,13 +14,15 @@ use Edvardas\Hyphenation\Hyphenator\Algorithm\WordHyphenationNumbers;
 use Edvardas\Hyphenation\Hyphenator\Algorithm\PatternHyphenationNumbers;
 use Edvardas\Hyphenation\Hyphenator\Algorithm\AbstractHyphenationAlgorithm;
 use Edvardas\Hyphenation\App\App;
+use Psr\Log\LoggerInterface;
+use Psr\SimpleCache\CacheInterface;
 
 class FullTreeHyphenationAlgorithm extends AbstractHyphenationAlgorithm
 {
-    public function __construct(array $patterns)
+    public function __construct(array $patterns, CacheInterface $cache, LoggerInterface $logger)
     {
-        parent::__construct($patterns);
-        App::$logger->info("Started full tree hyphenation algorithm.");
+        parent::__construct($patterns, $cache, $logger);
+        $this->logger->info("Started full tree hyphenation algorithm.");
     }
 
     protected function parsePatternTree(array $patterns): array
@@ -61,10 +63,10 @@ class FullTreeHyphenationAlgorithm extends AbstractHyphenationAlgorithm
                     )
                 );
             } else {
-                App::$logger->info("Reached level $level in patterns tree.");
+                $this->logger->info("Reached level $level in patterns tree.");
             }
         } else {
-            App::$logger->info("Reached level $level in patterns tree.");
+            $this->logger->info("Reached level $level in patterns tree.");
         }
 
         $patternsOfThisLevel->addAll($patternsOfNextLevels->get());

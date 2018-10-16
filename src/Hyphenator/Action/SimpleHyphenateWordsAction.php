@@ -12,18 +12,21 @@ use Edvardas\Hyphenation\App\App;
 use Edvardas\Hyphenation\Hyphenator\Algorithm\AlgorithmRunner;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
 use Edvardas\Hyphenation\UtilityComponents\Timer\Timer;
+use Psr\Log\LoggerInterface;
 
 class SimpleHyphenateWordsAction implements Action
 {
     private $output;
     private $dataProvider;
     private $timer;
+    private $logger;
 
     public function __construct(HyphenationDataProvider $dataProvider)
     {
         $this->timer = new Timer();
         $this->output = $dataProvider->getOutput();
         $this->dataProvider = $dataProvider;
+        $this->logger = $dataProvider->getLogger();
     }
 
     public function execute()
@@ -45,6 +48,6 @@ class SimpleHyphenateWordsAction implements Action
     {
         $time = $this->timer->getInterval();
         $this->output->printTime($time);
-        App::$logger->info("Finished in $time seconds.");
+        $this->logger->info("Finished in $time seconds.");
     }
 }

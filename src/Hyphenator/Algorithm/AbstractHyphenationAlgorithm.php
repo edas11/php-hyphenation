@@ -12,6 +12,8 @@ namespace Edvardas\Hyphenation\Hyphenator\Algorithm;
 use Edvardas\Hyphenation\Hyphenator\Algorithm\HyphenationAlgorithmInterface;
 use Edvardas\Hyphenation\Hyphenator\Algorithm\WordHyphenationNumbers;
 use Edvardas\Hyphenation\App\App;
+use Psr\Log\LoggerInterface;
+use Psr\SimpleCache\CacheInterface;
 
 abstract class AbstractHyphenationAlgorithm implements HyphenationAlgorithmInterface
 {
@@ -19,18 +21,23 @@ abstract class AbstractHyphenationAlgorithm implements HyphenationAlgorithmInter
     private $patterns;
     private $macthedPatterns = [];
     private $saveMatchedPatterns = false;
+    private $cache;
+    protected $logger;
 
-    public function __construct(array $patterns)
+    public function __construct(array $patterns, CacheInterface $cache, LoggerInterface $logger)
     {
         $this->patterns = $patterns;
+        $this->cache = $cache;
+        $this->logger = $logger;
         $patternTree = $this->parsePatternTree($patterns);
-        App::$cache->set('patterns-tree', $patternTree);
+        $this->cache->set('patterns-tree', $patternTree);
     }
 
     abstract protected function parsePatternTree(array $patterns);
 
     public function execute(string $inputWord, bool $saveMatchedPatterns = false): string
     {
+        $this->logger->info("Started hyphenation algorithm at " . date('Y-m-d H:i:s'));
         $this->saveMatchedPatterns = $saveMatchedPatterns;
         $this->macthedPatterns = [];
         $matchedNumbersAll = $this->getWordHyphenationNumbers($inputWord);
@@ -45,7 +52,7 @@ abstract class AbstractHyphenationAlgorithm implements HyphenationAlgorithmInter
 
     private function getWordHyphenationNumbers(string $inputWord): WordHyphenationNumbers
     {
-        App::$logger->info("Hyphenation on word $inputWord.");
+        $this->logger->info("Hyphenation on word $inputWord.");
         $matchedNumbersAll = new WordHyphenationNumbers(strlen($inputWord) - 1);
         for ($wordIndex = 0; $wordIndex < strlen($inputWord); $wordIndex++) {
             $possiblePatterns = $this->matchedPattern($inputWord, $wordIndex, $this->patternTree());
@@ -65,7 +72,7 @@ abstract class AbstractHyphenationAlgorithm implements HyphenationAlgorithmInter
         if ($this->begginingOrEndPatternFoundInMiddle($pattern, $reducedPattern, $inputWord, $wordIndex)) {
             return new WordHyphenationNumbers(strlen($inputWord) - 1);
         }
-        App::$logger->info("Matched pattern $pattern");
+        $this->logger->info("Matched pattern $pattern");
         if ($this->saveMatchedPatterns) {
             array_push($this->macthedPatterns, $pattern);
         }
@@ -96,10 +103,10 @@ abstract class AbstractHyphenationAlgorithm implements HyphenationAlgorithmInter
 
     private function patternTree(): array
     {
-        $tree = App::$cache->get('patterns-tree');
+        $tree = $this->cache->get('patterns-tree');
         if ($tree === null) {
             $tree = $this->parsePatternTree($this->patterns);
-            App::$cache->set('patterns-tree', $tree);
+            $this->cache->set('patterns-tree', $tree);
         }
         return $tree;
     }

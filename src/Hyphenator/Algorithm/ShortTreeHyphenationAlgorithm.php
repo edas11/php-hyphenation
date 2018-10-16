@@ -13,13 +13,15 @@ use Edvardas\Hyphenation\Hyphenator\Algorithm\PatternsNodeInTree;
 use Edvardas\Hyphenation\Hyphenator\Algorithm\AbstractHyphenationAlgorithm;
 use Edvardas\Hyphenation\Hyphenator\Algorithm\WordHyphenationNumbers;
 use Edvardas\Hyphenation\App\App;
+use Psr\Log\LoggerInterface;
+use Psr\SimpleCache\CacheInterface;
 
 class ShortTreeHyphenationAlgorithm extends AbstractHyphenationAlgorithm
 {
-    public function __construct(array $patterns)
+    public function __construct(array $patterns, CacheInterface $cache, LoggerInterface $logger)
     {
-        parent::__construct($patterns);
-        App::$logger->info("Started short tree hyphenation algorithm.");
+        parent::__construct($patterns, $cache, $logger);
+        $this->logger->info("Started short tree hyphenation algorithm.");
     }
 
     protected function parsePatternTree(array $patterns): array

@@ -19,10 +19,12 @@ use Edvardas\Hyphenation\Hyphenator\Output\JsonHyphenationOutput;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationConsoleDataProvider;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationHttpDataProvider;
 use Edvardas\Hyphenation\Hyphenator\WebHyphenator;
+use Edvardas\Hyphenation\UtilityComponents\Cache\MemoryCache;
 use Edvardas\Hyphenation\UtilityComponents\Config\Config;
 use Edvardas\Hyphenation\UtilityComponents\Database\MySqlDatabase;
 use Edvardas\Hyphenation\UtilityComponents\Http\HttpRequest;
 use Edvardas\Hyphenation\UtilityComponents\Http\Route;
+use Edvardas\Hyphenation\UtilityComponents\Logger\FileLogger;
 
 class DiContainer
 {
@@ -42,13 +44,18 @@ class DiContainer
             case ConsoleHyphenator::class:
                 return new ConsoleHyphenator($this->get(ConsoleController::class));
             case ConsoleController::class:
-                return new ConsoleController($this->get(ConsoleInput::class), $this->get(HyphenationConsoleDataProvider::class));
+                return new ConsoleController(
+                    $this->get(ConsoleInput::class),
+                    $this->get(HyphenationConsoleDataProvider::class)
+                );
             case HyphenationConsoleDataProvider::class:
                 return new HyphenationConsoleDataProvider(
                     $this->get(ConsoleInput::class),
                     $this->get(ConsoleOutput::class),
                     $this->get(Config::class),
-                    $this->get(ModelFactory::class)
+                    $this->get(ModelFactory::class),
+                    $this->get(MemoryCache::class),
+                    $this->get(FileLogger::class)
                 );
             case ConsoleOutput::class:
                 return new ConsoleOutput();
@@ -58,19 +65,34 @@ class DiContainer
                 $configData = require('config.php');
                 return new Config($configData);
             case WebHyphenator::class:
-                return new WebHyphenator($this->get(HttpController::class), $this->get(JsonHyphenationOutput::class));
+                return new WebHyphenator(
+                    $this->get(HttpController::class),
+                    $this->get(JsonHyphenationOutput::class)
+                );
             case HttpController::class:
-                return new HttpController($this->get(HyphenationHttpDataProvider::class), $this->get(Route::class));
+                return new HttpController(
+                    $this->get(HyphenationHttpDataProvider::class),
+                    $this->get(Route::class)
+                );
             case JsonHyphenationOutput::class:
                 return new JsonHyphenationOutput();
             case HyphenationHttpDataProvider::class:
-                return new HyphenationHttpDataProvider($this->get(JsonHyphenationOutput::class), $this->get(ModelFactory::class));
+                return new HyphenationHttpDataProvider(
+                    $this->get(JsonHyphenationOutput::class),
+                    $this->get(ModelFactory::class),
+                    $this->get(MemoryCache::class),
+                    $this->get(FileLogger::class)
+                );
             case Route::class:
                 return HttpRequest::getRoute();
             case ModelFactory::class:
                 return new ModelFactory($this->get(MySqlDatabase::class));
             case MySqlDatabase::class:
                 return new MySqlDatabaseProxy($this->get(Config::class));
+            case MemoryCache::class:
+                return new MemoryCache();
+            case FileLogger::class:
+                return new FileLogger();
             default:
                 throw new \Exception("Cant create $instanceName");
         }

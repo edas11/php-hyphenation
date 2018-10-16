@@ -24,6 +24,9 @@ use Edvardas\Hyphenation\Hyphenator\Model\ModelFactory;
 use Edvardas\Hyphenation\Hyphenator\Model\Patterns;
 use Edvardas\Hyphenation\Hyphenator\Output\HyphenationOutput;
 use Edvardas\Hyphenation\UtilityComponents\Config\Config;
+use Edvardas\Hyphenation\UtilityComponents\Logger\NullLogger;
+use Psr\Log\LoggerInterface;
+use Psr\SimpleCache\CacheInterface;
 
 class HyphenationConsoleDataProvider implements HyphenationDataProvider
 {
@@ -31,13 +34,23 @@ class HyphenationConsoleDataProvider implements HyphenationDataProvider
     private $output;
     private $config;
     private $modelFactory;
+    private $cache;
+    private $logger;
 
-    public function __construct(ConsoleInput $input, HyphenationOutput $output, Config $config, ModelFactory $modelFactory)
-    {
+    public function __construct(
+        ConsoleInput $input,
+        HyphenationOutput $output,
+        Config $config,
+        ModelFactory $modelFactory,
+        CacheInterface $cache,
+        LoggerInterface $logger
+    ) {
         $this->input = $input;
         $this->output = $output;
         $this->config = $config;
         $this->modelFactory = $modelFactory;
+        $this->cache = $cache;
+        $this->logger = $logger;
     }
 
     public function getOutput(): HyphenationOutput
@@ -50,18 +63,31 @@ class HyphenationConsoleDataProvider implements HyphenationDataProvider
         return $this->modelFactory;
     }
 
+    public function getLogger(): LoggerInterface
+    {
+        return $this->logger;
+    }
+
     public function getWords(): array
     {
         $wordsInput = $this->input->getWordsInput();
         if ($wordsInput === '') {
             $wordsFileName = $this->config->get(['wordsFileName'], 'words.txt');
-            App::$logger->info("Reading words from $wordsFileName file.");
-            $words = WordsFile::getContentsAsArray($wordsFileName);
+            $this->logger->info("Reading words from $wordsFileName file.");
+            $words = WordsFile::getContentsAsArray($wordsFileName, $this->logger);
         } else {
             $words = explode(' ', $wordsInput);
         }
-        App::wordsReadEvent(count($words));
+        $this->wordsReadEvent(count($words));
         return $words;
+    }
+
+    private function wordsReadEvent(int $numberOfWords): void
+    {
+        if ($numberOfWords > (int) $this->config->get(['wordsThreshold'])) {
+            $this->logger->notice('Too many words, disabling logger.');
+            $this->logger = new NullLogger();
+        }
     }
 
     public function getHyphenatedWords(): array
@@ -75,13 +101,13 @@ class HyphenationConsoleDataProvider implements HyphenationDataProvider
         $algorithmChoice = $this->input->getAlgorithmInput();
         switch ($algorithmChoice) {
             case InputCodes::FULL_TREE_ALGORITHM:
-                return new FullTreeHyphenationAlgorithm($patterns);
+                return new FullTreeHyphenationAlgorithm($patterns, $this->cache, $this->logger);
                 break;
             case InputCodes::SHORT_TREE_ALGORITHM:
-                return new ShortTreeHyphenationAlgorithm($patterns);
+                return new ShortTreeHyphenationAlgorithm($patterns, $this->cache, $this->logger);
                 break;
             default:
-                return new FullTreeHyphenationAlgorithm($patterns);
+                return new FullTreeHyphenationAlgorithm($patterns, $this->cache, $this->logger);
         }
     }
 
@@ -91,7 +117,7 @@ class HyphenationConsoleDataProvider implements HyphenationDataProvider
             $patterns = $this->modelFactory->getKnownPatterns();
         } else {
             $patternsFileName = $this->config->get(['patternsFileName'], 'patterns');
-            $patterns = new Patterns(PatternsFile::getContentsAsArray($patternsFileName));
+            $patterns = $this->modelFactory->createPatternsModel(PatternsFile::getContentsAsArray($patternsFileName, $this->logger));
         }
         return $patterns;
     }

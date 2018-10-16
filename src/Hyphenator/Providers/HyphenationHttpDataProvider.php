@@ -17,18 +17,28 @@ use Edvardas\Hyphenation\Hyphenator\Input\HyphenationInput;
 use Edvardas\Hyphenation\Hyphenator\Model\ModelFactory;
 use Edvardas\Hyphenation\Hyphenator\Model\Patterns;
 use Edvardas\Hyphenation\Hyphenator\Output\HyphenationOutput;
+use Psr\Log\LoggerInterface;
+use Psr\SimpleCache\CacheInterface;
 
 class HyphenationHttpDataProvider implements HyphenationDataProvider
 {
     private $output;
     private $modelFactory;
+    private $cache;
+    private $logger;
     private $wordsArray = [];
     private $hyphenatedWordsArray = [];
 
-    public function __construct(HyphenationOutput $output, ModelFactory $modelFactory)
-    {
+    public function __construct(
+        HyphenationOutput $output,
+        ModelFactory $modelFactory,
+        CacheInterface $cache,
+        LoggerInterface $logger
+    ) {
         $this->modelFactory = $modelFactory;
         $this->output = $output;
+        $this->cache = $cache;
+        $this->logger = $logger;
     }
 
     public function getOutput(): HyphenationOutput
@@ -39,6 +49,11 @@ class HyphenationHttpDataProvider implements HyphenationDataProvider
     public function getModelFactory(): ModelFactory
     {
         return $this->modelFactory;
+    }
+
+    public function getLogger(): LoggerInterface
+    {
+        return $this->logger;
     }
 
     public function getWords(): array
@@ -53,7 +68,7 @@ class HyphenationHttpDataProvider implements HyphenationDataProvider
 
     public function getAlgorithm($patterns): HyphenationAlgorithmInterface
     {
-        return new FullTreeHyphenationAlgorithm($patterns);
+        return new FullTreeHyphenationAlgorithm($patterns, $this->cache, $this->logger);
     }
 
     public function getPatterns(): Patterns

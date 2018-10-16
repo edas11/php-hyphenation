@@ -56,7 +56,7 @@ class HyphenationHttpDataProvider implements HyphenationDataProvider
         return $this->logger;
     }
 
-    public function getWords(): array
+    public function getWordsInput(): array
     {
         return $this->wordsArray;
     }
@@ -66,14 +66,14 @@ class HyphenationHttpDataProvider implements HyphenationDataProvider
         return $this->hyphenatedWordsArray;
     }
 
-    public function getAlgorithm($patterns): HyphenationAlgorithmInterface
+    public function getAlgorithm(): HyphenationAlgorithmInterface
     {
-        return new FullTreeHyphenationAlgorithm($patterns, $this->cache, $this->logger);
+        return new FullTreeHyphenationAlgorithm($this->getPatternsInput(), $this->cache, $this->logger);
     }
 
-    public function getPatterns(): Patterns
+    public function getPatternsInput(): array
     {
-        $patterns = $this->modelFactory->getKnownPatterns();
+        $patterns = $this->modelFactory->getKnownPatterns()->getPatterns();
         return $patterns;
     }
 

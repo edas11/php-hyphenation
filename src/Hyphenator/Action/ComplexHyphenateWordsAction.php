@@ -5,10 +5,10 @@
  * Date: 18.10.8
  * Time: 13.25
  */
+declare(strict_types = 1);
 
 namespace Edvardas\Hyphenation\Hyphenator\Action;
 
-use Edvardas\Hyphenation\App\App;
 use Edvardas\Hyphenation\Hyphenator\Algorithm\AlgorithmRunner;
 use Edvardas\Hyphenation\Hyphenator\Database\HyphenationDatabase;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
@@ -31,42 +31,48 @@ class ComplexHyphenateWordsAction implements Action
         $this->logger = $dataProvider->getLogger();
     }
 
-    public function execute()
+    public function execute(): void
     {
-        $inputWords = $this->dataProvider->getWords();
-        $patterns = $this->dataProvider->getPatterns()->getPatterns();
-        $algorithm = $this->dataProvider->getAlgorithm($patterns);
-        $runner = new AlgorithmRunner($algorithm);
+        $inputWords = $this->dataProvider->getWordsInput();
+        $algorithm = $this->dataProvider->getAlgorithm();
 
         $this->timer->start();
 
-        $dbWords = $this->modelFactory->getKnownWords($inputWords);
-        $wordsInDb = $dbWords->getOriginalWords();
-        $wordsNotInDb = array_values(array_diff($inputWords, $wordsInDb));
+        $dbWordsModel = $this->modelFactory->getKnownHyphenatedWords($inputWords);
+        $wordsNotInDb = $dbWordsModel->filterUnknownWords($inputWords);
 
         $resultWords = [];
         if (count($wordsNotInDb) > 0) {
-            $runner->run($wordsNotInDb, true);
-            $resultWords = $runner->getHyphenatedWords();
-            $hyphnatedWords = $this->modelFactory->createWords(array_combine($wordsNotInDb, $resultWords));
-            $wordPatterns = $this->modelFactory->createWordPatterns($runner->getMatchedPatterns());
-            $this->modelFactory->createCompositeModel([$hyphnatedWords, $wordPatterns])->persist();
+            $runner = new AlgorithmRunner($algorithm);
+            $resultWords = $this->hyphenateWordsNotInDb($runner, $wordsNotInDb);
         }
 
-        $matchedPatternsResult = $this->modelFactory->getKnownWordPatterns($inputWords)->getMatchedPatterns();
+        $matchedPatternsResult = $this->getMatchedPatterns($inputWords);
         $this->output->printMatchedPatterns($matchedPatternsResult);
-        $this->output->printHyphenatedWords(
-            array_combine($wordsNotInDb, $resultWords),
-            array_combine($wordsInDb, $dbWords->getHyphenatedWords())
-        );
+        $this->output->printHyphenatedWords($resultWords, $dbWordsModel->getWords());
         $this->printTime();
     }
 
-    public function printTime(): void
+    private function hyphenateWordsNotInDb($runner, $wordsNotInDb)
+    {
+        $runner->run($wordsNotInDb, true);
+        $resultWords = $runner->getHyphenatedWords();
+        $hyphenatedWordsModel = $this->modelFactory->createHyphenatedWords($resultWords);
+        $wordPatterns = $this->modelFactory->createWordPatterns($runner->getMatchedPatterns());
+        $this->modelFactory->createCompositeModel([$hyphenatedWordsModel, $wordPatterns])->persist();
+        return $resultWords;
+    }
+
+    protected function getMatchedPatterns($inputWords)
+    {
+        $matchedPatternsResult = $this->modelFactory->getKnownWordPatterns($inputWords)->getMatchedPatterns();
+        return $matchedPatternsResult;
+    }
+
+    private function printTime(): void
     {
         $time = $this->timer->getInterval();
         $this->output->printTime($time);
         $this->logger->info("Finished in $time seconds.");
     }
-
 }

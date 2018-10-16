@@ -10,5 +10,5 @@ namespace Edvardas\Hyphenation\Hyphenator\Action;
 
 interface Action
 {
-    public function execute();
+    public function execute(): void;
 }

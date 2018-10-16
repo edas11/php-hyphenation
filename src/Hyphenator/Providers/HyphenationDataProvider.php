@@ -22,11 +22,11 @@ interface HyphenationDataProvider
 
     public function getLogger(): LoggerInterface;
 
-    public function getWords(): array;
+    public function getWordsInput(): array;
 
     public function getHyphenatedWords(): array;
 
-    public function getAlgorithm($patterns): HyphenationAlgorithmInterface;
+    public function getAlgorithm(): HyphenationAlgorithmInterface;
 
-    public function getPatterns(): Patterns;
+    public function getPatternsInput(): array;
 }

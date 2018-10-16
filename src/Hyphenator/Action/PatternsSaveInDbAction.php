@@ -15,15 +15,17 @@ use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
 class PatternsSaveInDbAction implements Action
 {
     private $dataProvider;
+    private $modelFactory;
 
     public function __construct(HyphenationDataProvider $dataProvider)
     {
         $this->dataProvider = $dataProvider;
+        $this->modelFactory = $dataProvider->getModelFactory();
     }
 
-    public function execute()
+    public function execute(): void
     {
-        $this->dataProvider->getPatterns()->persist();
+        $this->modelFactory->createPatternsModel($this->dataProvider->getPatternsInput())->persist();
     }
 
 }

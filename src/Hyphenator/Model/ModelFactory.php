@@ -20,18 +20,14 @@ class ModelFactory
         $this->db = $db;
     }
 
-    public function createWords(array $words): Words
+    public function createHyphenatedWords(array $words): HyphenatedWords
     {
-        return new Words($words, $this->db);
+        return new HyphenatedWords($words, $this->db);
     }
 
-    public function getKnownWords(array $filterWords = []): Words
+    public function getKnownHyphenatedWords(array $filterWords = []): HyphenatedWords
     {
-        if (count($filterWords) > 0) {
-            return Words::getKnownIn($filterWords, $this->db);
-        } else {
-            return Words::getKnown($this->db);
-        }
+        return HyphenatedWords::getKnownIn($this->db, $filterWords);
     }
 
     public function createPatternsModel(array $patterns): Patterns

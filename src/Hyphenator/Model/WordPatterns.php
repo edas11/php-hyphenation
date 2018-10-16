@@ -33,7 +33,7 @@ class WordPatterns implements PersistentModel
     public static function getKnown(array $words, SqlDatabase $db): WordPatterns
     {
         $builder = $db->builder();
-        $db->beginTransaction();
+        $token = $db->beginTransaction();
         $query = $builder
             ->select()
             ->columns(['word', 'pattern'])
@@ -44,25 +44,19 @@ class WordPatterns implements PersistentModel
             ->in('words.word', $words)
             ->build();
         $wordMatchedPatterns = $db->executeAndFetch($query, new WordPatternsMappingStrategy());
-        $db->commit();
+        $db->commit($token);
 
         return new WordPatterns($wordMatchedPatterns, $db);
     }
 
     public function persist(): void
     {
-        $this->db->beginTransaction();
-        $this->persistNoTransaction();
-        $this->db->commit();
-    }
-
-    public function persistNoTransaction(): void
-    {
+        $token = $this->db->beginTransaction();
         $builder = $this->db->builder();
         foreach ($this->wordPatterns as $word => $matchedPatterns) {
             foreach ($matchedPatterns as $pattern) {
                 $querry = $builder
-                    ->insert()
+                    ->replace()
                     ->into('word_patterns', ['word_id', 'pattern_id'])
                     ->select()
                     ->columns(['word_id', 'pattern_id'])
@@ -74,5 +68,6 @@ class WordPatterns implements PersistentModel
                 $this->db->execute($querry);
             }
         }
+        $this->db->commit($token);
     }
 }

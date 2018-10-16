@@ -68,7 +68,7 @@ class HyphenationConsoleDataProvider implements HyphenationDataProvider
         return $this->logger;
     }
 
-    public function getWords(): array
+    public function getWordsInput(): array
     {
         $wordsInput = $this->input->getWordsInput();
         if ($wordsInput === '') {
@@ -96,28 +96,28 @@ class HyphenationConsoleDataProvider implements HyphenationDataProvider
         return explode(' ', $hyphenatedWordsInput);
     }
 
-    public function getAlgorithm($patterns): HyphenationAlgorithmInterface
+    public function getAlgorithm(): HyphenationAlgorithmInterface
     {
         $algorithmChoice = $this->input->getAlgorithmInput();
         switch ($algorithmChoice) {
             case InputCodes::FULL_TREE_ALGORITHM:
-                return new FullTreeHyphenationAlgorithm($patterns, $this->cache, $this->logger);
+                return new FullTreeHyphenationAlgorithm($this->getPatternsInput(), $this->cache, $this->logger);
                 break;
             case InputCodes::SHORT_TREE_ALGORITHM:
-                return new ShortTreeHyphenationAlgorithm($patterns, $this->cache, $this->logger);
+                return new ShortTreeHyphenationAlgorithm($this->getPatternsInput(), $this->cache, $this->logger);
                 break;
             default:
-                return new FullTreeHyphenationAlgorithm($patterns, $this->cache, $this->logger);
+                return new FullTreeHyphenationAlgorithm($this->getPatternsInput(), $this->cache, $this->logger);
         }
     }
 
-    public function getPatterns(): Patterns
+    public function getPatternsInput(): array
     {
         if ($this->input->getSourceInput() === InputCodes::DB_SRC) {
-            $patterns = $this->modelFactory->getKnownPatterns();
+            $patterns = $this->modelFactory->getKnownPatterns()->getPatterns();
         } else {
             $patternsFileName = $this->config->get(['patternsFileName'], 'patterns');
-            $patterns = $this->modelFactory->createPatternsModel(PatternsFile::getContentsAsArray($patternsFileName, $this->logger));
+            $patterns = PatternsFile::getContentsAsArray($patternsFileName, $this->logger);
         }
         return $patterns;
     }

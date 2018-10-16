@@ -8,8 +8,6 @@
 
 namespace Edvardas\Hyphenation\Hyphenator\Action;
 
-
-use Edvardas\Hyphenation\Hyphenator\Model\Words;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
 
 class WordsGetKnownAction implements Action
@@ -25,14 +23,10 @@ class WordsGetKnownAction implements Action
         $this->modelFactory = $dataProvider->getModelFactory();
     }
 
-    public function execute()
+    public function execute(): void
     {
-        $words = $this->dataProvider->getWords();
-        if (count($words) > 0) {
-            $words = $this->modelFactory->getKnownWords($words);
-        } else {
-            $words = $this->modelFactory->getKnownWords();
-        }
-        $this->output->printResult(array_combine($words->getOriginalWords(), $words->getHyphenatedWords()));
+        $filterWords = $this->dataProvider->getWordsInput();
+        $words = $this->modelFactory->getKnownHyphenatedWords($filterWords);
+        $this->output->printResult($words->getWords());
     }
 }

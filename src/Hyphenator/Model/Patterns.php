@@ -38,34 +38,29 @@ class Patterns implements PersistentModel
             ->columns(['pattern'])
             ->from('patterns')
             ->build();
-        $db->beginTransaction();
+        $token = $db->beginTransaction();
         $patterns = $db->executeAndFetch($query, new PatternsMappingStrategy());
-        $db->commit();
+        $db->commit($token);
         return new Patterns($patterns, $db);
     }
 
     public function persist(): void
     {
-        $this->db->beginTransaction();
-        $this->persistNoTransaction();
-        $this->db->commit();
-    }
-
-    public function persistNoTransaction(): void
-    {
+        $token = $this->db->beginTransaction();
         $builder = $this->db->builder();
         $query = $builder
             ->delete()
-            ->from('patterns')
+            ->from(HyphenatedWords::WORDS_TABLE)
             ->build();
         $this->db->execute($query);
         $builder = $builder
-            ->insert()
+            ->replace()
             ->into('patterns', ['pattern']);
         foreach ($this->patterns as $pattern) {
-            $builder = $builder->values([$pattern]);
+            $builder->values([$pattern]);
         }
         $query = $builder->build();
         $this->db->execute($query);
+        $this->db->commit($token);
     }
 }

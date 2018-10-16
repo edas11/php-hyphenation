@@ -12,5 +12,4 @@ namespace Edvardas\Hyphenation\Hyphenator\Model;
 interface PersistentModel
 {
     public function persist(): void;
-    public function persistNoTransaction(): void;
 }

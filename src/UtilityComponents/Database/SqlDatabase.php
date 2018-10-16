@@ -10,9 +10,9 @@ namespace Edvardas\Hyphenation\UtilityComponents\Database;
 
 interface SqlDatabase
 {
-    public function beginTransaction();
+    public function beginTransaction(): TransactionToken;
 
-    public function commit();
+    public function commit(TransactionToken $token);
 
     public function executeAndFetch(MySqlQuery $query, DbDataMappingStrategy $mapping = null): array;
 

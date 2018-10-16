@@ -13,6 +13,7 @@ use Edvardas\Hyphenation\App\App;
 class MySqlDatabase implements SqlDatabase
 {
     private $builder;
+    private $currentTransactionToken = null;
 
     public function __construct(string $host, string $db, string $user, string $pass, string $charset)
     {
@@ -31,18 +32,26 @@ class MySqlDatabase implements SqlDatabase
         }
     }
 
-    public function beginTransaction()
+    public function beginTransaction(): TransactionToken
     {
+        if (!is_null($this->currentTransactionToken)) {
+            return new TransactionToken();
+        }
         try {
             $this->pdo->beginTransaction();
+            $this->currentTransactionToken = new TransactionToken();
+            return $this->currentTransactionToken;
         } catch (Exception $e) {
             $this->pdo->rollback();
             throw $e;
         }
     }
 
-    public function commit()
+    public function commit(TransactionToken $token)
     {
+        if ($token !== $this->currentTransactionToken) {
+            return;
+        }
         try {
             $this->pdo->commit();
         } catch (Exception $e) {

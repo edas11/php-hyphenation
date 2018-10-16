@@ -9,7 +9,7 @@
 namespace Edvardas\Hyphenation\UtilityComponents\Database;
 
 
-class MySqlQuery implements SqlQuery
+class MySqlQuery
 {
     private $queryString;
     private $bindParams;

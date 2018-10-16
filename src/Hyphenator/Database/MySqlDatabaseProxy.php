@@ -16,6 +16,7 @@ use Edvardas\Hyphenation\UtilityComponents\Database\MySqlDatabase;
 use Edvardas\Hyphenation\UtilityComponents\Database\MySqlQuery;
 use Edvardas\Hyphenation\UtilityComponents\Database\MySqlQueryBuilder;
 use \Edvardas\Hyphenation\UtilityComponents\Database\SqlDatabase;
+use Edvardas\Hyphenation\UtilityComponents\Database\TransactionToken;
 
 class MySqlDatabaseProxy implements SqlDatabase
 {
@@ -30,16 +31,16 @@ class MySqlDatabaseProxy implements SqlDatabase
         $this->config = $config;
     }
 
-    public function beginTransaction()
+    public function beginTransaction(): TransactionToken
     {
         $this->checkDbInstance();
-        $this->mysqlDb->beginTransaction();
+        return $this->mysqlDb->beginTransaction();
     }
 
-    public function commit()
+    public function commit(TransactionToken $token)
     {
         $this->checkDbInstance();
-        $this->mysqlDb->commit();
+        $this->mysqlDb->commit($token);
     }
 
     public function executeAndFetch(MySqlQuery $query, DbDataMappingStrategy $mapping = null): array

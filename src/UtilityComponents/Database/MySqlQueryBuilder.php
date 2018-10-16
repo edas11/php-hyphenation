@@ -11,7 +11,7 @@ namespace Edvardas\Hyphenation\UtilityComponents\Database;
 
 use Edvardas\Hyphenation\App\App;
 
-class MySqlQueryBuilder implements SqlQueryBuilder
+class MySqlQueryBuilder
 {
     private $queryString = '';
     private $bindParams = [];
@@ -90,6 +90,12 @@ class MySqlQueryBuilder implements SqlQueryBuilder
     public function insert()
     {
         $this->queryString = $this->queryString . 'INSERT ';
+        return $this;
+    }
+
+    public function replace()
+    {
+        $this->queryString = $this->queryString . 'REPLACE ';
         return $this;
     }
 

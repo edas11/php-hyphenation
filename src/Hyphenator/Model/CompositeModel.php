@@ -26,16 +26,10 @@ class CompositeModel implements PersistentModel
 
     public function persist(): void
     {
-        $this->db->beginTransaction();
+        $token = $this->db->beginTransaction();
         foreach ($this->models as $model) {
-            $model->persistNoTransaction();
+            $model->persist();
         }
-        $this->db->commit();
+        $this->db->commit($token);
     }
-
-    public function persistNoTransaction(): void
-    {
-        throw new \Exception('Unsupported operation');
-    }
-
 }

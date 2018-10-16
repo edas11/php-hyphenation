@@ -33,7 +33,7 @@ class ConsoleInput
             $this->console->printLn("(".InputCodes::PUT_PATTERNS_IN_DB_ACTION.") Load patterns to database");
             $this->actionInput = (int)$this->console->getInput();
             if ($this->actionInput === InputCodes::PUT_PATTERNS_IN_DB_ACTION) {
-                $this->sourceInput = InputCodes::DB_SRC;
+                $this->sourceInput = InputCodes::FILE_SRC;
             }
         }
         return $this->actionInput;

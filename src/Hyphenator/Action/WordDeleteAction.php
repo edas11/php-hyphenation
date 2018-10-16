@@ -10,7 +10,7 @@ namespace Edvardas\Hyphenation\Hyphenator\Action;
 
 
 use Edvardas\Hyphenation\Hyphenator\Model\ModelFactory;
-use Edvardas\Hyphenation\Hyphenator\Model\Words;
+use Edvardas\Hyphenation\Hyphenator\Model\HyphenatedWords;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
 
 class WordDeleteAction implements Action
@@ -26,15 +26,15 @@ class WordDeleteAction implements Action
         $this->modelFactory = $dataProvider->getModelFactory();
     }
 
-    public function execute()
+    public function execute(): void
     {
-        $words = $this->dataProvider->getWords();
+        $words = $this->dataProvider->getWordsInput();
         if (count($words) < 1) {
             $this->output->printResult(['Error']);
             return;
         }
         $word = $words[0];
-        $this->modelFactory->createWords([$word => ''])->delete();
+        $this->modelFactory->createHyphenatedWords([$word => ''])->delete();
         $this->output->printResult(['Success']);
     }
 }

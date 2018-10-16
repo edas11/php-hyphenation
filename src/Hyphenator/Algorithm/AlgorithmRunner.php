@@ -25,9 +25,9 @@ class AlgorithmRunner
         $hyphenatedWords = [];
         $matchedPatternsAll = [];
         foreach ($words as $inputWord) {
-            $word = $this->algorithm->execute($inputWord, $saveMatchedPatterns);
+            $hyphenatedWord = $this->algorithm->execute($inputWord, $saveMatchedPatterns);
             $matchedPatternsAll[$inputWord] = $this->algorithm->getMatchedPatterns();
-            array_push($hyphenatedWords, $word);
+            $hyphenatedWords[$inputWord] = $hyphenatedWord;
         }
         $this->hyphenatedWords = $hyphenatedWords;
         $this->matchedPatternsAll = $matchedPatternsAll;

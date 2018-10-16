@@ -29,11 +29,10 @@ class SimpleHyphenateWordsAction implements Action
         $this->logger = $dataProvider->getLogger();
     }
 
-    public function execute()
+    public function execute(): void
     {
-        $inputWords = $this->dataProvider->getWords();
-        $patterns = $this->dataProvider->getPatterns()->getPatterns();
-        $algorithm = $this->dataProvider->getAlgorithm($patterns);
+        $inputWords = $this->dataProvider->getWordsInput();
+        $algorithm = $this->dataProvider->getAlgorithm();
         $runner = new AlgorithmRunner($algorithm);
 
         $this->timer->start();

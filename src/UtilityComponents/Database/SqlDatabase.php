@@ -14,7 +14,7 @@ interface SqlDatabase
 
     public function commit();
 
-    public function executeAndFetch(MySqlQuery $query): array;
+    public function executeAndFetch(MySqlQuery $query, DbDataMappingStrategy $mapping = null): array;
 
     public function execute(MySqlQuery $query): void;
 

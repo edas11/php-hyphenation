@@ -51,7 +51,7 @@ class MySqlDatabase implements SqlDatabase
         }
     }
 
-    public function executeAndFetch(MySqlQuery $query): array
+    public function executeAndFetch(MySqlQuery $query, DbDataMappingStrategy $mapping = null): array
     {
         $statement = $this->pdo->prepare($query->getQueryString());
         try {
@@ -60,6 +60,9 @@ class MySqlDatabase implements SqlDatabase
         } catch (Exception $e) {
             $this->pdo->rollback();
             throw $e;
+        }
+        if (!is_null($mapping)) {
+            $fetchedData = $mapping->map($fetchedData);
         }
         return $fetchedData;
     }

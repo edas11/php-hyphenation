@@ -10,34 +10,27 @@ declare(strict_types = 1);
 namespace Edvardas\Hyphenation\Hyphenator\Model;
 
 use Edvardas\Hyphenation\App\App;
+use Edvardas\Hyphenation\Hyphenator\Model\MappingStrategy\WordsMappingStrategy;
 
 class Words implements PersistentModel
 {
     private $words = [];
-    private const WORD_COLUMN = 'word';
-    private const HYPHENATED_WORD_COLUMN = 'word_h';
+    public const WORD_COLUMN = 'word';
+    public const HYPHENATED_WORD_COLUMN = 'word_h';
 
-    public function __construct(array $originalWords, array $hyphenatedWords)
+    public function __construct(array $words)
     {
-        $this->words = self::createTable($originalWords, $hyphenatedWords);
-    }
-
-    private static function createFromDbData(array $dbWords)
-    {
-        return new Words(
-            array_column($dbWords, self::WORD_COLUMN),
-            array_column($dbWords, self::HYPHENATED_WORD_COLUMN)
-        );
+        $this->words = $words;
     }
 
     public function getOriginalWords(): array
     {
-        return array_column($this->words, self::WORD_COLUMN);
+        return array_keys($this->words);
     }
 
     public function getHyphenatedWords(): array
     {
-        return array_column($this->words, self::HYPHENATED_WORD_COLUMN);
+        return array_values($this->words);
     }
 
     /**
@@ -55,9 +48,9 @@ class Words implements PersistentModel
             ->in(self::WORD_COLUMN, $words)
             ->build();
         $db->beginTransaction();
-        $hyphenatedWords = $db->executeAndFetch($query);
+        $hyphenatedWords = $db->executeAndFetch($query, new WordsMappingStrategy());
         $db->commit();
-        return self::createFromDbData($hyphenatedWords);
+        return new Words($hyphenatedWords);
     }
 
     public static function getKnown(): Words
@@ -70,43 +63,62 @@ class Words implements PersistentModel
             ->from('words')
             ->build();
         $db->beginTransaction();
-        $hyphenatedWords = $db->executeAndFetch($query);
+        $hyphenatedWords = $db->executeAndFetch($query, new WordsMappingStrategy());
         $db->commit();
-        return self::createFromDbData($hyphenatedWords);
+        return new Words($hyphenatedWords);
     }
 
     public function addOrUpdate(): void
     {
         $db = App::getDb();
-        $builder = $db->builder();
         $db->beginTransaction();
-        foreach ($this->words as $wordRow) {
-            $querry = $builder
-                ->select()
-                ->columns(['*'])
-                ->from('words')
-                ->where()
-                ->equals(self::WORD_COLUMN, $wordRow['word'])
-                ->build();
-            $result = $db->executeAndFetch($querry);
-            if (count($result) > 0) {
-                $querry = $builder
-                    ->update('words')
-                    ->set([self::HYPHENATED_WORD_COLUMN => $wordRow[self::HYPHENATED_WORD_COLUMN]])
-                    ->where()
-                    ->equals(self::WORD_COLUMN, $wordRow['word'])
-                    ->build();
-                $db->execute($querry);
+        foreach ($this->words as $word => $hyphenatedWord) {
+            if ($this->doesWordExist($word)) {
+                $this->updateWord($word, $hyphenatedWord);
             } else {
-                $querry = $builder
-                    ->insert()
-                    ->into('words', ['word, word_h'])
-                    ->values([$wordRow])
-                    ->build();
-                $db->execute($querry);
+                $this->addWord($word, $hyphenatedWord);
             }
         }
         $db->commit();
+    }
+
+    private function doesWordExist(string $word)
+    {
+        $db = App::getDb();
+        $builder = $db->builder();
+        $query = $builder
+            ->select()
+            ->columns(['*'])
+            ->from('words')
+            ->where()
+            ->equals(self::WORD_COLUMN, $word)
+            ->build();
+        $result = $db->executeAndFetch($query);
+        return count($result) > 0;
+    }
+
+    private function updateWord(string $word, string $hyphenatedWord)
+    {
+        $db = App::getDb();
+        $builder = $db->builder();
+        $query = $builder
+            ->update('words')
+            ->set([self::HYPHENATED_WORD_COLUMN => $hyphenatedWord])
+            ->where()
+            ->equals(self::WORD_COLUMN, $word)
+            ->build();
+        $db->execute($query);
+    }
+
+    private function addWord(string $word, string $hyphenatedWord)
+    {
+        $db = App::getDb();
+        $builder = $db->builder();
+        $query = $builder->insert()
+        ->into('words', ['word, word_h'])
+        ->values([$word, $hyphenatedWord])
+        ->build();
+        $db->execute($query);
     }
 
     public function delete(): void
@@ -114,14 +126,14 @@ class Words implements PersistentModel
         $db = App::getDb();
         $builder = $db->builder();
         $db->beginTransaction();
-        foreach ($this->words as $wordRow) {
-            $querry = $builder
+        foreach ($this->words as $word => $hyphenatedWord) {
+            $query = $builder
                 ->delete()
                 ->from('words')
                 ->where()
-                ->equals(self::WORD_COLUMN, $wordRow['word'])
+                ->equals(self::WORD_COLUMN, $word)
                 ->build();
-            $db->execute($querry);
+            $db->execute($query);
         }
         $db->commit();
     }
@@ -138,23 +150,13 @@ class Words implements PersistentModel
     {
         $db = App::getDb();
         $builder = $db->builder();
-        $querry = $builder
+        $builder = $builder
             ->insert()
-            ->into('words', ['word, word_h'])
-            ->values($this->words)
-            ->build();
-        $db->execute($querry);
-    }
-
-    private static function createTable(array $originalWords, array $hyphenatedWords): array
-    {
-        $wordsTable = [];
-        foreach ($originalWords as $index => $word) {
-            array_push(
-                $wordsTable,
-                [self::WORD_COLUMN => $word, self::HYPHENATED_WORD_COLUMN => $hyphenatedWords[$index]]
-            );
+            ->into('words', ['word, word_h']);
+        foreach ($this->words as $word => $hyphenatedWord) {
+            $builder = $builder->values([$word, $hyphenatedWord]);
         }
-        return $wordsTable;
+        $query = $builder->build();
+        $db->execute($query);
     }
 }

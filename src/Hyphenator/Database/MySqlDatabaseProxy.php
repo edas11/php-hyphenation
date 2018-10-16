@@ -10,6 +10,7 @@ declare(strict_types = 1);
 namespace Edvardas\Hyphenation\Hyphenator\Database;
 
 use Edvardas\Hyphenation\App\App;
+use Edvardas\Hyphenation\UtilityComponents\Database\DbDataMappingStrategy;
 use Edvardas\Hyphenation\UtilityComponents\Database\MySqlDatabase;
 use Edvardas\Hyphenation\UtilityComponents\Database\MySqlQuery;
 use Edvardas\Hyphenation\UtilityComponents\Database\MySqlQueryBuilder;
@@ -34,10 +35,10 @@ class MySqlDatabaseProxy implements SqlDatabase
         $this->mysqlDb->commit();
     }
 
-    public function executeAndFetch(MySqlQuery $query): array
+    public function executeAndFetch(MySqlQuery $query, DbDataMappingStrategy $mapping = null): array
     {
         $this->checkDbInstance();
-        return $this->mysqlDb->executeAndFetch($query);
+        return $this->mysqlDb->executeAndFetch($query, $mapping);
     }
 
     public function execute(MySqlQuery $query): void

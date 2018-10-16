@@ -16,6 +16,7 @@ class MySqlQueryBuilder implements SqlQueryBuilder
     private $queryString = '';
     private $bindParams = [];
     private $counter = 0; //for prepared statement parameters
+    private $isInsertValuesCalled = false;
 
     public function build(): MySqlQuery
     {
@@ -99,15 +100,14 @@ class MySqlQueryBuilder implements SqlQueryBuilder
         return $this;
     }
 
-    public function values(array $valuesMatrix)
+    public function values(array $valuesRow)
     {
-        $namesMatrix = $this->createNamesMatrix($valuesMatrix);
-        $this->prepareBindParams($namesMatrix, $valuesMatrix);
-        $insertRowsArray = array_map(function ($namesArray) {
-            return '(' . implode(',', $namesArray) . ')';
-        }, $namesMatrix);
-        $insertNamesString = implode(',', $insertRowsArray);
-        $this->queryString = $this->queryString . "VALUES $insertNamesString ";
+        $namesRow = $this->createNamesRow($valuesRow);
+        $this->bindParams = array_merge($this->bindParams, array_combine($namesRow, $valuesRow));
+        $insertNamesString = '(' . implode(',', $namesRow) . ')';
+        $prependToken = $this->isInsertValuesCalled ? ',' : 'VALUES';
+        $this->queryString = $this->queryString . "$prependToken $insertNamesString ";
+        $this->isInsertValuesCalled = true;
         return $this;
     }
 
@@ -157,27 +157,17 @@ class MySqlQueryBuilder implements SqlQueryBuilder
         $this->queryString = '';
         $this->bindParams = [];
         $this->counter = 0;
+        $this->isInsertValuesCalled = false;
     }
 
-    private function createNamesMatrix($valuesMatrix)
+    private function createNamesRow(array $valuesRow)
     {
-        $namesMatrix = [];
-        foreach ($valuesMatrix as $valuesArray) {
-            $namesArray = array_map(function ($val) {
-                $nextCounter = $this->nextCounter();
-                $name = ":value$nextCounter";
-                return $name;
-            }, $valuesArray);
-            array_push($namesMatrix, $namesArray);
+        $namesRow = [];
+        foreach ($valuesRow as $value) {
+            $nextCounter = $this->nextCounter();
+            $name = ":value$nextCounter";
+            array_push($namesRow, $name);
         }
-        return $namesMatrix;
-    }
-
-    private function prepareBindParams(array $namesMatrix, array $valuesMatrix)
-    {
-        foreach ($namesMatrix as $rowIndex => $namesArray) {
-            $valuesArray = $valuesMatrix[$rowIndex];
-            $this->bindParams = array_merge($this->bindParams, array_combine($namesArray, $valuesArray));
-        }
+        return $namesRow;
     }
 }

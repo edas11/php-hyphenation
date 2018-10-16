@@ -31,7 +31,7 @@ class WordDeleteAction implements Action
             return;
         }
         $word = $words[0];
-        (new Words([$word], [$word]))->delete();
+        (new Words([$word => '']))->delete();
         $this->output->printResult(['Success']);
     }
 }

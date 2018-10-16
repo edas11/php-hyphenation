@@ -10,6 +10,7 @@ namespace Edvardas\Hyphenation\Hyphenator\Model;
 
 
 use Edvardas\Hyphenation\App\App;
+use Edvardas\Hyphenation\Hyphenator\Model\MappingStrategy\WordPatternsMappingStrategy;
 
 class WordPatterns implements PersistentModel
 {
@@ -42,10 +43,10 @@ class WordPatterns implements PersistentModel
             ->where()
             ->in('words.word', $words)
             ->build();
-        $wordMatchedPatterns = $db->executeAndFetch($query);
+        $wordMatchedPatterns = $db->executeAndFetch($query, new WordPatternsMappingStrategy());
         $db->commit();
 
-        return new WordPatterns(self::mapTableToApplication($wordMatchedPatterns));
+        return new WordPatterns($wordMatchedPatterns);
     }
 
     public function persist(): void
@@ -75,18 +76,5 @@ class WordPatterns implements PersistentModel
                 $db->execute($querry);
             }
         }
-    }
-
-    private static function mapTableToApplication(array $wordMatchedPatterns): array
-    {
-        $matchedPatternsResult = [];
-        foreach ($wordMatchedPatterns as $match) {
-            if (array_key_exists($match['word'], $matchedPatternsResult)) {
-                array_push($matchedPatternsResult[$match['word']], $match['pattern']);
-            } else {
-                $matchedPatternsResult[$match['word']] = [$match['pattern']];
-            }
-        }
-        return $matchedPatternsResult;
     }
 }

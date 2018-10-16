@@ -33,7 +33,7 @@ class WordPutAction implements Action
         }
         $word = $words[0];
         $hyphenatedWord = $hyphenatedWords[0];
-        (new Words([$word], [$hyphenatedWord]))->addOrUpdate();
+        (new Words([$word => $hyphenatedWord]))->addOrUpdate();
         $this->output->printResult(['Success']);
     }
 }

@@ -9,6 +9,7 @@ declare(strict_types = 1);
 namespace Edvardas\Hyphenation\Hyphenator\Model;
 
 use Edvardas\Hyphenation\App\App;
+use Edvardas\Hyphenation\Hyphenator\Model\MappingStrategy\PatternsMappingStrategy;
 
 class Patterns implements PersistentModel
 {
@@ -19,12 +20,12 @@ class Patterns implements PersistentModel
      */
     public function __construct(array $patterns)
     {
-        $this->patterns = self::mapApplicationToDb($patterns);
+        $this->patterns = $patterns;
     }
 
     public function getPatterns()
     {
-        return self::mapDbToApplication($this->patterns);
+        return $this->patterns;
     }
 
     public static function getKnown(): Patterns
@@ -37,9 +38,9 @@ class Patterns implements PersistentModel
             ->from('patterns')
             ->build();
         $db->beginTransaction();
-        $patterns = $db->executeAndFetch($query);
+        $patterns = $db->executeAndFetch($query, new PatternsMappingStrategy());
         $db->commit();
-        return new Patterns(self::mapDbToApplication($patterns));
+        return new Patterns($patterns);
     }
 
     public function persist(): void
@@ -59,23 +60,13 @@ class Patterns implements PersistentModel
             ->from('patterns')
             ->build();
         $db->execute($query);
-        $query = $builder
+        $builder = $builder
             ->insert()
-            ->into('patterns', ['pattern'])
-            ->values($this->patterns)->build();
+            ->into('patterns', ['pattern']);
+        foreach ($this->patterns as $pattern) {
+            $builder = $builder->values([$pattern]);
+        }
+        $query = $builder->build();
         $db->execute($query);
-    }
-
-    private static function mapDbToApplication(array $patterns): array
-    {
-        return array_column($patterns, 'pattern');
-    }
-
-    private static function mapApplicationToDb(array $patterns): array
-    {
-        $patternsTable = array_map(function ($pattern) {
-            return ['pattern' => $pattern];
-        }, $patterns);
-        return $patternsTable;
     }
 }

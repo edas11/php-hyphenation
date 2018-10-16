@@ -8,19 +8,20 @@
 declare(strict_types = 1);
 namespace Edvardas\Hyphenation\Hyphenator\Model;
 
-
-use Edvardas\Hyphenation\App\App;
 use Edvardas\Hyphenation\Hyphenator\Model\MappingStrategy\WordPatternsMappingStrategy;
+use Edvardas\Hyphenation\UtilityComponents\Database\SqlDatabase;
 
 class WordPatterns implements PersistentModel
 {
     private $wordPatterns;
+    private $db;
 
     /**
      * @param string[][] $wordPatterns
      */
-    public function __construct(array $wordPatterns)
+    public function __construct(array $wordPatterns, SqlDatabase $db)
     {
+        $this->db = $db;
         $this->wordPatterns = $wordPatterns;
     }
 
@@ -29,9 +30,8 @@ class WordPatterns implements PersistentModel
         return $this->wordPatterns;
     }
 
-    public static function getKnown(array $words): WordPatterns
+    public static function getKnown(array $words, SqlDatabase $db): WordPatterns
     {
-        $db = App::getDb();
         $builder = $db->builder();
         $db->beginTransaction();
         $query = $builder
@@ -46,21 +46,19 @@ class WordPatterns implements PersistentModel
         $wordMatchedPatterns = $db->executeAndFetch($query, new WordPatternsMappingStrategy());
         $db->commit();
 
-        return new WordPatterns($wordMatchedPatterns);
+        return new WordPatterns($wordMatchedPatterns, $db);
     }
 
     public function persist(): void
     {
-        $db = App::getDb();
-        $db->beginTransaction();
+        $this->db->beginTransaction();
         $this->persistNoTransaction();
-        $db->commit();
+        $this->db->commit();
     }
 
     public function persistNoTransaction(): void
     {
-        $db = App::getDb();
-        $builder = $db->builder();
+        $builder = $this->db->builder();
         foreach ($this->wordPatterns as $word => $matchedPatterns) {
             foreach ($matchedPatterns as $pattern) {
                 $querry = $builder
@@ -73,7 +71,7 @@ class WordPatterns implements PersistentModel
                     ->and()
                     ->equals('pattern', $pattern)
                     ->build();
-                $db->execute($querry);
+                $this->db->execute($querry);
             }
         }
     }

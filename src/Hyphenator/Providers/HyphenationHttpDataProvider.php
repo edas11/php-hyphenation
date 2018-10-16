@@ -8,32 +8,37 @@
 
 namespace Edvardas\Hyphenation\Hyphenator\Providers;
 
-
-use Edvardas\Hyphenation\App\App;
 use Edvardas\Hyphenation\Hyphenator\Action\HyphenateAndAddToDbAction;
 use Edvardas\Hyphenation\Hyphenator\Algorithm\FullTreeHyphenationAlgorithm;
 use Edvardas\Hyphenation\Hyphenator\Algorithm\HyphenationAlgorithmInterface;
 use Edvardas\Hyphenation\Hyphenator\Database\HyphenationDatabase;
 use Edvardas\Hyphenation\Hyphenator\Input\HttpInput;
 use Edvardas\Hyphenation\Hyphenator\Input\HyphenationInput;
+use Edvardas\Hyphenation\Hyphenator\Model\ModelFactory;
 use Edvardas\Hyphenation\Hyphenator\Model\Patterns;
 use Edvardas\Hyphenation\Hyphenator\Output\HyphenationOutput;
-use Edvardas\Hyphenation\UtilityComponents\Http\HttpRequest;
 
 class HyphenationHttpDataProvider implements HyphenationDataProvider
 {
     private $output;
+    private $modelFactory;
     private $wordsArray = [];
     private $hyphenatedWordsArray = [];
 
-    public function __construct(HyphenationOutput $output)
+    public function __construct(HyphenationOutput $output, ModelFactory $modelFactory)
     {
+        $this->modelFactory = $modelFactory;
         $this->output = $output;
     }
 
     public function getOutput(): HyphenationOutput
     {
         return $this->output;
+    }
+
+    public function getModelFactory(): ModelFactory
+    {
+        return $this->modelFactory;
     }
 
     public function getWords(): array
@@ -53,7 +58,7 @@ class HyphenationHttpDataProvider implements HyphenationDataProvider
 
     public function getPatterns(): Patterns
     {
-        $patterns = Patterns::getKnown();
+        $patterns = $this->modelFactory->getKnownPatterns();
         return $patterns;
     }
 

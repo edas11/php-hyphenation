@@ -22,12 +22,14 @@ class ComplexHyphenateWordsAction implements Action
     private $output;
     private $dataProvider;
     private $timer;
+    private $modelFactory;
 
     public function __construct(HyphenationDataProvider $dataProvider)
     {
         $this->timer = new Timer();
         $this->output = $dataProvider->getOutput();
         $this->dataProvider = $dataProvider;
+        $this->modelFactory = $this->dataProvider->getModelFactory();
     }
 
     public function execute()
@@ -39,7 +41,7 @@ class ComplexHyphenateWordsAction implements Action
 
         $this->timer->start();
 
-        $dbWords = Words::getKnownIn($inputWords);
+        $dbWords = $this->modelFactory->getKnownWords($inputWords);
         $wordsInDb = $dbWords->getOriginalWords();
         $wordsNotInDb = array_values(array_diff($inputWords, $wordsInDb));
 
@@ -47,12 +49,12 @@ class ComplexHyphenateWordsAction implements Action
         if (count($wordsNotInDb) > 0) {
             $runner->run($wordsNotInDb, true);
             $resultWords = $runner->getHyphenatedWords();
-            $hyphnatedWords = new Words(array_combine($wordsNotInDb, $resultWords));
-            $wordPatterns = new WordPatterns($runner->getMatchedPatterns());
-            (new CompositeModel([$hyphnatedWords, $wordPatterns]))->persist();
+            $hyphnatedWords = $this->modelFactory->createWords(array_combine($wordsNotInDb, $resultWords));
+            $wordPatterns = $this->modelFactory->createWordPatterns($runner->getMatchedPatterns());
+            $this->modelFactory->createCompositeModel([$hyphnatedWords, $wordPatterns])->persist();
         }
 
-        $matchedPatternsResult = WordPatterns::getKnown($inputWords)->getMatchedPatterns();
+        $matchedPatternsResult = $this->modelFactory->getKnownWordPatterns($inputWords)->getMatchedPatterns();
         $this->output->printMatchedPatterns($matchedPatternsResult);
         $this->output->printHyphenatedWords(
             array_combine($wordsNotInDb, $resultWords),

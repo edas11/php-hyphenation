@@ -9,6 +9,7 @@
 namespace Edvardas\Hyphenation\Hyphenator\Action;
 
 
+use Edvardas\Hyphenation\Hyphenator\Model\ModelFactory;
 use Edvardas\Hyphenation\Hyphenator\Model\Words;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
 
@@ -16,11 +17,13 @@ class WordDeleteAction implements Action
 {
     private $output;
     private $dataProvider;
+    private $modelFactory;
 
     public function __construct(HyphenationDataProvider $dataProvider)
     {
         $this->output = $dataProvider->getOutput();
         $this->dataProvider = $dataProvider;
+        $this->modelFactory = $dataProvider->getModelFactory();
     }
 
     public function execute()
@@ -31,7 +34,7 @@ class WordDeleteAction implements Action
             return;
         }
         $word = $words[0];
-        (new Words([$word => '']))->delete();
+        $this->modelFactory->createWords([$word => ''])->delete();
         $this->output->printResult(['Success']);
     }
 }

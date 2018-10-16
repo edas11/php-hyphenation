@@ -8,29 +8,29 @@
 
 namespace Edvardas\Hyphenation\Hyphenator\Model;
 
-
-use Edvardas\Hyphenation\App\App;
+use Edvardas\Hyphenation\UtilityComponents\Database\SqlDatabase;
 
 class CompositeModel implements PersistentModel
 {
     private $models;
+    private $db;
 
     /**
      * @param PersistentModel[] $models
      */
-    public function __construct(array $models)
+    public function __construct(array $models, SqlDatabase $db)
     {
         $this->models = $models;
+        $this->db = $db;
     }
 
     public function persist(): void
     {
-        $db = App::getDb();
-        $db->beginTransaction();
+        $this->db->beginTransaction();
         foreach ($this->models as $model) {
             $model->persistNoTransaction();
         }
-        $db->commit();
+        $this->db->commit();
     }
 
     public function persistNoTransaction(): void

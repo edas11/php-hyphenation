@@ -16,20 +16,22 @@ class WordsGetKnownAction implements Action
 {
     private $output;
     private $dataProvider;
+    private $modelFactory;
 
     public function __construct(HyphenationDataProvider $dataProvider)
     {
         $this->output = $dataProvider->getOutput();
         $this->dataProvider = $dataProvider;
+        $this->modelFactory = $dataProvider->getModelFactory();
     }
 
     public function execute()
     {
         $words = $this->dataProvider->getWords();
         if (count($words) > 0) {
-            $words = Words::getKnownIn($words);
+            $words = $this->modelFactory->getKnownWords($words);
         } else {
-            $words = Words::getKnown();
+            $words = $this->modelFactory->getKnownWords();
         }
         $this->output->printResult(array_combine($words->getOriginalWords(), $words->getHyphenatedWords()));
     }

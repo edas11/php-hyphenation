@@ -20,18 +20,24 @@ use Edvardas\Hyphenation\Hyphenator\File\WordsFile;
 use Edvardas\Hyphenation\Hyphenator\Input\ConsoleInput;
 use Edvardas\Hyphenation\Hyphenator\Input\HyphenationInput;
 use Edvardas\Hyphenation\Hyphenator\Input\InputCodes;
+use Edvardas\Hyphenation\Hyphenator\Model\ModelFactory;
 use Edvardas\Hyphenation\Hyphenator\Model\Patterns;
 use Edvardas\Hyphenation\Hyphenator\Output\HyphenationOutput;
+use Edvardas\Hyphenation\UtilityComponents\Config\Config;
 
 class HyphenationConsoleDataProvider implements HyphenationDataProvider
 {
     private $input;
     private $output;
+    private $config;
+    private $modelFactory;
 
-    public function __construct(ConsoleInput $input, HyphenationOutput $output)
+    public function __construct(ConsoleInput $input, HyphenationOutput $output, Config $config, ModelFactory $modelFactory)
     {
         $this->input = $input;
         $this->output = $output;
+        $this->config = $config;
+        $this->modelFactory = $modelFactory;
     }
 
     public function getOutput(): HyphenationOutput
@@ -39,11 +45,16 @@ class HyphenationConsoleDataProvider implements HyphenationDataProvider
         return $this->output;
     }
 
+    public function getModelFactory(): ModelFactory
+    {
+        return $this->modelFactory;
+    }
+
     public function getWords(): array
     {
         $wordsInput = $this->input->getWordsInput();
         if ($wordsInput === '') {
-            $wordsFileName = App::getConfig(['wordsFileName'], 'words.txt');
+            $wordsFileName = $this->config->get(['wordsFileName'], 'words.txt');
             App::$logger->info("Reading words from $wordsFileName file.");
             $words = WordsFile::getContentsAsArray($wordsFileName);
         } else {
@@ -77,9 +88,9 @@ class HyphenationConsoleDataProvider implements HyphenationDataProvider
     public function getPatterns(): Patterns
     {
         if ($this->input->getSourceInput() === InputCodes::DB_SRC) {
-            $patterns = Patterns::getKnown();
+            $patterns = $this->modelFactory->getKnownPatterns();
         } else {
-            $patternsFileName = App::getConfig(['patternsFileName'], 'patterns');
+            $patternsFileName = $this->config->get(['patternsFileName'], 'patterns');
             $patterns = new Patterns(PatternsFile::getContentsAsArray($patternsFileName));
         }
         return $patterns;

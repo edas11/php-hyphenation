@@ -8,19 +8,21 @@
 declare(strict_types = 1);
 namespace Edvardas\Hyphenation\Hyphenator\Model;
 
-use Edvardas\Hyphenation\App\App;
 use Edvardas\Hyphenation\Hyphenator\Model\MappingStrategy\PatternsMappingStrategy;
+use Edvardas\Hyphenation\UtilityComponents\Database\SqlDatabase;
 
 class Patterns implements PersistentModel
 {
     private $patterns = [];
+    private $db;
 
     /**
      * @param string[][] $patterns
      */
-    public function __construct(array $patterns)
+    public function __construct(array $patterns, SqlDatabase $db)
     {
         $this->patterns = $patterns;
+        $this->db = $db;
     }
 
     public function getPatterns()
@@ -28,9 +30,8 @@ class Patterns implements PersistentModel
         return $this->patterns;
     }
 
-    public static function getKnown(): Patterns
+    public static function getKnown(SqlDatabase $db): Patterns
     {
-        $db = App::getDb();
         $builder = $db->builder();
         $query = $builder
             ->select()
@@ -40,26 +41,24 @@ class Patterns implements PersistentModel
         $db->beginTransaction();
         $patterns = $db->executeAndFetch($query, new PatternsMappingStrategy());
         $db->commit();
-        return new Patterns($patterns);
+        return new Patterns($patterns, $db);
     }
 
     public function persist(): void
     {
-        $db = App::getDb();
-        $db->beginTransaction();
+        $this->db->beginTransaction();
         $this->persistNoTransaction();
-        $db->commit();
+        $this->db->commit();
     }
 
     public function persistNoTransaction(): void
     {
-        $db = App::getDb();
-        $builder = $db->builder();
+        $builder = $this->db->builder();
         $query = $builder
             ->delete()
             ->from('patterns')
             ->build();
-        $db->execute($query);
+        $this->db->execute($query);
         $builder = $builder
             ->insert()
             ->into('patterns', ['pattern']);
@@ -67,6 +66,6 @@ class Patterns implements PersistentModel
             $builder = $builder->values([$pattern]);
         }
         $query = $builder->build();
-        $db->execute($query);
+        $this->db->execute($query);
     }
 }

@@ -11,11 +11,8 @@ namespace Edvardas\Hyphenation\App;
 
 use Edvardas\Hyphenation\Hyphenator\ConsoleHyphenator;
 use Edvardas\Hyphenation\Hyphenator\DiContainer\DiContainer;
-use Edvardas\Hyphenation\Hyphenator\Database\MySqlDatabaseProxy;
 use Edvardas\Hyphenation\Hyphenator\Hyphenator;
 use Edvardas\Hyphenation\Hyphenator\WebHyphenator;
-use Edvardas\Hyphenation\UtilityComponents\Config\Config;
-use Edvardas\Hyphenation\UtilityComponents\Database\SqlDatabase;
 use Edvardas\Hyphenation\UtilityComponents\Logger\FileLogger;
 use Edvardas\Hyphenation\UtilityComponents\Cache\MemoryCache;
 use Edvardas\Hyphenation\UtilityComponents\Logger\NullLogger;
@@ -25,8 +22,6 @@ class App
     public const WORDS_THRESHOLD = 100000;
     public static $logger;
     public static $cache;
-    private static $config;
-    private static $db;
 
     /**
      * @var Hyphenator
@@ -58,27 +53,5 @@ class App
             self::$logger->notice('Too many words, disabling logger.');
             self::$logger = new NullLogger();
         }
-    }
-
-    public static function getConfig(array $keys, string $default = ''): string
-    {
-        if (!isset(self::$config)) {
-            self::$config = self::readConfig('config.php');
-        }
-        return self::$config->get($keys, $default);
-    }
-
-    private static function readConfig(string $pathToConfig): Config
-    {
-        $configData = require($pathToConfig);
-        return new Config($configData);
-    }
-
-    public static function getDb(): SqlDatabase
-    {
-        if (!isset(self::$db)) {
-            self::$db = new MySqlDatabaseProxy();
-        }
-        return self::$db;
     }
 }

@@ -11,7 +11,7 @@ namespace Edvardas\Hyphenation\Hyphenator\Controller;
 use Edvardas\Hyphenation\Hyphenator\Action\Action;
 use Edvardas\Hyphenation\Hyphenator\Action\ComplexHyphenateWordsAction;
 use Edvardas\Hyphenation\Hyphenator\Action\SimpleHyphenateWordsAction;
-use Edvardas\Hyphenation\Hyphenator\Action\PutPatternsInDbAction;
+use Edvardas\Hyphenation\Hyphenator\Action\PatternsSaveInDbAction;
 use Edvardas\Hyphenation\Hyphenator\Input\ConsoleInput;
 use Edvardas\Hyphenation\Hyphenator\Input\InputCodes;
 use Edvardas\Hyphenation\Hyphenator\Output\HyphenationOutput;
@@ -36,7 +36,7 @@ class ConsoleController implements Controller
                 return $this->getHyphenationAction();
                 break;
             case InputCodes::PUT_PATTERNS_IN_DB_ACTION:
-                return new PutPatternsInDbAction($this->provider);
+                return new PatternsSaveInDbAction($this->provider);
                 break;
         }
     }

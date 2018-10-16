@@ -12,7 +12,7 @@ namespace Edvardas\Hyphenation\Hyphenator\Action;
 use Edvardas\Hyphenation\Hyphenator\Database\HyphenationDatabase;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
 
-class PutPatternsInDbAction implements Action
+class PatternsSaveInDbAction implements Action
 {
     private $dataProvider;
 

@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: edvardas
  * Date: 18.10.11
- * Time: 13.29
+ * Time: 15.11
  */
 
 namespace Edvardas\Hyphenation\Hyphenator\Action;
@@ -12,7 +12,7 @@ namespace Edvardas\Hyphenation\Hyphenator\Action;
 use Edvardas\Hyphenation\Hyphenator\Model\Words;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
 
-class GetKnownWordsAction implements Action
+class WordDeleteAction implements Action
 {
     private $output;
     private $dataProvider;
@@ -26,11 +26,12 @@ class GetKnownWordsAction implements Action
     public function execute()
     {
         $words = $this->dataProvider->getWords();
-        if (count($words) > 0) {
-            $words = Words::getKnownIn($words);
-        } else {
-            $words = Words::getKnown();
+        if (count($words) < 1) {
+            $this->output->printResult(['Error']);
+            return;
         }
-        $this->output->printResult(array_combine($words->getOriginalWords(), $words->getHyphenatedWords()));
+        $word = $words[0];
+        (new Words([$word], [$word]))->delete();
+        $this->output->printResult(['Success']);
     }
 }

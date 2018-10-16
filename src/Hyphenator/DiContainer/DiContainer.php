@@ -24,89 +24,39 @@ class DiContainer
 {
     private $instances = [];
 
-    public function getConsoleHyphenator(): ConsoleHyphenator
+    public function get(string $instanceName)
     {
-        $instanceName = 'ConsoleHyphenator';
         if (!array_key_exists($instanceName, $this->instances)) {
-            $this->instances[$instanceName] = new ConsoleHyphenator($this->getConsoleController());
+            $this->instances[$instanceName] = $this->create($instanceName);
         }
         return $this->instances[$instanceName];
     }
 
-    public function getConsoleController(): ConsoleController
+    private function create(string $instanceName)
     {
-        $instanceName = 'ConsoleController';
-        if (!array_key_exists($instanceName, $this->instances)) {
-            $this->instances[$instanceName] = new ConsoleController($this->getConsoleInput(), $this->getHyphenationConsoleDataProvider());
+        switch ($instanceName) {
+            case ConsoleHyphenator::class:
+                return new ConsoleHyphenator($this->get(ConsoleController::class));
+            case ConsoleController::class:
+                return new ConsoleController($this->get(ConsoleInput::class), $this->get(HyphenationConsoleDataProvider::class));
+            case HyphenationConsoleDataProvider::class:
+                return new HyphenationConsoleDataProvider($this->get(ConsoleInput::class), $this->get(ConsoleOutput::class));
+            case ConsoleOutput::class:
+                return new ConsoleOutput();
+            case ConsoleInput::class:
+                return new ConsoleInput();
+            case WebHyphenator::class:
+                return new WebHyphenator($this->get(HttpController::class), $this->get(JsonHyphenationOutput::class));
+            case HttpController::class:
+                return new HttpController($this->get(HyphenationHttpDataProvider::class), $this->get(Route::class));
+            case JsonHyphenationOutput::class:
+                return new JsonHyphenationOutput();
+            case HyphenationHttpDataProvider::class:
+                return new HyphenationHttpDataProvider($this->get(JsonHyphenationOutput::class));
+            case Route::class:
+                return HttpRequest::getRoute();
+            default:
+                throw new \Exception("Cant create $instanceName");
         }
-        return $this->instances[$instanceName];
-    }
-
-    public function getHyphenationConsoleDataProvider(): HyphenationConsoleDataProvider
-    {
-        $instanceName = 'HyphenationConsoleDataProvider';
-        if (!array_key_exists($instanceName, $this->instances)) {
-            $this->instances[$instanceName] = new HyphenationConsoleDataProvider($this->getConsoleInput(), $this->getConsoleOutput());
-        }
-        return $this->instances[$instanceName];
-    }
-
-    public function getConsoleOutput(): ConsoleOutput
-    {
-        $instanceName = 'ConsoleOutput';
-        if (!array_key_exists($instanceName, $this->instances)) {
-            $this->instances[$instanceName] = new ConsoleOutput();
-        }
-        return $this->instances[$instanceName];
-    }
-
-    public function getConsoleInput(): ConsoleInput
-    {
-        $instanceName = 'ConsoleInput';
-        if (!array_key_exists($instanceName, $this->instances)) {
-            $this->instances[$instanceName] = new ConsoleInput();
-        }
-        return $this->instances[$instanceName];
-    }
-
-    public function getWebHyphenator(): WebHyphenator
-    {
-        $instanceName = 'WebHyphenator';
-        if (!array_key_exists($instanceName, $this->instances)) {
-            $this->instances[$instanceName] = new WebHyphenator($this->getHttpController(), $this->getJsonHyphenationOutput());
-        }
-        return $this->instances[$instanceName];
-    }
-
-    public function getHttpController(): HttpController
-    {
-        $instanceName = 'HttpController';
-        if (!array_key_exists($instanceName, $this->instances)) {
-            $this->instances[$instanceName] = new HttpController($this->getHyphenationHttpDataProvider(), $this->getRoute());
-        }
-        return $this->instances[$instanceName];
-    }
-
-    public function getJsonHyphenationOutput(): JsonHyphenationOutput
-    {
-        $instanceName = 'JsonHyphenationOutput';
-        if (!array_key_exists($instanceName, $this->instances)) {
-            $this->instances[$instanceName] = new JsonHyphenationOutput();
-        }
-        return $this->instances[$instanceName];
-    }
-
-    public function getHyphenationHttpDataProvider(): HyphenationHttpDataProvider
-    {
-        $instanceName = 'HyphenationHttpDataProvider';
-        if (!array_key_exists($instanceName, $this->instances)) {
-            $this->instances[$instanceName] = new HyphenationHttpDataProvider($this->getJsonHyphenationOutput());
-        }
-        return $this->instances[$instanceName];
-    }
-
-    public function getRoute(): Route
-    {
-        return HttpRequest::getRoute();
     }
 }

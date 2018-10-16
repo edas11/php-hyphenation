@@ -10,10 +10,10 @@ namespace Edvardas\Hyphenation\Hyphenator\Controller;
 
 use Edvardas\Hyphenation\Hyphenator\Action\Action;
 use Edvardas\Hyphenation\Hyphenator\Action\BadRequestAction;
-use Edvardas\Hyphenation\Hyphenator\Action\DeleteWordAction;
-use Edvardas\Hyphenation\Hyphenator\Action\GetKnownWordsAction;
+use Edvardas\Hyphenation\Hyphenator\Action\WordDeleteAction;
+use Edvardas\Hyphenation\Hyphenator\Action\WordsGetKnownAction;
 use Edvardas\Hyphenation\Hyphenator\Action\ComplexHyphenateWordsAction;
-use Edvardas\Hyphenation\Hyphenator\Action\PutWordAction;
+use Edvardas\Hyphenation\Hyphenator\Action\WordPutAction;
 use Edvardas\Hyphenation\Hyphenator\Input\HttpInput;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationHttpDataProvider;
 use Edvardas\Hyphenation\UtilityComponents\Http\HttpRequest;
@@ -56,7 +56,7 @@ class HttpController implements Controller
             if (array_key_exists('for', $queryParams)) {
                 $this->provider->setWords([$queryParams['for']]);
             }
-            return new GetKnownWordsAction($this->provider);
+            return new WordsGetKnownAction($this->provider);
         } else {
             return new BadRequestAction($this->provider);
         }
@@ -89,7 +89,7 @@ class HttpController implements Controller
             }
             $this->provider->setWords([$this->route->getPathParam()]);
 
-            return new PutWordAction($this->provider);
+            return new WordPutAction($this->provider);
         } else {
             return new BadRequestAction($this->provider);
         }
@@ -100,7 +100,7 @@ class HttpController implements Controller
         $this->route->match(['hyphenation', 'words', '{param}']);
         if ($this->route->matches()) {
             $this->provider->setWords([$this->route->getPathParam()]);
-            return new DeleteWordAction($this->provider);
+            return new WordDeleteAction($this->provider);
         } else {
             return new BadRequestAction($this->provider);
         }

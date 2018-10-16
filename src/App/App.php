@@ -9,9 +9,11 @@ declare(strict_types = 1);
 
 namespace Edvardas\Hyphenation\App;
 
+use Edvardas\Hyphenation\Hyphenator\ConsoleHyphenator;
 use Edvardas\Hyphenation\Hyphenator\DiContainer\DiContainer;
 use Edvardas\Hyphenation\Hyphenator\Database\MySqlDatabaseProxy;
 use Edvardas\Hyphenation\Hyphenator\Hyphenator;
+use Edvardas\Hyphenation\Hyphenator\WebHyphenator;
 use Edvardas\Hyphenation\UtilityComponents\Config\Config;
 use Edvardas\Hyphenation\UtilityComponents\Database\SqlDatabase;
 use Edvardas\Hyphenation\UtilityComponents\Logger\FileLogger;
@@ -42,9 +44,9 @@ class App
         self::$logger->info("Started hyphenation algorithm at " . date('Y-m-d H:i:s'));
         $container = new DiContainer();
         if (php_sapi_name() === 'cli') {
-            $this->hyphenator = $container->getConsoleHyphenator();
+            $this->hyphenator = $container->get(ConsoleHyphenator::class);
         } else {
-            $this->hyphenator = $container->getWebHyphenator();
+            $this->hyphenator = $container->get(WebHyphenator::class);
         }
         $this->hyphenator->execute();
 

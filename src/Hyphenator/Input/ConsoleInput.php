@@ -32,9 +32,6 @@ class ConsoleInput
             $this->console->printLn("(".InputCodes::HYPHENATE_ACTION.") Hyphenate words");
             $this->console->printLn("(".InputCodes::PUT_PATTERNS_IN_DB_ACTION.") Load patterns to database");
             $this->actionInput = (int)$this->console->getInput();
-            if ($this->actionInput === InputCodes::PUT_PATTERNS_IN_DB_ACTION) {
-                $this->sourceInput = InputCodes::FILE_SRC;
-            }
         }
         return $this->actionInput;
     }
@@ -42,17 +39,15 @@ class ConsoleInput
     public function getSourceInput(): int
     {
         if (is_null($this->sourceInput)) {
+            if ($this->actionInput === InputCodes::PUT_PATTERNS_IN_DB_ACTION) {
+                return InputCodes::FILE_SRC;
+            }
             $this->console->printLn("Choose hyphenation source:");
             $this->console->printLn("(".InputCodes::FILE_SRC.") File");
             $this->console->printLn("(".InputCodes::DB_SRC.") Database");
             $this->sourceInput = (int)$this->console->getInput();
         }
         return $this->sourceInput;
-    }
-
-    public function getHyphenatedWordsInput(): string
-    {
-        return '';
     }
 
     public function getWordsInput(): string

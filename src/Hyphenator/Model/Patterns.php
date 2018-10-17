@@ -48,11 +48,6 @@ class Patterns implements PersistentModel
     {
         $token = $this->db->beginTransaction();
         $builder = $this->db->builder();
-        $query = $builder
-            ->delete()
-            ->from(HyphenatedWords::WORDS_TABLE)
-            ->build();
-        $this->db->execute($query);
         $builder = $builder
             ->replace()
             ->into('patterns', ['pattern']);

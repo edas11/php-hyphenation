@@ -15,25 +15,25 @@ use Edvardas\Hyphenation\UtilityComponents\Database\SqlDatabase;
 class HyphenatedWords implements PersistentModel
 {
     private $db;
-    private $words = [];
+    private $hyphenatedWords = [];
     public const WORD_COLUMN = 'word';
     public const HYPHENATED_WORD_COLUMN = 'word_h';
     public const WORDS_TABLE = 'words';
 
-    public function __construct(array $words, SqlDatabase $db)
+    public function __construct(array $hyphenatedWords, SqlDatabase $db)
     {
-        $this->words = $words;
+        $this->hyphenatedWords = $hyphenatedWords;
         $this->db = $db;
     }
 
-    public function getWords(): array
+    public function getHyphenatedWords(): array
     {
-        return $this->words;
+        return $this->hyphenatedWords;
     }
 
     public function filterUnknownWords(array $inputWords)
     {
-        return array_values(array_diff($inputWords, array_keys($this->words)));
+        return array_values(array_diff($inputWords, array_keys($this->hyphenatedWords)));
     }
 
     /**
@@ -42,12 +42,12 @@ class HyphenatedWords implements PersistentModel
     public static function getKnownIn(SqlDatabase $db, array $words = []): HyphenatedWords
     {
         $builder = $db->builder();
-        $builder->select()
+        $builder
+            ->select()
             ->columns([self::WORD_COLUMN, self::HYPHENATED_WORD_COLUMN])
             ->from(self::WORDS_TABLE);
         if (count($words) > 0) {
-            $builder->where()
-                ->in(self::WORD_COLUMN, $words);
+            $builder->where()->in(self::WORD_COLUMN, $words);
         }
         $query = $builder->build();
         $token = $db->beginTransaction();
@@ -60,7 +60,7 @@ class HyphenatedWords implements PersistentModel
     {
         $builder = $this->db->builder();
         $token = $this->db->beginTransaction();
-        foreach ($this->words as $word => $hyphenatedWord) {
+        foreach ($this->hyphenatedWords as $word => $hyphenatedWord) {
             $query = $builder
                 ->delete()
                 ->from(self::WORDS_TABLE)
@@ -72,6 +72,18 @@ class HyphenatedWords implements PersistentModel
         $this->db->commit($token);
     }
 
+    public function deleteAll(): void
+    {
+        $builder = $this->db->builder();
+        $token = $this->db->beginTransaction();
+        $query = $builder
+            ->delete()
+            ->from(self::WORDS_TABLE)
+            ->build();
+        $this->db->execute($query);
+        $this->db->commit($token);
+    }
+
     public function persist(): void
     {
         $token = $this->db->beginTransaction();
@@ -79,7 +91,7 @@ class HyphenatedWords implements PersistentModel
         $builder = $builder
             ->replace()
             ->into(self::WORDS_TABLE, [self::WORD_COLUMN, self::HYPHENATED_WORD_COLUMN]);
-        foreach ($this->words as $word => $hyphenatedWord) {
+        foreach ($this->hyphenatedWords as $word => $hyphenatedWord) {
             $builder = $builder->values([$word, $hyphenatedWord]);
         }
         $query = $builder->build();

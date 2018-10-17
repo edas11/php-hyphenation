@@ -8,8 +8,6 @@
 
 namespace Edvardas\Hyphenation\Hyphenator\Providers;
 
-
-use Edvardas\Hyphenation\App\App;
 use Edvardas\Hyphenation\Hyphenator\Action\HyphenateAndAddToDbAction;
 use Edvardas\Hyphenation\Hyphenator\Algorithm\FullTreeHyphenationAlgorithm;
 use Edvardas\Hyphenation\Hyphenator\Algorithm\HyphenationAlgorithmInterface;
@@ -21,7 +19,6 @@ use Edvardas\Hyphenation\Hyphenator\Input\ConsoleInput;
 use Edvardas\Hyphenation\Hyphenator\Input\HyphenationInput;
 use Edvardas\Hyphenation\Hyphenator\Input\InputCodes;
 use Edvardas\Hyphenation\Hyphenator\Model\ModelFactory;
-use Edvardas\Hyphenation\Hyphenator\Model\Patterns;
 use Edvardas\Hyphenation\Hyphenator\Output\HyphenationOutput;
 use Edvardas\Hyphenation\UtilityComponents\Config\Config;
 use Edvardas\Hyphenation\UtilityComponents\Logger\NullLogger;
@@ -78,22 +75,16 @@ class HyphenationConsoleDataProvider implements HyphenationDataProvider
         } else {
             $words = explode(' ', $wordsInput);
         }
-        $this->wordsReadEvent(count($words));
-        return $words;
-    }
-
-    private function wordsReadEvent(int $numberOfWords): void
-    {
-        if ($numberOfWords > (int) $this->config->get(['wordsThreshold'])) {
+        if (count($words) > (int) $this->config->get(['wordsThreshold'])) {
             $this->logger->notice('Too many words, disabling logger.');
             $this->logger = new NullLogger();
         }
+        return $words;
     }
 
     public function getHyphenatedWordsInput(): array
     {
-        $hyphenatedWordsInput = $this->input->getHyphenatedWordsInput();
-        return explode(' ', $hyphenatedWordsInput);
+        throw new \Exception('Operation not supported');
     }
 
     public function getAlgorithm(): HyphenationAlgorithmInterface

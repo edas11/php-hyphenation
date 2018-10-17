@@ -26,6 +26,6 @@ class WordsGetKnownAction implements Action
     public function execute(): void
     {
         $words = $this->modelFactory->getKnownHyphenatedWords($this->filterWords);
-        $this->output->printResult($words->getWords());
+        $this->output->printResult($words->getHyphenatedWords());
     }
 }

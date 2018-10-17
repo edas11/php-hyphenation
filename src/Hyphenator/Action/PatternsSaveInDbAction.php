@@ -25,6 +25,7 @@ class PatternsSaveInDbAction implements Action
 
     public function execute(): void
     {
+        $this->modelFactory->createHyphenatedWords([])->deleteAll();
         $this->modelFactory->createPatternsModel($this->patternsInput)->persist();
     }
 

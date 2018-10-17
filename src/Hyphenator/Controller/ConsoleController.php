@@ -44,7 +44,6 @@ class ConsoleController implements Controller
     private function getHyphenationAction(): Action
     {
         $source = $this->input->getSourceInput();
-        $this->sourceInput = $source;
         switch ($source) {
             case InputCodes::FILE_SRC:
                 return new WordsHyphenationAction($this->provider);

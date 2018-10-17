@@ -8,22 +8,25 @@
 
 namespace Edvardas\Hyphenation\Hyphenator\DiContainer;
 
+use Edvardas\Hyphenation\Hyphenator\Console\InputDialog;
 use Edvardas\Hyphenation\Hyphenator\ConsoleHyphenator;
 use Edvardas\Hyphenation\Hyphenator\Controller\ConsoleController;
-use Edvardas\Hyphenation\Hyphenator\Controller\HttpMainController;
+use Edvardas\Hyphenation\Hyphenator\Controller\HttpController;
 use Edvardas\Hyphenation\Hyphenator\Database\MySqlDatabaseProxy;
-use Edvardas\Hyphenation\Hyphenator\Input\ConsoleInput;
+use Edvardas\Hyphenation\Hyphenator\Console\ConsoleInput;
 use Edvardas\Hyphenation\Hyphenator\Model\ModelFactory;
 use Edvardas\Hyphenation\Hyphenator\Output\ConsoleOutput;
 use Edvardas\Hyphenation\Hyphenator\Output\JsonHyphenationOutput;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationConsoleDataProvider;
+use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationConsoleDataProviderFactory;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationHttpDataProvider;
+use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationHttpDataProviderFactory;
 use Edvardas\Hyphenation\Hyphenator\WebHyphenator;
 use Edvardas\Hyphenation\UtilityComponents\Cache\MemoryCache;
 use Edvardas\Hyphenation\UtilityComponents\Config\Config;
 use Edvardas\Hyphenation\UtilityComponents\Database\MySqlDatabase;
 use Edvardas\Hyphenation\UtilityComponents\Http\HttpRequest;
-use Edvardas\Hyphenation\UtilityComponents\Http\Route;
+use Edvardas\Hyphenation\UtilityComponents\Http\Router;
 use Edvardas\Hyphenation\UtilityComponents\Logger\FileLogger;
 
 class DiContainer
@@ -45,12 +48,12 @@ class DiContainer
                 return new ConsoleHyphenator($this->get(ConsoleController::class));
             case ConsoleController::class:
                 return new ConsoleController(
-                    $this->get(ConsoleInput::class),
-                    $this->get(HyphenationConsoleDataProvider::class)
+                    $this->get(InputDialog::class),
+                    $this->get(HyphenationConsoleDataProviderFactory::class)
                 );
-            case HyphenationConsoleDataProvider::class:
-                return new HyphenationConsoleDataProvider(
-                    $this->get(ConsoleInput::class),
+            case HyphenationConsoleDataProviderFactory::class:
+                return new HyphenationConsoleDataProviderFactory(
+                    $this->get(InputDialog::class),
                     $this->get(ConsoleOutput::class),
                     $this->get(Config::class),
                     $this->get(ModelFactory::class),
@@ -59,6 +62,8 @@ class DiContainer
                 );
             case ConsoleOutput::class:
                 return new ConsoleOutput();
+            case InputDialog::class:
+                return new InputDialog($this->get(ConsoleInput::class));
             case ConsoleInput::class:
                 return new ConsoleInput();
             case Config::class:
@@ -66,18 +71,19 @@ class DiContainer
                 return new Config($configData);
             case WebHyphenator::class:
                 return new WebHyphenator(
-                    $this->get(HttpMainController::class),
+                    $this->get(HttpController::class),
                     $this->get(JsonHyphenationOutput::class)
                 );
-            case HttpMainController::class:
-                return new HttpMainController(
-                    $this->get(HyphenationHttpDataProvider::class),
-                    $this->get(HttpRequest::class)
+            case HttpController::class:
+                return new HttpController(
+                    $this->get(HyphenationHttpDataProviderFactory::class),
+                    $this->get(HttpRequest::class),
+                    $this->get(Router::class)
                 );
             case JsonHyphenationOutput::class:
                 return new JsonHyphenationOutput();
-            case HyphenationHttpDataProvider::class:
-                return new HyphenationHttpDataProvider(
+            case HyphenationHttpDataProviderFactory::class:
+                return new HyphenationHttpDataProviderFactory(
                     $this->get(JsonHyphenationOutput::class),
                     $this->get(ModelFactory::class),
                     $this->get(MemoryCache::class),
@@ -85,6 +91,8 @@ class DiContainer
                 );
             case HttpRequest::class:
                 return new HttpRequest();
+            case Router::class:
+                return new Router($this->get(HttpRequest::class));
             case ModelFactory::class:
                 return new ModelFactory($this->get(MySqlDatabase::class));
             case MySqlDatabase::class:

@@ -5,21 +5,22 @@
  * Date: 18.10.17
  * Time: 11.37
  */
-
+declare(strict_types = 1);
 namespace Edvardas\Hyphenation\UtilityComponents\Http;
-
 
 class Router
 {
     private $routeConfig;
     private $route;
+    private $method;
     private $possibleRoutes;
     private $routeHandlerName;
     private $matchedRoute;
 
-    public function __construct(Route $route)
+    public function __construct(HttpRequest $request)
     {
-        $this->route = $route;
+        $this->route = $request->parseRoute();
+        $this->method = $request->getMethod();
         $this->routeConfig = require 'routes.php';
         $this->doParsing();
     }
@@ -42,7 +43,7 @@ class Router
 
     private function parseHttpMethod(): void
     {
-        switch (HttpRequest::getMethod()) {
+        switch ($this->method) {
             case 'GET':
                 $this->possibleRoutes = $this->routeConfig['get'];
                 break;

@@ -18,18 +18,18 @@ class HttpRequest
         return $_SERVER['REQUEST_METHOD'];
     }
 
-    public function getRoute(): Route
+    public function parseRoute(): Route
     {
         return new Route($_SERVER['REQUEST_URI']);
     }
 
-    public function getBody(): array
+    public function parseBody(): HttpBody
     {
         $body = file_get_contents('php://input');
         $jsonBody = json_decode($body, true);
-        if (is_array($jsonBody)) {
-            return $jsonBody;
+        if (!is_array($jsonBody)) {
+            $jsonBody = [];
         }
-        return [];
+        return new HttpBody($jsonBody);
     }
 }

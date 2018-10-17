@@ -12,15 +12,15 @@ use Edvardas\Hyphenation\Hyphenator\Action\HyphenateAndAddToDbAction;
 use Edvardas\Hyphenation\Hyphenator\Algorithm\FullTreeHyphenationAlgorithm;
 use Edvardas\Hyphenation\Hyphenator\Algorithm\HyphenationAlgorithmInterface;
 use Edvardas\Hyphenation\Hyphenator\Database\HyphenationDatabase;
-use Edvardas\Hyphenation\Hyphenator\Input\HttpInput;
-use Edvardas\Hyphenation\Hyphenator\Input\HyphenationInput;
+use Edvardas\Hyphenation\Hyphenator\Console\HttpInput;
+use Edvardas\Hyphenation\Hyphenator\Console\HyphenationInput;
 use Edvardas\Hyphenation\Hyphenator\Model\ModelFactory;
 use Edvardas\Hyphenation\Hyphenator\Model\Patterns;
 use Edvardas\Hyphenation\Hyphenator\Output\HyphenationOutput;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 
-class HyphenationHttpDataProvider implements HyphenationDataProvider
+class HyphenationHttpDataProviderFactory
 {
     private $output;
     private $modelFactory;
@@ -41,29 +41,17 @@ class HyphenationHttpDataProvider implements HyphenationDataProvider
         $this->logger = $logger;
     }
 
-    public function getOutput(): HyphenationOutput
+    public function build(): HyphenationDataProvider
     {
-        return $this->output;
-    }
-
-    public function getModelFactory(): ModelFactory
-    {
-        return $this->modelFactory;
-    }
-
-    public function getLogger(): LoggerInterface
-    {
-        return $this->logger;
-    }
-
-    public function getWordsInput(): array
-    {
-        return $this->wordsArray;
-    }
-
-    public function getHyphenatedWordsInput(): array
-    {
-        return $this->hyphenatedWordsArray;
+        return new HyphenationDataProvider(
+            $this->getPatternsInput(),
+            $this->output,
+            $this->wordsArray,
+            $this->hyphenatedWordsArray,
+            $this->modelFactory,
+            $this->getAlgorithm(),
+            $this->logger
+        );
     }
 
     public function getAlgorithm(): HyphenationAlgorithmInterface

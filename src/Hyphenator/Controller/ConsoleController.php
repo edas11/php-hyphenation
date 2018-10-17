@@ -5,6 +5,7 @@
  * Date: 18.10.11
  * Time: 16.41
  */
+declare(strict_types=1);
 
 namespace Edvardas\Hyphenation\Hyphenator\Controller;
 
@@ -12,20 +13,20 @@ use Edvardas\Hyphenation\Hyphenator\Action\Action;
 use Edvardas\Hyphenation\Hyphenator\Action\WordsHyphenationWithDbAction;
 use Edvardas\Hyphenation\Hyphenator\Action\WordsHyphenationAction;
 use Edvardas\Hyphenation\Hyphenator\Action\PatternsSaveInDbAction;
-use Edvardas\Hyphenation\Hyphenator\Input\ConsoleInput;
-use Edvardas\Hyphenation\Hyphenator\Input\InputCodes;
-use Edvardas\Hyphenation\Hyphenator\Output\HyphenationOutput;
+use Edvardas\Hyphenation\Hyphenator\Console\InputCodes;
+use Edvardas\Hyphenation\Hyphenator\Console\InputDialog;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationConsoleDataProvider;
+use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationConsoleDataProviderFactory;
 
 class ConsoleController implements Controller
 {
     private $provider;
     private $input;
 
-    public function __construct(ConsoleInput $input, HyphenationConsoleDataProvider $provider)
+    public function __construct(InputDialog $input, HyphenationConsoleDataProviderFactory $factory)
     {
         $this->input = $input;
-        $this->provider = $provider;
+        $this->provider = $factory->build();
     }
 
     public function getAction(): Action

@@ -12,12 +12,12 @@ use Edvardas\Hyphenation\Hyphenator\Action\HyphenateAndAddToDbAction;
 use Edvardas\Hyphenation\Hyphenator\Algorithm\FullTreeHyphenationAlgorithm;
 use Edvardas\Hyphenation\Hyphenator\Algorithm\HyphenationAlgorithmInterface;
 use Edvardas\Hyphenation\Hyphenator\Algorithm\ShortTreeHyphenationAlgorithm;
+use Edvardas\Hyphenation\Hyphenator\Console\InputDialog;
 use Edvardas\Hyphenation\Hyphenator\Database\HyphenationDatabase;
 use Edvardas\Hyphenation\Hyphenator\File\PatternsFile;
 use Edvardas\Hyphenation\Hyphenator\File\WordsFile;
-use Edvardas\Hyphenation\Hyphenator\Input\ConsoleInput;
-use Edvardas\Hyphenation\Hyphenator\Input\HyphenationInput;
-use Edvardas\Hyphenation\Hyphenator\Input\InputCodes;
+use Edvardas\Hyphenation\Hyphenator\Console\HyphenationInput;
+use Edvardas\Hyphenation\Hyphenator\Console\InputCodes;
 use Edvardas\Hyphenation\Hyphenator\Model\ModelFactory;
 use Edvardas\Hyphenation\Hyphenator\Output\HyphenationOutput;
 use Edvardas\Hyphenation\UtilityComponents\Config\Config;
@@ -25,7 +25,7 @@ use Edvardas\Hyphenation\UtilityComponents\Logger\NullLogger;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 
-class HyphenationConsoleDataProvider implements HyphenationDataProvider
+class HyphenationConsoleDataProviderFactory
 {
     private $input;
     private $output;
@@ -35,7 +35,7 @@ class HyphenationConsoleDataProvider implements HyphenationDataProvider
     private $logger;
 
     public function __construct(
-        ConsoleInput $input,
+        InputDialog $input,
         HyphenationOutput $output,
         Config $config,
         ModelFactory $modelFactory,
@@ -50,19 +50,17 @@ class HyphenationConsoleDataProvider implements HyphenationDataProvider
         $this->logger = $logger;
     }
 
-    public function getOutput(): HyphenationOutput
+    public function build(): HyphenationDataProvider
     {
-        return $this->output;
-    }
-
-    public function getModelFactory(): ModelFactory
-    {
-        return $this->modelFactory;
-    }
-
-    public function getLogger(): LoggerInterface
-    {
-        return $this->logger;
+        return new HyphenationDataProvider(
+            $this->getPatternsInput(),
+            $this->output,
+            $this->getWordsInput(),
+            [],
+            $this->modelFactory,
+            $this->getAlgorithm(),
+            $this->logger
+        );
     }
 
     public function getWordsInput(): array
@@ -80,11 +78,6 @@ class HyphenationConsoleDataProvider implements HyphenationDataProvider
             $this->logger = new NullLogger();
         }
         return $words;
-    }
-
-    public function getHyphenatedWordsInput(): array
-    {
-        throw new \Exception('Operation not supported');
     }
 
     public function getAlgorithm(): HyphenationAlgorithmInterface

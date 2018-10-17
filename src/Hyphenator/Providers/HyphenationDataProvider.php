@@ -2,31 +2,79 @@
 /**
  * Created by PhpStorm.
  * User: edvardas
- * Date: 18.10.12
- * Time: 10.08
+ * Date: 18.10.17
+ * Time: 15.27
  */
 
 namespace Edvardas\Hyphenation\Hyphenator\Providers;
 
+
+use Edvardas\Hyphenation\Hyphenator\Algorithm\AbstractHyphenationAlgorithm;
 use Edvardas\Hyphenation\Hyphenator\Algorithm\HyphenationAlgorithmInterface;
 use Edvardas\Hyphenation\Hyphenator\Model\ModelFactory;
-use Edvardas\Hyphenation\Hyphenator\Model\Patterns;
 use Edvardas\Hyphenation\Hyphenator\Output\HyphenationOutput;
 use Psr\Log\LoggerInterface;
 
-interface HyphenationDataProvider
+class HyphenationDataProvider
 {
-    public function getOutput(): HyphenationOutput;
+    private $patterns;
+    private $output;
+    private $words;
+    private $hyphenatedWords;
+    private $modelFactory;
+    private $algorithm;
+    private $logger;
 
-    public function getModelFactory(): ModelFactory;
+    public function __construct(
+        array $patterns,
+        HyphenationOutput $output,
+        array $words,
+        array $hyphenatedWords,
+        ModelFactory $modelFactory,
+        AbstractHyphenationAlgorithm $algorithm,
+        LoggerInterface $logger
+    ) {
+        $this->patterns = $patterns;
+        $this->output = $output;
+        $this->words = $words;
+        $this->hyphenatedWords = $hyphenatedWords;
+        $this->modelFactory = $modelFactory;
+        $this->algorithm = $algorithm;
+        $this->logger = $logger;
+    }
 
-    public function getLogger(): LoggerInterface;
+    public function getOutput(): HyphenationOutput
+    {
+        return $this->output;
+    }
 
-    public function getWordsInput(): array;
+    public function getModelFactory(): ModelFactory
+    {
+        return $this->modelFactory;
+    }
 
-    public function getHyphenatedWordsInput(): array;
+    public function getLogger(): LoggerInterface
+    {
+        return $this->logger;
+    }
 
-    public function getAlgorithm(): HyphenationAlgorithmInterface;
+    public function getWordsInput(): array
+    {
+        return $this->words;
+    }
 
-    public function getPatternsInput(): array;
+    public function getHyphenatedWordsInput(): array
+    {
+        return $this->hyphenatedWords;
+    }
+
+    public function getAlgorithm(): HyphenationAlgorithmInterface
+    {
+        return $this->algorithm;
+    }
+
+    public function getPatternsInput(): array
+    {
+        return $this->patterns;
+    }
 }

@@ -6,7 +6,7 @@
  * Time: 10.56
  */
 
-namespace Edvardas\Hyphenation\Hyphenator\Input;
+namespace Edvardas\Hyphenation\Hyphenator\Console;
 
 class InputCodes
 {

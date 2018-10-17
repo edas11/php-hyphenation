@@ -20,7 +20,7 @@ use Edvardas\Hyphenation\Hyphenator\Output\HyphenationOutput;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 
-class HyphenationHttpDataProviderFactory
+class HttpDataProviderFactory
 {
     private $output;
     private $modelFactory;

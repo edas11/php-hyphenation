@@ -15,7 +15,7 @@ use Edvardas\Hyphenation\Hyphenator\Action\WordPutAction;
 use Edvardas\Hyphenation\Hyphenator\Action\WordsGetKnownAction;
 use Edvardas\Hyphenation\Hyphenator\Action\WordsHyphenationWithDbAction;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
-use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationHttpDataProviderFactory;
+use Edvardas\Hyphenation\Hyphenator\Providers\HttpDataProviderFactory;
 use Edvardas\Hyphenation\UtilityComponents\Http\HttpRequest;
 use Edvardas\Hyphenation\UtilityComponents\Http\Router;
 
@@ -25,7 +25,7 @@ class HelperHttpController
     private $factory;
     private $body;
 
-    public function __construct(HyphenationHttpDataProviderFactory $factory, HttpRequest $request, Router $router)
+    public function __construct(HttpDataProviderFactory $factory, HttpRequest $request, Router $router)
     {
         $this->matchedRoute = $router->getMatchedRoute();
         $this->body = $request->parseBody();

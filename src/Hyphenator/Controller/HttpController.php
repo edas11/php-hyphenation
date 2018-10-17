@@ -12,7 +12,7 @@ use Edvardas\Hyphenation\Hyphenator\Action\Action;
 use Edvardas\Hyphenation\Hyphenator\Action\BadRequestAction;
 use Edvardas\Hyphenation\Hyphenator\Console\HttpInput;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationHttpDataProvider;
-use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationHttpDataProviderFactory;
+use Edvardas\Hyphenation\Hyphenator\Providers\HttpDataProviderFactory;
 use Edvardas\Hyphenation\UtilityComponents\Http\HttpRequest;
 use Edvardas\Hyphenation\UtilityComponents\Http\Router;
 
@@ -22,7 +22,7 @@ class HttpController implements Controller
     private $router;
     private $request;
 
-    public function __construct(HyphenationHttpDataProviderFactory $factory, HttpRequest $request, Router $router)
+    public function __construct(HttpDataProviderFactory $factory, HttpRequest $request, Router $router)
     {
         $this->factory = $factory;
         $this->request = $request;

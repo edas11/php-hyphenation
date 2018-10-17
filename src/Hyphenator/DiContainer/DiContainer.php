@@ -13,17 +13,17 @@ use Edvardas\Hyphenation\Hyphenator\ConsoleHyphenator;
 use Edvardas\Hyphenation\Hyphenator\Controller\ConsoleController;
 use Edvardas\Hyphenation\Hyphenator\Controller\HttpController;
 use Edvardas\Hyphenation\Hyphenator\Database\MySqlDatabaseProxy;
-use Edvardas\Hyphenation\Hyphenator\Console\ConsoleInput;
 use Edvardas\Hyphenation\Hyphenator\Model\ModelFactory;
 use Edvardas\Hyphenation\Hyphenator\Output\ConsoleOutput;
 use Edvardas\Hyphenation\Hyphenator\Output\JsonHyphenationOutput;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationConsoleDataProvider;
-use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationConsoleDataProviderFactory;
+use Edvardas\Hyphenation\Hyphenator\Providers\ConsoleDataProviderFactory;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationHttpDataProvider;
-use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationHttpDataProviderFactory;
+use Edvardas\Hyphenation\Hyphenator\Providers\HttpDataProviderFactory;
 use Edvardas\Hyphenation\Hyphenator\WebHyphenator;
 use Edvardas\Hyphenation\UtilityComponents\Cache\MemoryCache;
 use Edvardas\Hyphenation\UtilityComponents\Config\Config;
+use Edvardas\Hyphenation\UtilityComponents\Console\Console;
 use Edvardas\Hyphenation\UtilityComponents\Database\MySqlDatabase;
 use Edvardas\Hyphenation\UtilityComponents\Http\HttpRequest;
 use Edvardas\Hyphenation\UtilityComponents\Http\Router;
@@ -49,10 +49,10 @@ class DiContainer
             case ConsoleController::class:
                 return new ConsoleController(
                     $this->get(InputDialog::class),
-                    $this->get(HyphenationConsoleDataProviderFactory::class)
+                    $this->get(ConsoleDataProviderFactory::class)
                 );
-            case HyphenationConsoleDataProviderFactory::class:
-                return new HyphenationConsoleDataProviderFactory(
+            case ConsoleDataProviderFactory::class:
+                return new ConsoleDataProviderFactory(
                     $this->get(InputDialog::class),
                     $this->get(ConsoleOutput::class),
                     $this->get(Config::class),
@@ -63,9 +63,9 @@ class DiContainer
             case ConsoleOutput::class:
                 return new ConsoleOutput();
             case InputDialog::class:
-                return new InputDialog($this->get(ConsoleInput::class));
-            case ConsoleInput::class:
-                return new ConsoleInput();
+                return new InputDialog($this->get(Console::class));
+            case Console::class:
+                return new Console();
             case Config::class:
                 $configData = require('config.php');
                 return new Config($configData);
@@ -76,14 +76,14 @@ class DiContainer
                 );
             case HttpController::class:
                 return new HttpController(
-                    $this->get(HyphenationHttpDataProviderFactory::class),
+                    $this->get(HttpDataProviderFactory::class),
                     $this->get(HttpRequest::class),
                     $this->get(Router::class)
                 );
             case JsonHyphenationOutput::class:
                 return new JsonHyphenationOutput();
-            case HyphenationHttpDataProviderFactory::class:
-                return new HyphenationHttpDataProviderFactory(
+            case HttpDataProviderFactory::class:
+                return new HttpDataProviderFactory(
                     $this->get(JsonHyphenationOutput::class),
                     $this->get(ModelFactory::class),
                     $this->get(MemoryCache::class),

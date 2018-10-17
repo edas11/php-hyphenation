@@ -16,14 +16,14 @@ use Edvardas\Hyphenation\Hyphenator\Action\PatternsSaveInDbAction;
 use Edvardas\Hyphenation\Hyphenator\Console\InputCodes;
 use Edvardas\Hyphenation\Hyphenator\Console\InputDialog;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationConsoleDataProvider;
-use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationConsoleDataProviderFactory;
+use Edvardas\Hyphenation\Hyphenator\Providers\ConsoleDataProviderFactory;
 
 class ConsoleController implements Controller
 {
     private $provider;
     private $input;
 
-    public function __construct(InputDialog $input, HyphenationConsoleDataProviderFactory $factory)
+    public function __construct(InputDialog $input, ConsoleDataProviderFactory $factory)
     {
         $this->input = $input;
         $this->provider = $factory->build();
@@ -32,26 +32,13 @@ class ConsoleController implements Controller
     public function getAction(): Action
     {
         $choice = $this->input->getActionInput();
-        switch ($choice) {
-            case InputCodes::HYPHENATE_ACTION:
-                return $this->getHyphenationAction();
-                break;
-            case InputCodes::PUT_PATTERNS_IN_DB_ACTION:
-                return new PatternsSaveInDbAction($this->provider);
-                break;
-        }
-    }
-
-    private function getHyphenationAction(): Action
-    {
         $source = $this->input->getSourceInput();
-        switch ($source) {
-            case InputCodes::FILE_SRC:
-                return new WordsHyphenationAction($this->provider);
-                break;
-            case InputCodes::DB_SRC:
-                return new WordsHyphenationWithDbAction($this->provider);
-                break;
+        if ($choice === InputCodes::HYPHENATE_ACTION && $source === InputCodes::FILE_SRC) {
+            return new WordsHyphenationAction($this->provider);
+        } elseif ($choice === InputCodes::HYPHENATE_ACTION && $source === InputCodes::DB_SRC) {
+            return new WordsHyphenationWithDbAction($this->provider);
+        } elseif ($choice === InputCodes::PUT_PATTERNS_IN_DB_ACTION) {
+            return new PatternsSaveInDbAction($this->provider);
         }
     }
 }

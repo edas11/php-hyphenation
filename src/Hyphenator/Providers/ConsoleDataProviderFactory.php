@@ -25,7 +25,7 @@ use Edvardas\Hyphenation\UtilityComponents\Logger\NullLogger;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 
-class HyphenationConsoleDataProviderFactory
+class ConsoleDataProviderFactory
 {
     private $input;
     private $output;
@@ -67,16 +67,11 @@ class HyphenationConsoleDataProviderFactory
     {
         $wordsInput = $this->input->getWordsInput();
         if ($wordsInput === '') {
-            $wordsFileName = $this->config->get(['wordsFileName'], 'words.txt');
-            $this->logger->info("Reading words from $wordsFileName file.");
-            $words = WordsFile::getContentsAsArray($wordsFileName, $this->logger);
+            $words = $this->getAllWordsFromFile();
         } else {
-            $words = explode(' ', $wordsInput);
+            $words = $this->getWordsFromInput($wordsInput);
         }
-        if (count($words) > (int) $this->config->get(['wordsThreshold'])) {
-            $this->logger->notice('Too many words, disabling logger.');
-            $this->logger = new NullLogger();
-        }
+        $this->checkNumberOfWords($words);
         return $words;
     }
 
@@ -98,11 +93,45 @@ class HyphenationConsoleDataProviderFactory
     public function getPatternsInput(): array
     {
         if ($this->input->getSourceInput() === InputCodes::DB_SRC) {
-            $patterns = $this->modelFactory->getKnownPatterns()->getPatterns();
+            $patterns = $this->getPatternsFromDb();
         } else {
-            $patternsFileName = $this->config->get(['patternsFileName'], 'patterns');
-            $patterns = PatternsFile::getContentsAsArray($patternsFileName, $this->logger);
+            $patterns = $this->getPatternsFromFile();
         }
+        return $patterns;
+    }
+
+    private function getAllWordsFromFile(): array
+    {
+        $wordsFileName = $this->config->get(['wordsFileName'], 'words.txt');
+        $this->logger->info("Reading words from $wordsFileName file.");
+        $words = WordsFile::getContentsAsArray($wordsFileName, $this->logger);
+        return $words;
+    }
+
+    private function getWordsFromInput($wordsInput): array
+    {
+        $words = explode(' ', $wordsInput);
+        return $words;
+    }
+
+    private function checkNumberOfWords($words): void
+    {
+        if (count($words) > (int)$this->config->get(['wordsThreshold'])) {
+            $this->logger->notice('Too many words, disabling logger.');
+            $this->logger = new NullLogger();
+        }
+    }
+
+    private function getPatternsFromDb()
+    {
+        $patterns = $this->modelFactory->getKnownPatterns()->getPatterns();
+        return $patterns;
+    }
+
+    private function getPatternsFromFile(): array
+    {
+        $patternsFileName = $this->config->get(['patternsFileName'], 'patterns');
+        $patterns = PatternsFile::getContentsAsArray($patternsFileName, $this->logger);
         return $patterns;
     }
 }

@@ -10,7 +10,7 @@ namespace Edvardas\Hyphenation\Hyphenator\DiContainer;
 
 use Edvardas\Hyphenation\Hyphenator\ConsoleHyphenator;
 use Edvardas\Hyphenation\Hyphenator\Controller\ConsoleController;
-use Edvardas\Hyphenation\Hyphenator\Controller\HttpController;
+use Edvardas\Hyphenation\Hyphenator\Controller\HttpMainController;
 use Edvardas\Hyphenation\Hyphenator\Database\MySqlDatabaseProxy;
 use Edvardas\Hyphenation\Hyphenator\Input\ConsoleInput;
 use Edvardas\Hyphenation\Hyphenator\Model\ModelFactory;
@@ -66,13 +66,13 @@ class DiContainer
                 return new Config($configData);
             case WebHyphenator::class:
                 return new WebHyphenator(
-                    $this->get(HttpController::class),
+                    $this->get(HttpMainController::class),
                     $this->get(JsonHyphenationOutput::class)
                 );
-            case HttpController::class:
-                return new HttpController(
+            case HttpMainController::class:
+                return new HttpMainController(
                     $this->get(HyphenationHttpDataProvider::class),
-                    $this->get(Route::class)
+                    $this->get(HttpRequest::class)
                 );
             case JsonHyphenationOutput::class:
                 return new JsonHyphenationOutput();
@@ -83,8 +83,8 @@ class DiContainer
                     $this->get(MemoryCache::class),
                     $this->get(FileLogger::class)
                 );
-            case Route::class:
-                return HttpRequest::getRoute();
+            case HttpRequest::class:
+                return new HttpRequest();
             case ModelFactory::class:
                 return new ModelFactory($this->get(MySqlDatabase::class));
             case MySqlDatabase::class:

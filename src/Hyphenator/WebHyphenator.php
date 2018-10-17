@@ -8,7 +8,7 @@
 
 namespace Edvardas\Hyphenation\Hyphenator;
 
-use Edvardas\Hyphenation\Hyphenator\Controller\HttpController;
+use Edvardas\Hyphenation\Hyphenator\Controller\HttpMainController;
 use Edvardas\Hyphenation\Hyphenator\Input\HttpInput;
 use Edvardas\Hyphenation\Hyphenator\Output\JsonHyphenationOutput;
 
@@ -17,7 +17,7 @@ class WebHyphenator implements Hyphenator
     private $controller;
     private $output;
 
-    public function __construct(HttpController $controller, JsonHyphenationOutput $output)
+    public function __construct(HttpMainController $controller, JsonHyphenationOutput $output)
     {
         header('content-type: application/json');
         $this->controller = $controller;

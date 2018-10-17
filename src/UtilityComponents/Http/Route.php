@@ -12,9 +12,7 @@ namespace Edvardas\Hyphenation\UtilityComponents\Http;
 class Route
 {
     private $routeArray = [];
-    private $queryParams = [];
-    private $pathParam;
-    private $matches;
+    private $queryString;
 
     public function __construct(string $pathString)
     {
@@ -24,11 +22,10 @@ class Route
         } else {
             $routeString = substr($pathString, 0, $queryPos);
             if (strlen($pathString) === $queryPos + 1) {
-                $queryString = '';
+                $this->queryString = '';
             } else {
-                $queryString = substr($pathString, $queryPos + 1);
+                $this->queryString = substr($pathString, $queryPos + 1);
             }
-            parse_str($queryString, $this->queryParams);
         }
         $this->routeArray = $route = explode('/', trim($routeString, '/'));
     }
@@ -36,41 +33,28 @@ class Route
     /**
      * @param string[] $match
      */
-    public function match(array $match): void
+    public function match(Route $routeToMatch): MatchedRoute
     {
+        $match = $routeToMatch->routeArray;
         if (count($this->routeArray) !== count($match)) {
-            $this->matches = false;
-            return;
+            return new MatchedRoute(false);
         }
         foreach ($match as $pathIndex => $matchString) {
+            $pathParam = '';
+
             if (!array_key_exists($pathIndex, $this->routeArray)) {
-                $this->matches = false;
-                return;
+                return new MatchedRoute(false);
             }
             if ($matchString === '{param}') {
-                $this->pathParam = $this->routeArray[$pathIndex];
+                $pathParam = $this->routeArray[$pathIndex];
                 continue;
             }
             if ($this->routeArray[$pathIndex] !== $matchString) {
-                $this->matches = false;
-                return;
+                return new MatchedRoute(false);
             }
         }
-        $this->matches = true;
-    }
-
-    public function matches(): bool
-    {
-        return $this->matches;
-    }
-
-    public function getPathParam(): string
-    {
-        return $this->pathParam;
-    }
-
-    public function getQueryParams()
-    {
-        return $this->queryParams;
+        $queryParams = [];
+        parse_str($this->queryString, $queryParams);
+        return new MatchedRoute(true, $pathParam, $queryParams);
     }
 }

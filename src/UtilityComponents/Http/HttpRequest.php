@@ -13,17 +13,17 @@ use Edvardas\Hyphenation\UtilityComponents\Http\Route;
 
 class HttpRequest
 {
-    public static function getMethod(): string
+    public function getMethod(): string
     {
         return $_SERVER['REQUEST_METHOD'];
     }
 
-    public static function getRoute(): Route
+    public function getRoute(): Route
     {
         return new Route($_SERVER['REQUEST_URI']);
     }
 
-    public static function getBody(): array
+    public function getBody(): array
     {
         $body = file_get_contents('php://input');
         $jsonBody = json_decode($body, true);

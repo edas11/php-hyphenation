@@ -6,27 +6,21 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <style>
-        main {
-            margin: auto;
-            padding-top: 30px;
-            max-width: 90%;
-        }
-        h1 {
-            margin-bottom: 50px;
-        }
-    </style>
+
+    <link rel="stylesheet" href="/static/style.css"/>
 </head>
 <body>
+    <nav>
+        <h1><a href="/hyphenation">Hyphenator</a></h1>
+    </nav>
     <main>
-        <h1>Hyphenator</h1>
         <ul class="list-group">
-            <li class="list-group-item">Navigation</li>
+            <li class="list-group-item"><b>Navigation &darr;</b></li>
             <a class="list-group-item list-group-item-action" href="/hyphenation/show/words">Show hyphenated words</a>
             <a class="list-group-item list-group-item-action" href="/hyphenation/show/patterns">Show hyphenation patterns</a>
             <a class="list-group-item list-group-item-action" href="/hyphenation/hyphenated-words">Hyphenate words</a>
-            <a class="list-group-item list-group-item-action" href="/hyphenation/change-hyphenation">Manually change word hyphenation</a>
         </ul>
     </main>
 </body>
 </html>
+<script src="/static/main.js"/>

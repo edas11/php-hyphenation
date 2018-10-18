@@ -5,7 +5,7 @@
  * Date: 18.10.8
  * Time: 13.58
  */
-
+declare(strict_types = 1);
 namespace Edvardas\Hyphenation\Hyphenator\Providers;
 
 use Edvardas\Hyphenation\Hyphenator\Action\HyphenateAndAddToDbAction;
@@ -17,6 +17,7 @@ use Edvardas\Hyphenation\Hyphenator\Console\HyphenationInput;
 use Edvardas\Hyphenation\Hyphenator\Model\ModelFactory;
 use Edvardas\Hyphenation\Hyphenator\Model\Patterns;
 use Edvardas\Hyphenation\Hyphenator\Output\HyphenationOutput;
+use Edvardas\Hyphenation\Hyphenator\Output\WebOutput;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 
@@ -30,7 +31,7 @@ class HttpDataProviderFactory
     private $hyphenatedWordsArray = [];
 
     public function __construct(
-        HyphenationOutput $output,
+        WebOutput $output,
         ModelFactory $modelFactory,
         CacheInterface $cache,
         LoggerInterface $logger
@@ -54,6 +55,11 @@ class HttpDataProviderFactory
         );
     }
 
+    public function getOutput(): WebOutput
+    {
+        return $this->output;
+    }
+
     public function getAlgorithm(): HyphenationAlgorithmInterface
     {
         return new FullTreeHyphenationAlgorithm($this->getPatternsInput(), $this->cache, $this->logger);
@@ -65,17 +71,16 @@ class HttpDataProviderFactory
         return $patterns;
     }
 
-    /**
-     * @param string[] $words
-     */
+    public function configureWebOutput(string $contentType, string $pagePath = '')
+    {
+        $this->output->configureOutput($contentType, $pagePath);
+    }
+
     public function setWords(array $words)
     {
         $this->wordsArray = $words;
     }
 
-    /**
-     * @param string[] $hyphenatedWordsArray
-     */
     public function setHyphenatedWords(array $hyphenatedWordsArray)
     {
         $this->hyphenatedWordsArray = $hyphenatedWordsArray;

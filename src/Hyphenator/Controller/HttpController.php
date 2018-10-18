@@ -32,10 +32,13 @@ class HttpController implements Controller
     public function getAction(): Action
     {
         $handlerName = $this->router->getRouteHandlerName();
-        if ($handlerName === '' ||  !method_exists (HelperHttpController::class, $handlerName)) {
+        $handlerName = "Edvardas\Hyphenation\Hyphenator\Controller\WebControllers\\$handlerName";
+        if (!class_exists($handlerName)) {
             return new BadRequestAction($this->factory->build());
         }
-        $appController = new HelperHttpController($this->factory, $this->request, $this->router);
-        return $appController->{$handlerName}();
+        $appController = new $handlerName($this->factory, $this->request, $this->router);
+        if ($appController instanceof Controller) {
+            return $appController->getAction();
+        }
     }
 }

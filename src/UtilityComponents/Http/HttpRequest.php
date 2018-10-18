@@ -25,11 +25,21 @@ class HttpRequest
 
     public function parseBody(): HttpBody
     {
-        $body = file_get_contents('php://input');
-        $jsonBody = json_decode($body, true);
-        if (!is_array($jsonBody)) {
-            $jsonBody = [];
+        if (!array_key_exists("CONTENT_TYPE", $_SERVER)){
+            return new HttpBody([]);
         }
-        return new HttpBody($jsonBody);
+        $contentType = $_SERVER["CONTENT_TYPE"];
+        if ($contentType === 'application/json') {
+            $body = file_get_contents('php://input');
+            $bodyArray = json_decode($body, true);
+            if (!is_array($bodyArray)) {
+                $bodyArray = [];
+            }
+        } elseif ($contentType === 'application/x-www-form-urlencoded' || $contentType === 'multipart/form-data') {
+            $bodyArray = $_POST;
+        } else {
+            throw new \Exception('Unsupported body content type');
+        }
+        return new HttpBody($bodyArray);
     }
 }

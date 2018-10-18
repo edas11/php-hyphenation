@@ -1,0 +1,20 @@
+body {
+    margin: auto;
+    padding-top: 30px;
+    max-width: 90%;
+}
+main {
+    margin: auto;
+    max-width: 95%;
+}
+h1 {
+    margin-bottom: 50px;
+}
+form {
+    padding: 30px 0 50px 0;
+}
+a.badge {
+    float: right;
+    cursor: pointer;
+    color: white !important;
+}

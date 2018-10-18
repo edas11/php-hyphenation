@@ -1,21 +1,22 @@
 <?php
-// route => Edvardas\Hyphenation\Hyphenator\Controller\HelperHttpController method name
+// route => Edvardas\Hyphenation\Hyphenator\Controller\WebControllers class name
 return $routes = [
     'get' => [
-        'hyphenation/' => 'getPage',
-        'hyphenation/show/words' => 'getWordsPage',
-        'hyphenation/show/patterns' => 'getPatternsPage',
-        'hyphenation/hyphenated-words' => 'hyphenateWordsPage',
-        'hyphenation/change-hyphenation' => 'changeHyphenationPage',
-        'api/hyphenation/words/'  => 'getWords'
+        'hyphenation/' => 'PageMainController',
+        'hyphenation/show/words' => 'PageGetWordsController',
+        'hyphenation/show/patterns' => 'PageGetPatternsController',
+        'hyphenation/hyphenated-words' => 'PageHyphenateWordsController',
+        'hyphenation/change-hyphenation' => 'PageChangeHyphenationController',
+        'api/hyphenation/words/'  => 'ApiGetWordsController'
     ],
     'post' => [
-        'api/hyphenation/words/'  => 'postWords'
+        'hyphenation/hyphenated-words' => 'PageHyphenateWordsController',
+        'api/hyphenation/words/'  => 'ApiPostWordsController'
     ],
     'put' => [
-        'api/hyphenation/words/{param}'  => 'putWords'
+        'api/hyphenation/words/{param}'  => 'ApiPutWordsController'
     ],
     'delete' => [
-        'api/hyphenation/words/{param}'  => 'deleteWords'
+        'api/hyphenation/words/{param}'  => 'ApiDeleteWordsController'
     ]
 ];

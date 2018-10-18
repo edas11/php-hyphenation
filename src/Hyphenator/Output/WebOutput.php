@@ -11,13 +11,30 @@ namespace Edvardas\Hyphenation\Hyphenator\Output;
 
 class WebOutput implements HyphenationOutput
 {
+    private $contentType = 'application/json';
+    private $pagePath = '';
     private $outputData = [];
 
     public function flush()
     {
-        if (count($this->outputData) > 0) {
+        if ($this->contentType === 'application/json') {
             echo json_encode($this->outputData);
+        } else {
+            $this->includeHtmlPage();
         }
+    }
+
+    private function includeHtmlPage(): void
+    {
+        $data = $this->outputData;
+        require $this->pagePath;
+    }
+
+    public function configureOutput(string $contentType, string $pagePath = '')
+    {
+        header("content-type: $contentType");
+        $this->contentType = $contentType;
+        $this->pagePath = $pagePath;
     }
 
     public function printResult(array $result)
@@ -51,10 +68,5 @@ class WebOutput implements HyphenationOutput
     public function printHyphenatedWords(array $hyphenatedWords)
     {
         $this->outputData['hyphenatedWords'] = $hyphenatedWords;
-    }
-
-    public function printPage(string $pagePath): void
-    {
-        require $pagePath;
     }
 }

@@ -11,13 +11,11 @@ namespace Edvardas\Hyphenation\Hyphenator\Providers;
 use Edvardas\Hyphenation\Hyphenator\Action\HyphenateAndAddToDbAction;
 use Edvardas\Hyphenation\Hyphenator\Algorithm\FullTreeHyphenationAlgorithm;
 use Edvardas\Hyphenation\Hyphenator\Algorithm\HyphenationAlgorithmInterface;
-use Edvardas\Hyphenation\Hyphenator\Algorithm\ShortTreeHyphenationAlgorithm;
 use Edvardas\Hyphenation\Hyphenator\Console\InputDialog;
 use Edvardas\Hyphenation\Hyphenator\Database\HyphenationDatabase;
 use Edvardas\Hyphenation\Hyphenator\File\PatternsFile;
 use Edvardas\Hyphenation\Hyphenator\File\WordsFile;
 use Edvardas\Hyphenation\Hyphenator\Console\HyphenationInput;
-use Edvardas\Hyphenation\Hyphenator\Console\InputCodes;
 use Edvardas\Hyphenation\Hyphenator\Model\ModelFactory;
 use Edvardas\Hyphenation\Hyphenator\Output\HyphenationOutput;
 use Edvardas\Hyphenation\UtilityComponents\Config\Config;
@@ -27,7 +25,7 @@ use Psr\SimpleCache\CacheInterface;
 
 class ConsoleDataProviderFactory
 {
-    private $input;
+    private $inputData;
     private $output;
     private $config;
     private $modelFactory;
@@ -42,7 +40,7 @@ class ConsoleDataProviderFactory
         CacheInterface $cache,
         LoggerInterface $logger
     ) {
-        $this->input = $input;
+        $this->inputData = $input->getConsoleInput();
         $this->output = $output;
         $this->config = $config;
         $this->modelFactory = $modelFactory;
@@ -65,11 +63,11 @@ class ConsoleDataProviderFactory
 
     public function getWordsInput(): array
     {
-        $wordsInput = $this->input->getWordsInput();
-        if ($wordsInput === '') {
+        $words = [];
+        if ($this->inputData->isWordsFromFile()) {
             $words = $this->getAllWordsFromFile();
-        } else {
-            $words = $this->getWordsFromInput($wordsInput);
+        } elseif ($this->inputData->isWordsFromInput()) {
+            $words = $this->inputData->getWords();
         }
         $this->checkNumberOfWords($words);
         return $words;
@@ -77,22 +75,17 @@ class ConsoleDataProviderFactory
 
     public function getAlgorithm(): HyphenationAlgorithmInterface
     {
-        $algorithmChoice = $this->input->getAlgorithmInput();
-        switch ($algorithmChoice) {
-            case InputCodes::FULL_TREE_ALGORITHM:
-                return new FullTreeHyphenationAlgorithm($this->getPatternsInput(), $this->cache, $this->logger);
-                break;
-            case InputCodes::SHORT_TREE_ALGORITHM:
-                return new ShortTreeHyphenationAlgorithm($this->getPatternsInput(), $this->cache, $this->logger);
-                break;
-            default:
-                return new FullTreeHyphenationAlgorithm($this->getPatternsInput(), $this->cache, $this->logger);
+        $algorithmName = $this->inputData->getAlgorithmName();
+        if (class_exists($algorithmName)) {
+            return new $algorithmName($this->getPatternsInput(), $this->cache, $this->logger);
+        } else {
+            return new FullTreeHyphenationAlgorithm($this->getPatternsInput(), $this->cache, $this->logger);
         }
     }
 
     public function getPatternsInput(): array
     {
-        if ($this->input->getSourceInput() === InputCodes::DB_SRC) {
+        if ($this->inputData->isPatternsFromDb()) {
             $patterns = $this->getPatternsFromDb();
         } else {
             $patterns = $this->getPatternsFromFile();
@@ -105,12 +98,6 @@ class ConsoleDataProviderFactory
         $wordsFileName = $this->config->get(['wordsFileName'], 'words.txt');
         $this->logger->info("Reading words from $wordsFileName file.");
         $words = WordsFile::getContentsAsArray($wordsFileName, $this->logger);
-        return $words;
-    }
-
-    private function getWordsFromInput($wordsInput): array
-    {
-        $words = explode(' ', $wordsInput);
         return $words;
     }
 

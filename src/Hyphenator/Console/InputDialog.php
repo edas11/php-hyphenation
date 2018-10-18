@@ -14,27 +14,31 @@ use Edvardas\Hyphenation\UtilityComponents\Console\Console;
 class InputDialog
 {
     private $console;
-    private $actionInput = 0;
-    private $sourceInput = 0;
-    private $wordsInput = '';
-    private $algorithmInput = 0;
+    private $inputData;
 
     public function __construct(Console $console)
     {
         $this->console = $console;
-        $this->start();
+        $this->askInput();
     }
 
-    public function start()
+    public function getConsoleInput(): ConsoleInputData
     {
-        $this->actionInput = $this->askActionInput();
-        if ($this->actionInput === InputCodes::PUT_PATTERNS_IN_DB_ACTION) {
-            $this->sourceInput = InputCodes::DB_SRC;
+        return $this->inputData;
+    }
+
+    private function askInput(): void
+    {
+        $actionInput = $this->askActionInput();
+        if ($actionInput === InputCodes::PUT_PATTERNS_IN_DB_ACTION) {
+            $sourceInput = InputCodes::DB_SRC;
+            $this->inputData = new ConsoleInputData($actionInput, $sourceInput);
             return;
         }
-        $this->sourceInput = $this->askSourceInput();
-        $this->wordsInput = $this->askWordsInput();
-        $this->algorithmInput = $this->askAlgorithmInput();
+        $sourceInput = $this->askSourceInput();
+        $wordsInput = $this->askWordsInput();
+        $algorithmInput = $this->askAlgorithmInput();
+        $this->inputData = new ConsoleInputData($actionInput, $sourceInput, $wordsInput, $algorithmInput);
     }
 
     public function askActionInput(): int
@@ -66,25 +70,5 @@ class InputDialog
         $this->console->printLn("(" . InputCodes::FULL_TREE_ALGORITHM . ") Full tree");
         $this->console->printLn("(" . InputCodes::SHORT_TREE_ALGORITHM . ") Short tree");
         return (int)$this->console->getInput();
-    }
-
-    public function getActionInput(): int
-    {
-        return $this->actionInput;
-    }
-
-    public function getSourceInput(): int
-    {
-        return $this->sourceInput;
-    }
-
-    public function getWordsInput(): string
-    {
-        return $this->wordsInput;
-    }
-
-    public function getAlgorithmInput(): int
-    {
-        return $this->algorithmInput;
     }
 }

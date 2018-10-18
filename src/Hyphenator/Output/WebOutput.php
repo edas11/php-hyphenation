@@ -5,17 +5,19 @@
  * Date: 18.10.10
  * Time: 16.20
  */
+declare(strict_types = 1);
 
 namespace Edvardas\Hyphenation\Hyphenator\Output;
 
-
-class JsonHyphenationOutput implements HyphenationOutput
+class WebOutput implements HyphenationOutput
 {
     private $outputData = [];
 
     public function flush()
     {
-        echo json_encode($this->outputData);
+        if (count($this->outputData) > 0) {
+            echo json_encode($this->outputData);
+        }
     }
 
     public function printResult(array $result)
@@ -49,5 +51,10 @@ class JsonHyphenationOutput implements HyphenationOutput
     public function printHyphenatedWords(array $hyphenatedWords)
     {
         $this->outputData['hyphenatedWords'] = $hyphenatedWords;
+    }
+
+    public function printPage(string $pagePath): void
+    {
+        require $pagePath;
     }
 }

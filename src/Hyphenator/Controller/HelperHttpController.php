@@ -10,6 +10,7 @@ namespace Edvardas\Hyphenation\Hyphenator\Controller;
 
 
 use Edvardas\Hyphenation\Hyphenator\Action\Action;
+use Edvardas\Hyphenation\Hyphenator\Action\PageGetAction;
 use Edvardas\Hyphenation\Hyphenator\Action\WordDeleteAction;
 use Edvardas\Hyphenation\Hyphenator\Action\WordPutAction;
 use Edvardas\Hyphenation\Hyphenator\Action\WordsGetKnownAction;
@@ -34,6 +35,7 @@ class HelperHttpController
 
     public function getWords(): Action
     {
+        header('content-type: application/json');
         $queryParams = $this->matchedRoute->getQueryParams();
         if (array_key_exists('for', $queryParams)) {
             $this->factory->setWords([$queryParams['for']]);
@@ -43,6 +45,7 @@ class HelperHttpController
 
     public function postWords(): Action
     {
+        header('content-type: application/json');
         if ($this->body->hasArray('words')) {
             $this->factory->setWords(array_values($this->body->get('words')));
         }
@@ -51,6 +54,7 @@ class HelperHttpController
 
     public function putWords(): Action
     {
+        header('content-type: application/json');
         if ($this->body->hasString('newHyphenatedWord')) {
             $this->factory->setHyphenatedWords([$this->body->get('newHyphenatedWord')]);
         }
@@ -60,7 +64,34 @@ class HelperHttpController
 
     public function deleteWords(): Action
     {
+        header('content-type: application/json');
         $this->factory->setWords([$this->matchedRoute->getPathParam()]);
         return new WordDeleteAction($this->factory->build());
+    }
+
+    public function getPage(): Action
+    {
+        header('content-type: text/html');
+        return new PageGetAction($this->factory->build(), 'pages/page.php');
+    }
+    public function getWordsPage(): Action
+    {
+        header('content-type: text/html');
+        return new PageGetAction($this->factory->build(), 'pages/showWordsPage.php');
+    }
+    public function getPatternsPage(): Action
+    {
+        header('content-type: text/html');
+        return new PageGetAction($this->factory->build(), 'pages/showPatternsPage.php');
+    }
+    public function hyphenateWordsPage(): Action
+    {
+        header('content-type: text/html');
+        return new PageGetAction($this->factory->build(), 'pages/hyphenateWordsPage.php');
+    }
+    public function changeHyphenationPage(): Action
+    {
+        header('content-type: text/html');
+        return new PageGetAction($this->factory->build(), 'pages/changeHyphenationPage.php');
     }
 }

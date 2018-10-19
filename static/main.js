@@ -1,83 +1,72 @@
 "use strict";
 window.addEventListener("load", function () {
+    $("#changeForm").submit(function(event) {
+        event.preventDefault();
+        changeHyphenation();
+    });
     function changeHyphenation() {
-        var XHR = new XMLHttpRequest();
-        var word = document.getElementsByName("for")[0].value;
-        var hyphChange = document.getElementsByName("new")[0].value;
+        var word = $('[name="for"]').val();
+        var hyphChange = $('[name="new"]').val();
         var data = {
             "newHyphenatedWord": hyphChange
         };
-        XHR.addEventListener("load", function (event) {
-            alert(event.target.responseText);
+        $.ajax({
+            type: 'PUT',
+            url: "/api/hyphenation/words/" + word,
+            data: JSON.stringify(data),
+            success: function(data) {
+                alert("Success");
+            },
+            error: function(xhr) {
+                alert(xhr.statusText + xhr.responseText);
+            },
+            contentType: "application/json",
+            dataType: 'json'
         });
-        XHR.addEventListener("error", function (event) {
-            alert('Oops! Something went wrong.');
-        });
-
-        XHR.open("PUT", "/api/hyphenation/words/" + word);
-        XHR.setRequestHeader( 'Content-Type', 'application/json' );
-        XHR.send(JSON.stringify(data));
     }
 
+    $("#post-form").submit(function(event) {
+        event.preventDefault();
+        postHyphenation();
+    });
     function postHyphenation() {
-        var XHR = new XMLHttpRequest();
-        var words = document.getElementsByName("words")[0].value.split(' ');
+        var words = $('[name="words"]').val().split(' ');
         var data = {
             "words": words
         };
-        XHR.addEventListener("load", function (event) {
-            alert(event.target.responseText);
+        $.ajax({
+            type: 'POST',
+            url: "/api/hyphenation/words/",
+            data: JSON.stringify(data),
+            success: function(data) {
+                alert("Success");
+            },
+            error: function(xhr) {
+                alert(xhr.statusText + xhr.responseText);
+            },
+            contentType: "application/json",
+            dataType: 'json'
         });
-        XHR.addEventListener("error", function (event) {
-            alert('Oops! Something went wrong.');
-        });
-
-        XHR.open("POST", "/api/hyphenation/words/");
-        XHR.setRequestHeader( 'Content-Type', 'application/json' );
-        XHR.send(JSON.stringify(data));
     }
 
+    $(".word-delete-button").click(function(event) {
+        event.preventDefault();
+        deleteWord(event);
+    });
     function deleteWord(event) {
-        var XHR = new XMLHttpRequest();
         var wordToDelete = event.target.getAttribute('data-word');
-
-        XHR.addEventListener("load", function (event) {
-            var rowToDelete = document.getElementById(wordToDelete);
-            rowToDelete.parentNode.removeChild(rowToDelete);
-            alert(event.target.responseText);
+        $.ajax({
+            type: 'DELETE',
+            url: "/api/hyphenation/words/" + wordToDelete,
+            success: function(data) {
+                $("#"+wordToDelete).remove();
+                alert("Success");
+            },
+            error: function(xhr) {
+                alert(xhr.statusText + xhr.responseText);
+            },
+            contentType: "application/json",
+            dataType: 'json'
         });
-        XHR.addEventListener("error", function (event) {
-            alert('Oops! Something went wrong.');
-        });
-
-        XHR.open("DELETE", "/api/hyphenation/words/" + wordToDelete);
-        XHR.setRequestHeader( 'Content-Type', 'application/json' );
-        XHR.send();
-    }
-
-    var changeForm = document.getElementById("changeForm");
-    if (changeForm) {
-        changeForm.onsubmit = function (event) {
-            event.preventDefault();
-            changeHyphenation();
-        }
-    }
-
-    var postForm = document.getElementById("post-form");
-    if (postForm) {
-        postForm.onsubmit = function (event) {
-            event.preventDefault();
-            postHyphenation();
-        }
-    }
-
-    var deleteButtons = document.getElementsByClassName('word-delete-button');
-    if (deleteButtons && deleteButtons.length > 0) {
-        for (var i = 0; i < deleteButtons.length; i++) {
-            deleteButtons[i].onclick = function (event) {
-                event.preventDefault();
-                deleteWord(event);
-            }
-        }
     }
 });

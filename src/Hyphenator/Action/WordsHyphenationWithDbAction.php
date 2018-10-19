@@ -12,6 +12,7 @@ namespace Edvardas\Hyphenation\Hyphenator\Action;
 use Edvardas\Hyphenation\Hyphenator\Algorithm\AlgorithmRunner;
 use Edvardas\Hyphenation\Hyphenator\Database\HyphenationDatabase;
 use Edvardas\Hyphenation\Hyphenator\Model\HyphenatedWords;
+use Edvardas\Hyphenation\Hyphenator\Output\BufferedOutput;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
 use Edvardas\Hyphenation\UtilityComponents\Timer\Timer;
 
@@ -24,10 +25,10 @@ class WordsHyphenationWithDbAction implements Action
     private $inputWords;
     private $algorithm;
 
-    public function __construct(HyphenationDataProvider $dataProvider)
+    public function __construct(HyphenationDataProvider $dataProvider, BufferedOutput $output)
     {
         $this->timer = new Timer();
-        $this->output = $dataProvider->getOutput();
+        $this->output = $output;
         $this->modelFactory = $dataProvider->getModelFactory();
         $this->logger = $dataProvider->getLogger();
         $this->inputWords = $dataProvider->getWordsInput();
@@ -42,9 +43,9 @@ class WordsHyphenationWithDbAction implements Action
         $hyphenatedWords = $this->hyphenateUnknownWords($dbWordsModel);
         $matchedPatternsResult = $this->getMatchedPatterns();
 
-        $this->output->printMatchedPatterns($matchedPatternsResult);
-        $this->output->printHyphenatedWords($hyphenatedWords);
-        $this->output->printSkippedWords($dbWordsModel->getHyphenatedWords());
+        $this->output->set('matchedPatterns', $matchedPatternsResult);
+        $this->output->set('hyphenatedWords', $hyphenatedWords);
+        $this->output->set('skippedWords', $dbWordsModel->getHyphenatedWords());
 
         $this->printTime();
     }
@@ -86,7 +87,7 @@ class WordsHyphenationWithDbAction implements Action
     private function printTime(): void
     {
         $time = $this->timer->getInterval();
-        $this->output->printTime($time);
+        $this->output->set('time', $time);
         $this->logger->info("Finished in $time seconds.");
     }
 }

@@ -45,16 +45,16 @@ class DiContainer
     {
         switch ($instanceName) {
             case ConsoleHyphenator::class:
-                return new ConsoleHyphenator($this->get(ConsoleController::class));
+                return new ConsoleHyphenator($this->get(ConsoleController::class), $this->get(ConsoleOutput::class));
             case ConsoleController::class:
                 return new ConsoleController(
                     $this->get(InputDialog::class),
-                    $this->get(ConsoleDataProviderFactory::class)
+                    $this->get(ConsoleDataProviderFactory::class),
+                    $this->get(ConsoleOutput::class)
                 );
             case ConsoleDataProviderFactory::class:
                 return new ConsoleDataProviderFactory(
                     $this->get(InputDialog::class),
-                    $this->get(ConsoleOutput::class),
                     $this->get(Config::class),
                     $this->get(ModelFactory::class),
                     $this->get(MemoryCache::class),
@@ -78,13 +78,13 @@ class DiContainer
                 return new HttpController(
                     $this->get(HttpDataProviderFactory::class),
                     $this->get(HttpRequest::class),
-                    $this->get(Router::class)
+                    $this->get(Router::class),
+                    $this->get(WebOutput::class)
                 );
             case WebOutput::class:
                 return new WebOutput();
             case HttpDataProviderFactory::class:
                 return new HttpDataProviderFactory(
-                    $this->get(WebOutput::class),
                     $this->get(ModelFactory::class),
                     $this->get(MemoryCache::class),
                     $this->get(FileLogger::class)

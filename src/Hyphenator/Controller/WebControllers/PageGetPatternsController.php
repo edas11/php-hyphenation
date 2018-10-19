@@ -12,6 +12,8 @@ namespace Edvardas\Hyphenation\Hyphenator\Controller\WebControllers;
 use Edvardas\Hyphenation\Hyphenator\Action\Action;
 use Edvardas\Hyphenation\Hyphenator\Action\PatternsGetAction;
 use Edvardas\Hyphenation\Hyphenator\Controller\Controller;
+use Edvardas\Hyphenation\Hyphenator\Output\BufferedOutput;
+use Edvardas\Hyphenation\Hyphenator\Output\WebOutput;
 use Edvardas\Hyphenation\Hyphenator\Providers\HttpDataProviderFactory;
 use Edvardas\Hyphenation\UtilityComponents\Http\HttpRequest;
 use Edvardas\Hyphenation\UtilityComponents\Http\Router;
@@ -22,23 +24,29 @@ class PageGetPatternsController implements Controller
     private $factory;
     private $body;
 
-    public function __construct(HttpDataProviderFactory $factory, HttpRequest $request, Router $router)
-    {
+    public function __construct(
+        HttpDataProviderFactory $factory,
+        HttpRequest $request,
+        Router $router,
+        WebOutput $output
+    ) {
         $this->matchedRoute = $router->getMatchedRoute();
         $this->body = $request->parseBody();
         $this->factory = $factory;
+        $this->output = $output;
     }
     
     public function getAction(): Action
     {
-        $this->factory->configureWebOutput('text/html', 'pages/showPatternsPage.php');
+        $this->output->configureOutput('text/html', 'pages/showPatternsPage.php');
         $queryParams = $this->matchedRoute->getQueryParams();
         if (array_key_exists('page', $queryParams)) {
             $page = (int) $queryParams['page'];
+            if ($page < 1) $page = 1;
         } else {
             $page = 1;
         }
-        $this->factory->getOutput()->printError((string)$page);
-        return new PatternsGetAction($this->factory->build(), $page);
+        $this->output->set('page', $page);
+        return new PatternsGetAction($this->factory->build(), $this->output, $page);
     }
 }

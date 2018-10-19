@@ -9,6 +9,7 @@
 namespace Edvardas\Hyphenation\Hyphenator\Action;
 
 use Edvardas\Hyphenation\Hyphenator\Algorithm\AlgorithmRunner;
+use Edvardas\Hyphenation\Hyphenator\Output\BufferedOutput;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
 use Edvardas\Hyphenation\UtilityComponents\Timer\Timer;
 
@@ -20,10 +21,10 @@ class WordsHyphenationAction implements Action
     private $inputWords;
     private $algorithm;
 
-    public function __construct(HyphenationDataProvider $dataProvider)
+    public function __construct(HyphenationDataProvider $dataProvider, BufferedOutput $output)
     {
         $this->timer = new Timer();
-        $this->output = $dataProvider->getOutput();
+        $this->output = $output;
         $this->logger = $dataProvider->getLogger();
         $this->inputWords = $dataProvider->getWordsInput();
         $this->algorithm = $dataProvider->getAlgorithm();
@@ -35,7 +36,7 @@ class WordsHyphenationAction implements Action
 
         $runner = new AlgorithmRunner($this->algorithm);
         $runner->run($this->inputWords);
-        $this->output->printResult($runner->getHyphenatedWords());
+        $this->output->set('result', $runner->getHyphenatedWords());
 
         $this->printTime();
     }
@@ -43,7 +44,7 @@ class WordsHyphenationAction implements Action
     public function printTime(): void
     {
         $time = $this->timer->getInterval();
-        $this->output->printTime($time);
+        $this->output->set('time', $time);
         $this->logger->info("Finished in $time seconds.");
     }
 }

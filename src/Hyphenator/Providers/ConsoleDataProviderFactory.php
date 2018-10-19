@@ -5,19 +5,19 @@
  * Date: 18.10.8
  * Time: 13.58
  */
+declare(strict_types = 1);
 
 namespace Edvardas\Hyphenation\Hyphenator\Providers;
 
 use Edvardas\Hyphenation\Hyphenator\Action\HyphenateAndAddToDbAction;
+use Edvardas\Hyphenation\Hyphenator\Algorithm\AbstractHyphenationAlgorithm;
 use Edvardas\Hyphenation\Hyphenator\Algorithm\FullTreeHyphenationAlgorithm;
-use Edvardas\Hyphenation\Hyphenator\Algorithm\HyphenationAlgorithmInterface;
 use Edvardas\Hyphenation\Hyphenator\Console\InputDialog;
 use Edvardas\Hyphenation\Hyphenator\Database\HyphenationDatabase;
 use Edvardas\Hyphenation\Hyphenator\File\PatternsFile;
 use Edvardas\Hyphenation\Hyphenator\File\WordsFile;
 use Edvardas\Hyphenation\Hyphenator\Console\HyphenationInput;
 use Edvardas\Hyphenation\Hyphenator\Model\ModelFactory;
-use Edvardas\Hyphenation\Hyphenator\Output\HyphenationOutput;
 use Edvardas\Hyphenation\UtilityComponents\Config\Config;
 use Edvardas\Hyphenation\UtilityComponents\Logger\NullLogger;
 use Psr\Log\LoggerInterface;
@@ -26,7 +26,6 @@ use Psr\SimpleCache\CacheInterface;
 class ConsoleDataProviderFactory
 {
     private $inputData;
-    private $output;
     private $config;
     private $modelFactory;
     private $cache;
@@ -34,14 +33,12 @@ class ConsoleDataProviderFactory
 
     public function __construct(
         InputDialog $input,
-        HyphenationOutput $output,
         Config $config,
         ModelFactory $modelFactory,
         CacheInterface $cache,
         LoggerInterface $logger
     ) {
         $this->inputData = $input->getConsoleInput();
-        $this->output = $output;
         $this->config = $config;
         $this->modelFactory = $modelFactory;
         $this->cache = $cache;
@@ -52,7 +49,6 @@ class ConsoleDataProviderFactory
     {
         return new HyphenationDataProvider(
             $this->getPatternsInput(),
-            $this->output,
             $this->getWordsInput(),
             [],
             $this->modelFactory,
@@ -73,7 +69,7 @@ class ConsoleDataProviderFactory
         return $words;
     }
 
-    public function getAlgorithm(): HyphenationAlgorithmInterface
+    public function getAlgorithm(): AbstractHyphenationAlgorithm
     {
         $algorithmName = $this->inputData->getAlgorithmName();
         if (class_exists($algorithmName)) {

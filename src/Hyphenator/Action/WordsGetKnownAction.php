@@ -8,6 +8,7 @@
 
 namespace Edvardas\Hyphenation\Hyphenator\Action;
 
+use Edvardas\Hyphenation\Hyphenator\Output\BufferedOutput;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
 
 class WordsGetKnownAction implements Action
@@ -16,9 +17,9 @@ class WordsGetKnownAction implements Action
     private $modelFactory;
     private $filterWords;
 
-    public function __construct(HyphenationDataProvider $dataProvider)
+    public function __construct(HyphenationDataProvider $dataProvider, BufferedOutput $output)
     {
-        $this->output = $dataProvider->getOutput();
+        $this->output = $output;
         $this->modelFactory = $dataProvider->getModelFactory();
         $this->filterWords = $dataProvider->getWordsInput();
     }
@@ -26,6 +27,6 @@ class WordsGetKnownAction implements Action
     public function execute(): void
     {
         $words = $this->modelFactory->getKnownHyphenatedWords($this->filterWords);
-        $this->output->printResult($words->getHyphenatedWords());
+        $this->output->set('result', $words->getHyphenatedWords());
     }
 }

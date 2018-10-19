@@ -151,7 +151,7 @@ class MySqlQueryBuilder
         return $this;
     }
 
-    private function nextCounter(): MySqlQueryBuilder
+    private function nextCounter(): int
     {
         $this->counter++;
         return $this->counter;

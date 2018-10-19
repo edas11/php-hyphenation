@@ -11,6 +11,7 @@ namespace Edvardas\Hyphenation\Hyphenator\Action;
 
 use Edvardas\Hyphenation\Hyphenator\Model\ModelFactory;
 use Edvardas\Hyphenation\Hyphenator\Model\HyphenatedWords;
+use Edvardas\Hyphenation\Hyphenator\Output\BufferedOutput;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
 
 class WordPutAction implements Action
@@ -20,9 +21,9 @@ class WordPutAction implements Action
     private $inputWords;
     private $inputHyphenatedWords;
 
-    public function __construct(HyphenationDataProvider $dataProvider)
+    public function __construct(HyphenationDataProvider $dataProvider, BufferedOutput $output)
     {
-        $this->output = $dataProvider->getOutput();
+        $this->output = $output;
         $this->modelFactory = $dataProvider->getModelFactory();
         $this->inputWords = $dataProvider->getWordsInput();
         $this->inputHyphenatedWords = $dataProvider->getHyphenatedWordsInput();
@@ -31,12 +32,12 @@ class WordPutAction implements Action
     public function execute(): void
     {
         if (count($this->inputWords) < 1 || count($this->inputHyphenatedWords) < 1) {
-            $this->output->printResult(['Error']);
+            $this->output->set('result', ['Error']);
             return;
         }
         $word = $this->inputWords[0];
         $hyphenatedWord = $this->inputHyphenatedWords[0];
         $this->modelFactory->createHyphenatedWords([$word => $hyphenatedWord])->persist();
-        $this->output->printResult(['Success']);
+        $this->output->set('result', ['Success']);
     }
 }

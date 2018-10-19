@@ -9,13 +9,19 @@ declare(strict_types = 1);
 
 namespace Edvardas\Hyphenation\Hyphenator\Output;
 
-class WebOutput implements HyphenationOutput
+class WebOutput implements BufferedOutput
 {
     private $contentType = 'application/json';
     private $pagePath = '';
     private $outputData = [];
 
-    public function flush()
+
+    public function set(string $key, $data): void
+    {
+        $this->outputData[$key] = $data;
+    }
+
+    public function flush(): void
     {
         if ($this->contentType === 'application/json') {
             echo json_encode($this->outputData);
@@ -36,7 +42,7 @@ class WebOutput implements HyphenationOutput
         $this->contentType = $contentType;
         $this->pagePath = $pagePath;
     }
-
+/*
     public function printResult(array $result)
     {
         if (array_key_exists('result', $this->outputData)) {
@@ -68,5 +74,5 @@ class WebOutput implements HyphenationOutput
     public function printHyphenatedWords(array $hyphenatedWords)
     {
         $this->outputData['hyphenatedWords'] = $hyphenatedWords;
-    }
+    }*/
 }

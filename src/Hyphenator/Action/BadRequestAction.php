@@ -8,20 +8,21 @@
 
 namespace Edvardas\Hyphenation\Hyphenator\Action;
 
+use Edvardas\Hyphenation\Hyphenator\Output\BufferedOutput;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
 
 class BadRequestAction implements Action
 {
     private $output;
 
-    public function __construct(HyphenationDataProvider $dataProvider)
+    public function __construct(HyphenationDataProvider $dataProvider, BufferedOutput $output)
     {
-        $this->output = $dataProvider->getOutput();
+        $this->output = $output;
     }
 
     public function execute(): void
     {
         http_response_code(400);
-        $this->output->printError('Bad request');
+        $this->output->set('error', 'Bad request');
     }
 }

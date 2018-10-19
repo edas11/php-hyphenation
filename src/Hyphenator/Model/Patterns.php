@@ -55,7 +55,7 @@ class Patterns implements PersistentModel
             ->limit((int) $paginationLimits['start'], (int) $paginationLimits['perPage'])
             ->build();
         $token = $db->beginTransaction();
-        $patterns = $db->executeAndFetch($query, new PatternsMappingStrategy());
+        $patterns = $db->executeAndFetch($query, new PatternsMappingStrategy((int) $paginationLimits['start']));
         $db->commit($token);
         return new Patterns($patterns, $db);
     }

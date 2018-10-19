@@ -15,15 +15,11 @@ use Edvardas\Hyphenation\Hyphenator\Database\HyphenationDatabase;
 use Edvardas\Hyphenation\Hyphenator\Console\HttpInput;
 use Edvardas\Hyphenation\Hyphenator\Console\HyphenationInput;
 use Edvardas\Hyphenation\Hyphenator\Model\ModelFactory;
-use Edvardas\Hyphenation\Hyphenator\Model\Patterns;
-use Edvardas\Hyphenation\Hyphenator\Output\HyphenationOutput;
-use Edvardas\Hyphenation\Hyphenator\Output\WebOutput;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 
 class HttpDataProviderFactory
 {
-    private $output;
     private $modelFactory;
     private $cache;
     private $logger;
@@ -31,13 +27,11 @@ class HttpDataProviderFactory
     private $hyphenatedWordsArray = [];
 
     public function __construct(
-        WebOutput $output,
         ModelFactory $modelFactory,
         CacheInterface $cache,
         LoggerInterface $logger
     ) {
         $this->modelFactory = $modelFactory;
-        $this->output = $output;
         $this->cache = $cache;
         $this->logger = $logger;
     }
@@ -46,18 +40,12 @@ class HttpDataProviderFactory
     {
         return new HyphenationDataProvider(
             $this->getPatternsInput(),
-            $this->output,
             $this->wordsArray,
             $this->hyphenatedWordsArray,
             $this->modelFactory,
             $this->getAlgorithm(),
             $this->logger
         );
-    }
-
-    public function getOutput(): WebOutput
-    {
-        return $this->output;
     }
 
     public function getAlgorithm(): HyphenationAlgorithmInterface

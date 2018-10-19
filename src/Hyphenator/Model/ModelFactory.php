@@ -40,6 +40,11 @@ class ModelFactory
         return Patterns::getKnown($this->db);
     }
 
+    public function getPaginatedPatterns(int $page): Patterns
+    {
+        return Patterns::getPaginated($this->db, $page);
+    }
+
     public function createWordPatterns(array $wordPatterns): WordPatterns
     {
         return new WordPatterns($wordPatterns,$this->db);

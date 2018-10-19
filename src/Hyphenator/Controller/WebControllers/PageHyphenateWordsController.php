@@ -31,11 +31,6 @@ class PageHyphenateWordsController implements Controller
     public function getAction(): Action
     {
         $this->factory->configureWebOutput('text/html', 'pages/hyphenateWordsPage.php');
-        if ($this->body->hasString('words')) {
-            $this->factory->setWords(explode(' ', $this->body->get('words')));
-            return new WordsHyphenationWithDbAction($this->factory->build());
-        } else {
-            return new NullAction();
-        }
+        return new NullAction();
     }
 }

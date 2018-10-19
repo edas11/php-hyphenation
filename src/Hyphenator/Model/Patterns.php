@@ -44,6 +44,29 @@ class Patterns implements PersistentModel
         return new Patterns($patterns, $db);
     }
 
+    public static function getPaginated(SqlDatabase $db, int $page): Patterns
+    {
+        $paginationLimits = self::getPaginationRows($page);
+        $builder = $db->builder();
+        $query = $builder
+            ->select()
+            ->columns(['pattern'])
+            ->from('patterns')
+            ->limit((int) $paginationLimits['start'], (int) $paginationLimits['perPage'])
+            ->build();
+        $token = $db->beginTransaction();
+        $patterns = $db->executeAndFetch($query, new PatternsMappingStrategy());
+        $db->commit($token);
+        return new Patterns($patterns, $db);
+    }
+
+    private static function getPaginationRows(int $page): array
+    {
+        $perPage = 20;
+        $start = ($page - 1) * $perPage;
+        return ['start' => $start, 'perPage' => $perPage];
+    }
+
     public function persist(): void
     {
         $token = $this->db->beginTransaction();

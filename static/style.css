@@ -17,4 +17,5 @@ a.badge {
     float: right;
     cursor: pointer;
     color: white !important;
+    margin: 0 5px;
 }

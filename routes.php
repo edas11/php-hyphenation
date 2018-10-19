@@ -10,7 +10,6 @@ return $routes = [
         'api/hyphenation/words/'  => 'ApiGetWordsController'
     ],
     'post' => [
-        'hyphenation/hyphenated-words' => 'PageHyphenateWordsController',
         'api/hyphenation/words/'  => 'ApiPostWordsController'
     ],
     'put' => [

@@ -10,7 +10,6 @@ declare(strict_types = 1);
 namespace Edvardas\Hyphenation\Hyphenator\Controller\WebControllers;
 
 use Edvardas\Hyphenation\Hyphenator\Action\Action;
-use Edvardas\Hyphenation\Hyphenator\Action\NullAction;
 use Edvardas\Hyphenation\Hyphenator\Action\PatternsGetAction;
 use Edvardas\Hyphenation\Hyphenator\Controller\Controller;
 use Edvardas\Hyphenation\Hyphenator\Providers\HttpDataProviderFactory;
@@ -33,6 +32,13 @@ class PageGetPatternsController implements Controller
     public function getAction(): Action
     {
         $this->factory->configureWebOutput('text/html', 'pages/showPatternsPage.php');
-        return new PatternsGetAction($this->factory->build());
+        $queryParams = $this->matchedRoute->getQueryParams();
+        if (array_key_exists('page', $queryParams)) {
+            $page = (int) $queryParams['page'];
+        } else {
+            $page = 1;
+        }
+        $this->factory->getOutput()->printError((string)$page);
+        return new PatternsGetAction($this->factory->build(), $page);
     }
 }

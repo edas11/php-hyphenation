@@ -16,7 +16,7 @@
     <main>
         <h3>Hyphenate words</h3>
 
-        <form method="post">
+        <form id="post-form">
             <div class="form-group">
                 <label for="wordsTohyphenate">Enter word to hyphenate (seperated by spaces)</label>
                 <input type="text" name="words" class="form-control" id="wordsTohyphenate" placeholder="Enter word">
@@ -57,5 +57,6 @@
         <?php } ?>
     </main>
     <script type="text/javascript" src="/static/main.js"/>
+    <script type="text/javascript"></script>
 </body>
 </html>

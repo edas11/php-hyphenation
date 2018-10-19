@@ -35,8 +35,7 @@
         </form>
     </main>
     <script type="text/javascript" src="/static/main.js"/>
-    <script type="text/javascript">
-        //run();
+    <script type="text/javascript" >
     </script>
 </body>
 </html>

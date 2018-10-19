@@ -30,16 +30,19 @@
                 <th>Hyphenated word</th>
             </tr>
             <?php foreach ($data['result'] as $word => $hyphenatedWord) { ?>
-                <tr>
+                <tr id="<?= $word ?>">
                     <td><?= $word ?></td>
                     <td>
                         <?= $hyphenatedWord ?>
+                        <a class="badge badge-danger word-delete-button" data-word="<?= $word ?>">Delete</a>
                         <a class="badge badge-primary" href="/hyphenation/change-hyphenation?for=<?= $word ?>">Change</a>
                     </td>
                 </tr>
             <?php } ?>
         </table>
     </main>
+    <script src="/static/main.js"/>
+    <script type="text/javascript" >
+    </script>
 </body>
 </html>
-<script src="/static/main.js"/>

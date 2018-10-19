@@ -15,7 +15,18 @@
     </nav>
     <main>
         <h3>Patterns list</h3>
-
+        <?php
+            $page = (int) $data['error'];
+        ?>
+        <nav aria-label="Page navigation example">
+            <ul class="pagination">
+                <li class="page-item"><a class="page-link" href="/hyphenation/show/patterns?page=<?= $page-1 ?>">Previous</a></li>
+                <li class="page-item"><a class="page-link" href="/hyphenation/show/patterns?page=<?= $page-1 ?>"><?= $page-1 ?></a></li>
+                <li class="page-item"><a class="page-link" href="/hyphenation/show/patterns?page=<?= $page ?>"><?= $page ?></a></li>
+                <li class="page-item"><a class="page-link" href="/hyphenation/show/patterns?page=<?= $page+1 ?>"><?= $page+1 ?></a></li>
+                <li class="page-item"><a class="page-link" href="/hyphenation/show/patterns?page=<?= $page+1 ?>">Next</a></li>
+            </ul>
+        </nav>
         <table class="table table-bordered">
             <tr>
                 <th>Nr.</th>

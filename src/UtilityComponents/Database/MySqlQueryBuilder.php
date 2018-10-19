@@ -5,9 +5,9 @@
  * Date: 18.10.8
  * Time: 17.29
  */
+declare(strict_types = 1);
 
 namespace Edvardas\Hyphenation\UtilityComponents\Database;
-
 
 use Edvardas\Hyphenation\App\App;
 
@@ -25,7 +25,7 @@ class MySqlQueryBuilder
         return $query;
     }
 
-    public function select()
+    public function select(): MySqlQueryBuilder
     {
         $this->queryString = $this->queryString . 'SELECT ';
         return $this;
@@ -34,32 +34,32 @@ class MySqlQueryBuilder
     /**
      * @param string[] $columns
      */
-    public function columns(array $columns)
+    public function columns(array $columns): MySqlQueryBuilder
     {
         $columnsString = implode(', ', $columns);
         $this->queryString = $this->queryString . "$columnsString ";
         return $this;
     }
 
-    public function from(string $table)
+    public function from(string $table): MySqlQueryBuilder
     {
         $this->queryString = $this->queryString . "FROM $table ";
         return $this;
     }
 
-    public function join(string $table, string $joinColumnLeft, string $joinColumnRight)
+    public function join(string $table, string $joinColumnLeft, string $joinColumnRight): MySqlQueryBuilder
     {
         $this->queryString = $this->queryString . "INNER JOIN $table ON $joinColumnLeft = $joinColumnRight ";
         return $this;
     }
 
-    public function where()
+    public function where(): MySqlQueryBuilder
     {
         $this->queryString = $this->queryString . 'WHERE ';
         return $this;
     }
 
-    public function equals(string $column, string $value)
+    public function equals(string $column, string $value): MySqlQueryBuilder
     {
         $nextCounter = $this->nextCounter();
         $paramName = ":value$nextCounter";
@@ -68,13 +68,13 @@ class MySqlQueryBuilder
         return $this;
     }
 
-    public function and()
+    public function and(): MySqlQueryBuilder
     {
         $this->queryString = $this->queryString . 'AND ';
         return $this;
     }
 
-    public function in(string $column, array $values)
+    public function in(string $column, array $values): MySqlQueryBuilder
     {
         $namedParams = [];
         foreach ($values as $val) {
@@ -87,26 +87,32 @@ class MySqlQueryBuilder
         return $this;
     }
 
-    public function insert()
+    public function limit(int $start, int $length): MySqlQueryBuilder
+    {
+        $this->queryString = $this->queryString . "LIMIT $start, $length ";
+        return $this;
+    }
+
+    public function insert(): MySqlQueryBuilder
     {
         $this->queryString = $this->queryString . 'INSERT ';
         return $this;
     }
 
-    public function replace()
+    public function replace(): MySqlQueryBuilder
     {
         $this->queryString = $this->queryString . 'REPLACE ';
         return $this;
     }
 
-    public function into(string $table, array $columns)
+    public function into(string $table, array $columns): MySqlQueryBuilder
     {
         $columnsString = '(' . implode(', ', $columns) . ')';
         $this->queryString = $this->queryString . "INTO $table$columnsString ";
         return $this;
     }
 
-    public function values(array $valuesRow)
+    public function values(array $valuesRow): MySqlQueryBuilder
     {
         $namesRow = $this->createNamesRow($valuesRow);
         $this->bindParams = array_merge($this->bindParams, array_combine($namesRow, $valuesRow));
@@ -117,13 +123,13 @@ class MySqlQueryBuilder
         return $this;
     }
 
-    public function delete()
+    public function delete(): MySqlQueryBuilder
     {
         $this->queryString = $this->queryString . 'DELETE ';
         return $this;
     }
 
-    public function update(string $table)
+    public function update(string $table): MySqlQueryBuilder
     {
         $this->queryString = $this->queryString . "UPDATE $table ";
         return $this;
@@ -132,7 +138,7 @@ class MySqlQueryBuilder
     /**
      * @param string[] $newValues indexes are column names
      */
-    public function set(array $newValues)
+    public function set(array $newValues): MySqlQueryBuilder
     {
         $this->queryString = $this->queryString . 'SET ';
         $setClauses = [];
@@ -145,7 +151,7 @@ class MySqlQueryBuilder
         return $this;
     }
 
-    private function nextCounter()
+    private function nextCounter(): MySqlQueryBuilder
     {
         $this->counter++;
         return $this->counter;
@@ -158,7 +164,7 @@ class MySqlQueryBuilder
         return $inParams;
     }
 
-    private function reset()
+    private function reset(): void
     {
         $this->queryString = '';
         $this->bindParams = [];
@@ -166,7 +172,7 @@ class MySqlQueryBuilder
         $this->isInsertValuesCalled = false;
     }
 
-    private function createNamesRow(array $valuesRow)
+    private function createNamesRow(array $valuesRow): array
     {
         $namesRow = [];
         foreach ($valuesRow as $value) {

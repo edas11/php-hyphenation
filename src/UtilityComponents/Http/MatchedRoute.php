@@ -5,9 +5,9 @@
  * Date: 18.10.17
  * Time: 12.31
  */
+declare(strict_types = 1);
 
 namespace Edvardas\Hyphenation\UtilityComponents\Http;
-
 
 class MatchedRoute
 {

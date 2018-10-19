@@ -40,9 +40,9 @@ class ApiPutWordsController implements Controller
     {
         $this->output->configureOutput('application/json');
         if ($this->body->hasString('newHyphenatedWord')) {
-            $this->factory->setHyphenatedWords([$this->body->get('newHyphenatedWord')]);
+            $this->factory->setHyphenatedWords([strtolower($this->body->get('newHyphenatedWord'))]);
         }
-        $this->factory->setWords([$this->matchedRoute->getPathParam()]);
+        $this->factory->setWords([strtolower($this->matchedRoute->getPathParam())]);
         return new WordPutHyphenationAction($this->factory->build(), $this->output);
     }
 }

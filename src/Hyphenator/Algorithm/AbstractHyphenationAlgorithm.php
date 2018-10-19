@@ -37,6 +37,9 @@ abstract class AbstractHyphenationAlgorithm implements HyphenationAlgorithmInter
 
     public function execute(string $inputWord, bool $saveMatchedPatterns = false): string
     {
+        if ($inputWord === '') {
+            return '';
+        }
         $this->logger->info("Started hyphenation algorithm at " . date('Y-m-d H:i:s'));
         $this->saveMatchedPatterns = $saveMatchedPatterns;
         $this->macthedPatterns = [];

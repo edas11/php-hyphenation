@@ -22,3 +22,6 @@ a.badge {
 #add-new {
     float: left;
 }
+#post-data {
+    display: none;
+}

@@ -24,37 +24,23 @@
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>
 
-        <?php if (array_key_exists('skippedWords', $data) && count($data['skippedWords']) > 0) { ?>
-        <h4>Skipped:</h4>
-        <table class="table table-bordered">
-            <tr>
-                <th>Original word</th>
-                <th>Hyphenated word</th>
-            </tr>
-            <?php foreach ($data['skippedWords'] as $word => $hyphenatedWord) { ?>
+        <div id="post-data">
+            <h4>Skipped:</h4>
+            <table class="table table-bordered" id="skipped">
                 <tr>
-                    <td><?= $word ?></td>
-                    <td><?= $hyphenatedWord ?></td>
+                    <th>Original word</th>
+                    <th>Hyphenated word</th>
                 </tr>
-            <?php } ?>
-        </table>
-        <?php } ?>
+            </table>
 
-        <?php if (array_key_exists('hyphenatedWords', $data) && count($data['hyphenatedWords']) > 0) { ?>
-        <h4>Hyphenated:</h4>
-        <table class="table table-bordered">
-            <tr>
-                <th>Original word</th>
-                <th>Hyphenated word</th>
-            </tr>
-            <?php foreach ($data['hyphenatedWords'] as $word => $hyphenatedWord) { ?>
+            <h4>Hyphenated:</h4>
+            <table class="table table-bordered" id="hyphenated">
                 <tr>
-                    <td><?= $word ?></td>
-                    <td><?= $hyphenatedWord ?></td>
+                    <th>Original word</th>
+                    <th>Hyphenated word</th>
                 </tr>
-            <?php } ?>
-        </table>
-        <?php } ?>
+            </table>
+        </div>
     </main>
     <script type="text/javascript" src="/static/main.js"/>
     <script type="text/javascript"></script>

@@ -5,9 +5,9 @@
  * Date: 18.10.11
  * Time: 10.44
  */
+declare(strict_types = 1);
 
 namespace Edvardas\Hyphenation\Hyphenator\Algorithm;
-
 
 class AlgorithmRunner
 {

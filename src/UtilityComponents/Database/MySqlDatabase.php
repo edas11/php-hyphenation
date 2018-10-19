@@ -5,10 +5,9 @@
  * Date: 18.10.8
  * Time: 17.08
  */
+declare(strict_types = 1);
 
 namespace Edvardas\Hyphenation\UtilityComponents\Database;
-
-use Edvardas\Hyphenation\App\App;
 
 class MySqlDatabase implements SqlDatabase
 {
@@ -23,7 +22,7 @@ class MySqlDatabase implements SqlDatabase
         $options = [
             \PDO::ATTR_ERRMODE            => \PDO::ERRMODE_EXCEPTION,
             \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
-            \PDO::ATTR_EMULATE_PREPARES   => false,
+            \PDO::ATTR_EMULATE_PREPARES   => true,
         ];
         try {
             $this->pdo = new \PDO($dsn, $user, $pass, $options);
@@ -54,6 +53,7 @@ class MySqlDatabase implements SqlDatabase
         }
         try {
             $this->pdo->commit();
+            $this->currentTransactionToken = null;
         } catch (Exception $e) {
             $this->pdo->rollback();
             throw $e;

@@ -5,9 +5,9 @@
  * Date: 18.10.11
  * Time: 14.14
  */
+declare(strict_types = 1);
 
 namespace Edvardas\Hyphenation\Hyphenator\Action;
-
 
 use Edvardas\Hyphenation\Hyphenator\Model\ModelFactory;
 use Edvardas\Hyphenation\Hyphenator\Model\HyphenatedWords;

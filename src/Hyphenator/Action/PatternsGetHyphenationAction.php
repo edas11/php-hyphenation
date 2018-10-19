@@ -5,9 +5,9 @@
  * Date: 18.10.18
  * Time: 14.54
  */
+declare(strict_types = 1);
 
 namespace Edvardas\Hyphenation\Hyphenator\Action;
-
 
 use Edvardas\Hyphenation\Hyphenator\Output\BufferedOutput;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;

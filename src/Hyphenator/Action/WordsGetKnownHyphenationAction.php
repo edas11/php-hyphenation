@@ -5,6 +5,7 @@
  * Date: 18.10.11
  * Time: 13.29
  */
+declare(strict_types = 1);
 
 namespace Edvardas\Hyphenation\Hyphenator\Action;
 

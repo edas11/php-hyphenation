@@ -5,9 +5,9 @@
  * Date: 18.10.9
  * Time: 09.35
  */
+declare(strict_types = 1);
 
 namespace Edvardas\Hyphenation\UtilityComponents\Database;
-
 
 class MySqlQuery
 {

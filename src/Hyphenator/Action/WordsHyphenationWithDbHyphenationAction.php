@@ -56,14 +56,13 @@ class WordsHyphenationWithDbHyphenationAction implements HyphenationAction
         return $dbWordsModel;
     }
 
-    private function hyphenateUnknownWords($dbWordsModel)
+    private function hyphenateUnknownWords(HyphenatedWords $dbWordsModel): array
     {
         $wordsNotInDb = $dbWordsModel->filterUnknownWords($this->inputWords);
         if (count($wordsNotInDb) > 0) {
             $runner = new AlgorithmRunner($this->algorithm);
             $runner->run($wordsNotInDb, true);
             $hyphenatedWords = $runner->getHyphenatedWords();
-
             $this->saveHyphenationResults($hyphenatedWords, $runner->getMatchedPatterns());
         } else {
             $hyphenatedWords = [];
@@ -78,7 +77,7 @@ class WordsHyphenationWithDbHyphenationAction implements HyphenationAction
         $this->modelFactory->createCompositeModel([$hyphenatedWordsModel, $wordPatternsModel])->persist();
     }
 
-    private function getMatchedPatterns()
+    private function getMatchedPatterns(): array
     {
         $matchedPatternsResult = $this->modelFactory->getKnownWordPatterns($this->inputWords)->getMatchedPatterns();
         return $matchedPatternsResult;

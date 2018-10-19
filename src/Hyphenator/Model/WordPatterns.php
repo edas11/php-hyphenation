@@ -6,6 +6,7 @@
  * Time: 16.39
  */
 declare(strict_types = 1);
+
 namespace Edvardas\Hyphenation\Hyphenator\Model;
 
 use Edvardas\Hyphenation\Hyphenator\Model\MappingStrategy\WordPatternsMappingStrategy;
@@ -54,7 +55,7 @@ class WordPatterns implements PersistentModel
         $token = $this->db->beginTransaction();
         $builder = $this->db->builder();
         foreach ($this->wordPatterns as $word => $matchedPatterns) {
-            foreach ($matchedPatterns as $pattern) {
+            if (count($matchedPatterns) > 0){
                 $querry = $builder
                     ->replace()
                     ->into('word_patterns', ['word_id', 'pattern_id'])
@@ -63,7 +64,7 @@ class WordPatterns implements PersistentModel
                     ->from('words, patterns')->where()
                     ->equals('word', $word)
                     ->and()
-                    ->equals('pattern', $pattern)
+                    ->in('pattern', $matchedPatterns)
                     ->build();
                 $this->db->execute($querry);
             }

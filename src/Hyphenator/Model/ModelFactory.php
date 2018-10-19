@@ -5,9 +5,9 @@
  * Date: 18.10.16
  * Time: 11.34
  */
+declare(strict_types = 1);
 
 namespace Edvardas\Hyphenation\Hyphenator\Model;
-
 
 use Edvardas\Hyphenation\UtilityComponents\Config\Config;
 use Edvardas\Hyphenation\UtilityComponents\Database\SqlDatabase;
@@ -20,7 +20,7 @@ class ModelFactory
     public function __construct(SqlDatabase $db, Config $config)
     {
         $this->db = $db;
-        $this->perPage = (int) $config->get(['patternsPerPage'], 20);
+        $this->perPage = (int) $config->get(['patternsPerPage'], '20');
     }
 
     public function createHyphenatedWords(array $words): HyphenatedWords

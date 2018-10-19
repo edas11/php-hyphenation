@@ -6,6 +6,7 @@
  * Time: 16.32
  */
 declare(strict_types = 1);
+
 namespace Edvardas\Hyphenation\Hyphenator\Model;
 
 use Edvardas\Hyphenation\Hyphenator\Model\MappingStrategy\PatternsMappingStrategy;
@@ -29,20 +30,6 @@ class Patterns implements PersistentModel
     {
         return $this->patterns;
     }
-
-    /*public static function getKnown(SqlDatabase $db): Patterns
-    {
-        $builder = $db->builder();
-        $query = $builder
-            ->select()
-            ->columns(['pattern'])
-            ->from('patterns')
-            ->build();
-        $token = $db->beginTransaction();
-        $patterns = $db->executeAndFetch($query, new PatternsMappingStrategy());
-        $db->commit($token);
-        return new Patterns($patterns, $db);
-    }*/
 
     public static function getKnown(SqlDatabase $db, int $page = 0, int $perPage = 0): Patterns
     {

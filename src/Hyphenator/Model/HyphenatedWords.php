@@ -36,9 +36,6 @@ class HyphenatedWords implements PersistentModel
         return array_values(array_diff($inputWords, array_keys($this->hyphenatedWords)));
     }
 
-    /**
-     * @param string[] $words
-     */
     public static function getKnownIn(SqlDatabase $db, array $words = []): HyphenatedWords
     {
         $builder = $db->builder();
@@ -88,14 +85,17 @@ class HyphenatedWords implements PersistentModel
     {
         $token = $this->db->beginTransaction();
         $builder = $this->db->builder();
-        $builder = $builder
-            ->replace()
-            ->into(self::WORDS_TABLE, [self::WORD_COLUMN, self::HYPHENATED_WORD_COLUMN]);
-        foreach ($this->hyphenatedWords as $word => $hyphenatedWord) {
-            $builder = $builder->values([$word, $hyphenatedWord]);
+        $wordsChunk = array_chunk ($this->hyphenatedWords, 10000, true);
+        foreach ($wordsChunk as $i => $chunk) {
+            $builder
+                ->replace()
+                ->into(self::WORDS_TABLE, [self::WORD_COLUMN, self::HYPHENATED_WORD_COLUMN]);
+            foreach ($chunk as $word => $hyphenatedWord) {
+                $builder = $builder->values([$word, $hyphenatedWord]);
+            }
+            $query = $builder->build();
+            $this->db->execute($query);
         }
-        $query = $builder->build();
-        $this->db->execute($query);
         $this->db->commit($token);
     }
 }

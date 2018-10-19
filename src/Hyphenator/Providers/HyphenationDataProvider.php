@@ -5,12 +5,11 @@
  * Date: 18.10.17
  * Time: 15.27
  */
+declare(strict_types = 1);
 
 namespace Edvardas\Hyphenation\Hyphenator\Providers;
 
-
 use Edvardas\Hyphenation\Hyphenator\Algorithm\AbstractHyphenationAlgorithm;
-use Edvardas\Hyphenation\Hyphenator\Algorithm\HyphenationAlgorithmInterface;
 use Edvardas\Hyphenation\Hyphenator\Model\ModelFactory;
 use Psr\Log\LoggerInterface;
 
@@ -59,7 +58,7 @@ class HyphenationDataProvider
         return $this->hyphenatedWords;
     }
 
-    public function getAlgorithm(): HyphenationAlgorithmInterface
+    public function getAlgorithm(): AbstractHyphenationAlgorithm
     {
         return $this->algorithm;
     }

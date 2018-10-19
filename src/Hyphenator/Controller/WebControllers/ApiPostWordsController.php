@@ -40,7 +40,10 @@ class ApiPostWordsController implements Controller
     {
         $this->output->configureOutput('application/json');
         if ($this->body->hasArray('words')) {
-            $this->factory->setWords(array_values($this->body->get('words')));
+            $lowerCaseWords = array_map(function (string $rawWord) {
+                return strtolower($rawWord);
+            }, array_values($this->body->get('words')) );
+            $this->factory->setWords($lowerCaseWords);
         }
         return new WordsHyphenationWithDbHyphenationAction($this->factory->build(), $this->output);
     }

@@ -5,6 +5,7 @@
  * Date: 18.10.10
  * Time: 09.08
  */
+declare(strict_types = 1);
 
 namespace Edvardas\Hyphenation\Hyphenator\Model;
 

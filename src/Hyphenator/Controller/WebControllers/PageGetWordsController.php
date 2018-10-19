@@ -41,7 +41,7 @@ class PageGetWordsController implements Controller
         $this->output->configureOutput('text/html', 'pages/showWordsPage.php');
         $queryParams = $this->matchedRoute->getQueryParams();
         if (array_key_exists('for', $queryParams) && $queryParams['for'] !== '') {
-            $this->factory->setWords([$queryParams['for']]);
+            $this->factory->setWords([strtolower($queryParams['for'])]);
         }
         return new WordsGetKnownHyphenationAction($this->factory->build(), $this->output);
     }

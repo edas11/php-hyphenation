@@ -5,6 +5,8 @@
  * Date: 18.10.16
  * Time: 10.46
  */
+declare(strict_types = 1);
+
 namespace Edvardas\Hyphenation\Hyphenator\Model\MappingStrategy;
 
 use Edvardas\Hyphenation\UtilityComponents\Database\DbDataMappingStrategy;

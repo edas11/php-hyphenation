@@ -40,7 +40,7 @@ class ApiDeleteWordsController implements Controller
     public function getAction(): HyphenationAction
     {
         $this->output->configureOutput('application/json');
-        $this->factory->setWords([$this->matchedRoute->getPathParam()]);
+        $this->factory->setWords([strtolower($this->matchedRoute->getPathParam())]);
         return new WordDeleteHyphenationAction($this->factory->build(), $this->output);
     }
 }

@@ -6,6 +6,7 @@
  * Time: 11.37
  */
 declare(strict_types = 1);
+
 namespace Edvardas\Hyphenation\UtilityComponents\Http;
 
 class Router

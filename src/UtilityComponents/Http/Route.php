@@ -5,14 +5,14 @@
  * Date: 18.10.11
  * Time: 12.19
  */
+declare(strict_types = 1);
 
 namespace Edvardas\Hyphenation\UtilityComponents\Http;
-
 
 class Route
 {
     private $routeArray = [];
-    private $queryString;
+    private $queryString = '';
 
     public function __construct(string $pathString)
     {

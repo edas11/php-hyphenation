@@ -6,8 +6,8 @@
  * Time: 13.56
  */
 declare(strict_types = 1);
-namespace Edvardas\Hyphenation\UtilityComponents\Http;
 
+namespace Edvardas\Hyphenation\UtilityComponents\Http;
 
 class HttpBody
 {

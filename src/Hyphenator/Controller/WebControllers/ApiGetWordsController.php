@@ -41,7 +41,7 @@ class ApiGetWordsController implements Controller
         $this->output->configureOutput('application/json');
         $queryParams = $this->matchedRoute->getQueryParams();
         if (array_key_exists('for', $queryParams)) {
-            $this->factory->setWords([$queryParams['for']]);
+            $this->factory->setWords([strtolower($queryParams['for'])]);
         }
         return new WordsGetKnownHyphenationAction($this->factory->build(), $this->output);
     }

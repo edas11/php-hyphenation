@@ -5,9 +5,9 @@
  * Date: 18.10.12
  * Time: 12.10
  */
+declare(strict_types = 1);
 
 namespace Edvardas\Hyphenation\Hyphenator\File;
-
 
 use Psr\Log\LoggerInterface;
 

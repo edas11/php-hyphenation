@@ -25,7 +25,7 @@
         <form id="changeForm" method="post">
             <div class="form-group">
                 <label for="wordToShow">Enter word</label>
-                <input type="text" name="for" class="form-control" id="wordToShow" placeholder="Enter word" value="<?= $default ?>">
+                <input type="text" name="for" class="form-control" id="wordToShow" placeholder="Enter word" value="<?= htmlspecialchars($default) ?>">
             </div>
             <div class="form-group">
                 <label for="wordToShow">Enter new hyphenation</label>

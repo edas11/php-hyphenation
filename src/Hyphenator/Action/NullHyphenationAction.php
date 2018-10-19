@@ -9,7 +9,7 @@
 namespace Edvardas\Hyphenation\Hyphenator\Action;
 
 
-class NullAction implements Action
+class NullHyphenationAction implements HyphenationAction
 {
     public function execute(): void
     {

@@ -8,8 +8,8 @@
 
 namespace Edvardas\Hyphenation\Hyphenator\Controller;
 
-use Edvardas\Hyphenation\Hyphenator\Action\Action;
-use Edvardas\Hyphenation\Hyphenator\Action\BadRequestAction;
+use Edvardas\Hyphenation\Hyphenator\Action\HyphenationAction;
+use Edvardas\Hyphenation\Hyphenator\Action\NullHyphenationAction;
 use Edvardas\Hyphenation\Hyphenator\Console\HttpInput;
 use Edvardas\Hyphenation\Hyphenator\Output\WebOutput;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationHttpDataProvider;
@@ -36,12 +36,14 @@ class HttpController implements Controller
         $this->output = $output;
     }
 
-    public function getAction(): Action
+    public function getAction(): HyphenationAction
     {
         $handlerName = $this->router->getRouteHandlerName();
         $handlerName = "Edvardas\Hyphenation\Hyphenator\Controller\WebControllers\\$handlerName";
         if (!class_exists($handlerName)) {
-            return new BadRequestAction($this->factory->build(), $this->output);
+            http_response_code(400);
+            $this->output->set('error', 'Bad request');
+            return new NullHyphenationAction();
         }
         $appController = new $handlerName($this->factory, $this->request, $this->router, $this->output);
         if ($appController instanceof Controller) {

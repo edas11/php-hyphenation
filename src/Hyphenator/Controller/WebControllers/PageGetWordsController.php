@@ -9,8 +9,8 @@ declare(strict_types = 1);
 
 namespace Edvardas\Hyphenation\Hyphenator\Controller\WebControllers;
 
-use Edvardas\Hyphenation\Hyphenator\Action\Action;
-use Edvardas\Hyphenation\Hyphenator\Action\WordsGetKnownAction;
+use Edvardas\Hyphenation\Hyphenator\Action\HyphenationAction;
+use Edvardas\Hyphenation\Hyphenator\Action\WordsGetKnownHyphenationAction;
 use Edvardas\Hyphenation\Hyphenator\Controller\Controller;
 use Edvardas\Hyphenation\Hyphenator\Output\WebOutput;
 use Edvardas\Hyphenation\Hyphenator\Providers\HttpDataProviderFactory;
@@ -36,13 +36,13 @@ class PageGetWordsController implements Controller
         $this->output = $output;
     }
 
-    public function getAction(): Action
+    public function getAction(): HyphenationAction
     {
         $this->output->configureOutput('text/html', 'pages/showWordsPage.php');
         $queryParams = $this->matchedRoute->getQueryParams();
         if (array_key_exists('for', $queryParams) && $queryParams['for'] !== '') {
             $this->factory->setWords([$queryParams['for']]);
         }
-        return new WordsGetKnownAction($this->factory->build(), $this->output);
+        return new WordsGetKnownHyphenationAction($this->factory->build(), $this->output);
     }
 }

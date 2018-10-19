@@ -30,7 +30,7 @@ class Patterns implements PersistentModel
         return $this->patterns;
     }
 
-    public static function getKnown(SqlDatabase $db): Patterns
+    /*public static function getKnown(SqlDatabase $db): Patterns
     {
         $builder = $db->builder();
         $query = $builder
@@ -42,29 +42,24 @@ class Patterns implements PersistentModel
         $patterns = $db->executeAndFetch($query, new PatternsMappingStrategy());
         $db->commit($token);
         return new Patterns($patterns, $db);
-    }
+    }*/
 
-    public static function getPaginated(SqlDatabase $db, int $page): Patterns
+    public static function getKnown(SqlDatabase $db, int $page = 0, int $perPage = 0): Patterns
     {
-        $paginationLimits = self::getPaginationRows($page);
+        $start = ($page - 1) * $perPage;
         $builder = $db->builder();
-        $query = $builder
+        $builder
             ->select()
             ->columns(['pattern'])
-            ->from('patterns')
-            ->limit((int) $paginationLimits['start'], (int) $paginationLimits['perPage'])
-            ->build();
+            ->from('patterns');
+        if ($page > 0) {
+            $builder->limit($start, $perPage);
+        }
+        $query = $builder->build();
         $token = $db->beginTransaction();
-        $patterns = $db->executeAndFetch($query, new PatternsMappingStrategy((int) $paginationLimits['start']));
+        $patterns = $db->executeAndFetch($query, new PatternsMappingStrategy($start));
         $db->commit($token);
         return new Patterns($patterns, $db);
-    }
-
-    private static function getPaginationRows(int $page): array
-    {
-        $perPage = 20;
-        $start = ($page - 1) * $perPage;
-        return ['start' => $start, 'perPage' => $perPage];
     }
 
     public function persist(): void

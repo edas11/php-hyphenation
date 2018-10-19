@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Edvardas\Hyphenation\Hyphenator\Controller;
 
-use Edvardas\Hyphenation\Hyphenator\Action\Action;
+use Edvardas\Hyphenation\Hyphenator\Action\HyphenationAction;
 use Edvardas\Hyphenation\Hyphenator\Console\InputDialog;
 use Edvardas\Hyphenation\Hyphenator\Output\ConsoleOutput;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationConsoleDataProvider;
@@ -28,7 +28,7 @@ class ConsoleController implements Controller
         $this->output = $output;
     }
 
-    public function getAction(): Action
+    public function getAction(): HyphenationAction
     {
         $actionName = $this->inputData->getActionName();
         if (class_exists($actionName)) {

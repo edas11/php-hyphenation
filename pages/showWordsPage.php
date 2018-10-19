@@ -39,6 +39,11 @@
                     </td>
                 </tr>
             <?php } ?>
+            <tr>
+                <td colspan="2">
+                    <a id="add-new" class="badge badge-primary" href="/hyphenation/change-hyphenation">Add new</a>
+                </td>
+            </tr>
         </table>
     </main>
     <script src="/static/main.js"/>

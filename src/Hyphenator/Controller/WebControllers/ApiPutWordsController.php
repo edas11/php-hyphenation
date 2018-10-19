@@ -9,8 +9,8 @@ declare(strict_types = 1);
 
 namespace Edvardas\Hyphenation\Hyphenator\Controller\WebControllers;
 
-use Edvardas\Hyphenation\Hyphenator\Action\Action;
-use Edvardas\Hyphenation\Hyphenator\Action\WordPutAction;
+use Edvardas\Hyphenation\Hyphenator\Action\HyphenationAction;
+use Edvardas\Hyphenation\Hyphenator\Action\WordPutHyphenationAction;
 use Edvardas\Hyphenation\Hyphenator\Controller\Controller;
 use Edvardas\Hyphenation\Hyphenator\Output\WebOutput;
 use Edvardas\Hyphenation\Hyphenator\Providers\HttpDataProviderFactory;
@@ -36,13 +36,13 @@ class ApiPutWordsController implements Controller
         $this->output = $output;
     }
 
-    public function getAction(): Action
+    public function getAction(): HyphenationAction
     {
         $this->output->configureOutput('application/json');
         if ($this->body->hasString('newHyphenatedWord')) {
             $this->factory->setHyphenatedWords([$this->body->get('newHyphenatedWord')]);
         }
         $this->factory->setWords([$this->matchedRoute->getPathParam()]);
-        return new WordPutAction($this->factory->build(), $this->output);
+        return new WordPutHyphenationAction($this->factory->build(), $this->output);
     }
 }

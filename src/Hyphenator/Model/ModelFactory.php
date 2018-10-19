@@ -9,15 +9,18 @@
 namespace Edvardas\Hyphenation\Hyphenator\Model;
 
 
+use Edvardas\Hyphenation\UtilityComponents\Config\Config;
 use Edvardas\Hyphenation\UtilityComponents\Database\SqlDatabase;
 
 class ModelFactory
 {
     private $db;
+    private $perPage;
 
-    public function __construct(SqlDatabase $db)
+    public function __construct(SqlDatabase $db, Config $config)
     {
         $this->db = $db;
+        $this->perPage = (int) $config->get(['patternsPerPage'], 20);
     }
 
     public function createHyphenatedWords(array $words): HyphenatedWords
@@ -35,14 +38,9 @@ class ModelFactory
         return new Patterns($patterns, $this->db);
     }
 
-    public function getKnownPatterns(): Patterns
+    public function getKnownPatterns(int $page = 0): Patterns
     {
-        return Patterns::getKnown($this->db);
-    }
-
-    public function getPaginatedPatterns(int $page): Patterns
-    {
-        return Patterns::getPaginated($this->db, $page);
+        return Patterns::getKnown($this->db, $page, $this->perPage);
     }
 
     public function createWordPatterns(array $wordPatterns): WordPatterns

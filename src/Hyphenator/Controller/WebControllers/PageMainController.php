@@ -9,8 +9,8 @@ declare(strict_types = 1);
 
 namespace Edvardas\Hyphenation\Hyphenator\Controller\WebControllers;
 
-use Edvardas\Hyphenation\Hyphenator\Action\Action;
-use Edvardas\Hyphenation\Hyphenator\Action\NullAction;
+use Edvardas\Hyphenation\Hyphenator\Action\HyphenationAction;
+use Edvardas\Hyphenation\Hyphenator\Action\NullHyphenationAction;
 use Edvardas\Hyphenation\Hyphenator\Controller\Controller;
 use Edvardas\Hyphenation\Hyphenator\Output\WebOutput;
 use Edvardas\Hyphenation\Hyphenator\Providers\HttpDataProviderFactory;
@@ -36,9 +36,9 @@ class PageMainController implements Controller
         $this->output = $output;
     }
 
-    public function getAction(): Action
+    public function getAction(): HyphenationAction
     {
         $this->output->configureOutput('text/html', 'pages/main-page.php');
-        return new NullAction();
+        return new NullHyphenationAction();
     }
 }

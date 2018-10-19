@@ -14,7 +14,7 @@
         <h1><a href="/hyphenation">Hyphenator</a></h1>
     </nav>
     <main>
-        <h3>Hyphenated words list</h3>
+        <h3>Change hyphenation or add new</h3>
         <?php
         if (array_key_exists('for', $data)) {
             $default = $data['for'];

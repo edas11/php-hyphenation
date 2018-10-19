@@ -14,7 +14,7 @@ use Edvardas\Hyphenation\Hyphenator\Model\HyphenatedWords;
 use Edvardas\Hyphenation\Hyphenator\Output\BufferedOutput;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
 
-class WordDeleteAction implements Action
+class WordDeleteHyphenationAction implements HyphenationAction
 {
     private $output;
     private $modelFactory;

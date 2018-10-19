@@ -9,8 +9,8 @@ declare(strict_types = 1);
 
 namespace Edvardas\Hyphenation\Hyphenator\Controller\WebControllers;
 
-use Edvardas\Hyphenation\Hyphenator\Action\Action;
-use Edvardas\Hyphenation\Hyphenator\Action\WordsHyphenationWithDbAction;
+use Edvardas\Hyphenation\Hyphenator\Action\HyphenationAction;
+use Edvardas\Hyphenation\Hyphenator\Action\WordsHyphenationWithDbHyphenationAction;
 use Edvardas\Hyphenation\Hyphenator\Controller\Controller;
 use Edvardas\Hyphenation\Hyphenator\Output\WebOutput;
 use Edvardas\Hyphenation\Hyphenator\Providers\HttpDataProviderFactory;
@@ -36,12 +36,12 @@ class ApiPostWordsController implements Controller
         $this->output = $output;
     }
 
-    public function getAction(): Action
+    public function getAction(): HyphenationAction
     {
         $this->output->configureOutput('application/json');
         if ($this->body->hasArray('words')) {
             $this->factory->setWords(array_values($this->body->get('words')));
         }
-        return new WordsHyphenationWithDbAction($this->factory->build(), $this->output);
+        return new WordsHyphenationWithDbHyphenationAction($this->factory->build(), $this->output);
     }
 }

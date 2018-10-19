@@ -9,8 +9,8 @@ declare(strict_types = 1);
 
 namespace Edvardas\Hyphenation\Hyphenator\Controller\WebControllers;
 
-use Edvardas\Hyphenation\Hyphenator\Action\Action;
-use Edvardas\Hyphenation\Hyphenator\Action\PatternsGetAction;
+use Edvardas\Hyphenation\Hyphenator\Action\HyphenationAction;
+use Edvardas\Hyphenation\Hyphenator\Action\PatternsGetHyphenationAction;
 use Edvardas\Hyphenation\Hyphenator\Controller\Controller;
 use Edvardas\Hyphenation\Hyphenator\Output\BufferedOutput;
 use Edvardas\Hyphenation\Hyphenator\Output\WebOutput;
@@ -36,7 +36,7 @@ class PageGetPatternsController implements Controller
         $this->output = $output;
     }
     
-    public function getAction(): Action
+    public function getAction(): HyphenationAction
     {
         $this->output->configureOutput('text/html', 'pages/showPatternsPage.php');
         $queryParams = $this->matchedRoute->getQueryParams();
@@ -47,6 +47,6 @@ class PageGetPatternsController implements Controller
             $page = 1;
         }
         $this->output->set('page', $page);
-        return new PatternsGetAction($this->factory->build(), $this->output, $page);
+        return new PatternsGetHyphenationAction($this->factory->build(), $this->output, $page);
     }
 }

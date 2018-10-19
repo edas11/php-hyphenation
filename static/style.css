@@ -19,3 +19,6 @@ a.badge {
     color: white !important;
     margin: 0 5px;
 }
+#add-new {
+    float: left;
+}

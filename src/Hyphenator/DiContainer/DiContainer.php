@@ -94,7 +94,7 @@ class DiContainer
             case Router::class:
                 return new Router($this->get(HttpRequest::class));
             case ModelFactory::class:
-                return new ModelFactory($this->get(MySqlDatabase::class));
+                return new ModelFactory($this->get(MySqlDatabase::class), $this->get(Config::class));
             case MySqlDatabase::class:
                 return new MySqlDatabaseProxy($this->get(Config::class));
             case MemoryCache::class:

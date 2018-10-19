@@ -12,7 +12,7 @@ namespace Edvardas\Hyphenation\Hyphenator\Action;
 use Edvardas\Hyphenation\Hyphenator\Output\BufferedOutput;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
 
-class PatternsGetAction implements Action
+class PatternsGetHyphenationAction implements HyphenationAction
 {
     private $modelFactory;
     private $output;
@@ -26,7 +26,7 @@ class PatternsGetAction implements Action
 
     public function execute(): void
     {
-        $patterns = $this->modelFactory->getPaginatedPatterns($this->page)->getPatterns();
+        $patterns = $this->modelFactory->getKnownPatterns($this->page)->getPatterns();
         $this->output->set('result', $patterns);
     }
 }

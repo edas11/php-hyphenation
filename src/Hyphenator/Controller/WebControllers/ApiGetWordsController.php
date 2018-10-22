@@ -9,8 +9,8 @@ declare(strict_types = 1);
 
 namespace Edvardas\Hyphenation\Hyphenator\Controller\WebControllers;
 
-use Edvardas\Hyphenation\Hyphenator\Action\HyphenationAction;
-use Edvardas\Hyphenation\Hyphenator\Action\WordsGetKnownHyphenationAction;
+use Edvardas\Hyphenation\Hyphenator\Action\Action;
+use Edvardas\Hyphenation\Hyphenator\Action\HyphenatedWordsRetrievalAction;
 use Edvardas\Hyphenation\Hyphenator\Controller\Controller;
 use Edvardas\Hyphenation\Hyphenator\Output\WebOutput;
 use Edvardas\Hyphenation\Hyphenator\Providers\HttpDataProviderFactory;
@@ -36,13 +36,13 @@ class ApiGetWordsController implements Controller
         $this->output = $output;
     }
 
-    public function getAction(): HyphenationAction
+    public function getAction(): Action
     {
         $this->output->configureOutput('application/json');
         $queryParams = $this->matchedRoute->getQueryParams();
         if (array_key_exists('for', $queryParams)) {
             $this->factory->setWords([strtolower($queryParams['for'])]);
         }
-        return new WordsGetKnownHyphenationAction($this->factory->build(), $this->output);
+        return new HyphenatedWordsRetrievalAction($this->factory->build(), $this->output);
     }
 }

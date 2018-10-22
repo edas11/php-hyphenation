@@ -9,9 +9,9 @@ declare(strict_types = 1);
 
 namespace Edvardas\Hyphenation\Hyphenator\Controller\WebControllers;
 
-use Edvardas\Hyphenation\Hyphenator\Action\HyphenationAction;
-use Edvardas\Hyphenation\Hyphenator\Action\NullHyphenationAction;
-use Edvardas\Hyphenation\Hyphenator\Action\WordPutHyphenationAction;
+use Edvardas\Hyphenation\Hyphenator\Action\Action;
+use Edvardas\Hyphenation\Hyphenator\Action\NullAction;
+use Edvardas\Hyphenation\Hyphenator\Action\HyphenatedWordAddOrUpdateAction;
 use Edvardas\Hyphenation\Hyphenator\Controller\Controller;
 use Edvardas\Hyphenation\Hyphenator\Output\BufferedOutput;
 use Edvardas\Hyphenation\Hyphenator\Output\WebOutput;
@@ -37,13 +37,13 @@ class PageChangeHyphenationController implements Controller
         $this->output = $output;
     }
 
-    public function getAction(): HyphenationAction
+    public function getAction(): Action
     {
         $this->output->configureOutput('text/html', 'pages/changeHyphenationPage.php');
         $queryParams = $this->matchedRoute->getQueryParams();
         if (array_key_exists('for', $queryParams) && $queryParams['for'] !== '') {
             $this->output->set('for', $queryParams['for']);
         }
-        return new NullHyphenationAction();
+        return new NullAction();
     }
 }

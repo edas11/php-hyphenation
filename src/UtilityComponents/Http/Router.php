@@ -12,7 +12,7 @@ namespace Edvardas\Hyphenation\UtilityComponents\Http;
 class Router
 {
     private $routeConfig;
-    private $route;
+    private $requestRoute;
     private $method;
     private $possibleRoutes;
     private $routeHandlerName;
@@ -20,7 +20,7 @@ class Router
 
     public function __construct(HttpRequest $request)
     {
-        $this->route = $request->parseRoute();
+        $this->requestRoute = $request->parseRoute();
         $this->method = $request->getMethod();
         $this->routeConfig = require 'routes.php';
         $this->doParsing();
@@ -62,10 +62,10 @@ class Router
 
     private function parseHttpMatchedRoute(): void
     {
-        foreach ($this->possibleRoutes as $route => $routeHandlerName) {
-            $matchedRoute = $this->route->match(new Route($route));
-            if ($matchedRoute->matches() === true) {
-                $this->matchedRoute = $matchedRoute;
+        foreach ($this->possibleRoutes as $possibleRoute => $routeHandlerName) {
+            $possibleRoute = new RoutePattern($possibleRoute);
+            if ($this->requestRoute->matches($possibleRoute)) {
+                $this->matchedRoute = new MatchedRoute($this->requestRoute, $possibleRoute);
                 $this->routeHandlerName = $routeHandlerName;
                 return;
             }

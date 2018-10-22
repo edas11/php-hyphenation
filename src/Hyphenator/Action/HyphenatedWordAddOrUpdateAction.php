@@ -14,7 +14,7 @@ use Edvardas\Hyphenation\Hyphenator\Model\HyphenatedWords;
 use Edvardas\Hyphenation\Hyphenator\Output\BufferedOutput;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
 
-class WordPutHyphenationAction implements HyphenationAction
+class HyphenatedWordAddOrUpdateAction implements Action
 {
     private $output;
     private $modelFactory;

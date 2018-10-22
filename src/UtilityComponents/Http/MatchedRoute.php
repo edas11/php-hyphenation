@@ -2,29 +2,22 @@
 /**
  * Created by PhpStorm.
  * User: edvardas
- * Date: 18.10.17
- * Time: 12.31
+ * Date: 18.10.22
+ * Time: 12.44
  */
-declare(strict_types = 1);
 
 namespace Edvardas\Hyphenation\UtilityComponents\Http;
 
+
 class MatchedRoute
 {
-    private $queryParams = [];
-    private $pathParam;
-    private $matches;
+    private $requestRoute;
+    private $pathParam = '';
 
-    public function __construct(bool $matches, string $pathParam = '', array $queryParams = [])
+    public function __construct(Route $requestRoute, RoutePattern $matchedRoutePattern)
     {
-        $this->queryParams = $queryParams;
-        $this->pathParam = $pathParam;
-        $this->matches = $matches;
-    }
-
-    public function matches(): bool
-    {
-        return $this->matches;
+        $this->requestRoute = $requestRoute;
+        $this->setPathParam($matchedRoutePattern);
     }
 
     public function getPathParam(): string
@@ -32,8 +25,13 @@ class MatchedRoute
         return $this->pathParam;
     }
 
-    public function getQueryParams()
+    public function getQueryParams(): array
     {
-        return $this->queryParams;
+        return $this->requestRoute->getQueryParams();
+    }
+
+    private function setPathParam(RoutePattern $matchedRoutePattern): void
+    {
+        $this->pathParam = $this->requestRoute->getRouteParts()->getCorresponding($matchedRoutePattern->getPatternParts(), '{param}');
     }
 }

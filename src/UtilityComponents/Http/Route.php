@@ -11,50 +11,64 @@ namespace Edvardas\Hyphenation\UtilityComponents\Http;
 
 class Route
 {
-    private $routeArray = [];
-    private $queryString = '';
+    private $routeParts;
+    private $queryParams = [];
 
     public function __construct(string $pathString)
+    {
+        $routeString = $this->extractRouteString($pathString);
+        $queryString = $this->extractQueryString($pathString);
+        $this->prepareQueryParameters($queryString);
+        $this->prepareRouteParameters($routeString);
+    }
+
+    public function getRouteParts(): RouteParts
+    {
+        return $this->routeParts;
+    }
+
+    public function getQueryParams()
+    {
+        return $this->queryParams;
+    }
+
+    public function matches(RoutePattern $routePattern): bool
+    {
+        $routePatternParts = $routePattern->getPatternParts();
+        return $this->routeParts->matches($routePatternParts);
+    }
+
+    private function extractRouteString(string $pathString): string
     {
         $queryPos = strpos($pathString, '?');
         if ($queryPos === false) {
             $routeString = $pathString;
         } else {
             $routeString = substr($pathString, 0, $queryPos);
-            if (strlen($pathString) === $queryPos + 1) {
-                $this->queryString = '';
-            } else {
-                $this->queryString = substr($pathString, $queryPos + 1);
-            }
         }
-        $this->routeArray = $route = explode('/', trim($routeString, '/'));
+        return $routeString;
     }
 
-    /**
-     * @param string[] $match
-     */
-    public function match(Route $routeToMatch): MatchedRoute
+    private function extractQueryString(string $pathString): string
     {
-        $match = $routeToMatch->routeArray;
-        if (count($this->routeArray) !== count($match)) {
-            return new MatchedRoute(false);
+        $queryPos = strpos($pathString, '?');
+        if ($queryPos === false || strlen($pathString) === $queryPos + 1) {
+            $queryString = '';
+        } else {
+            $queryString = substr($pathString, $queryPos + 1);
         }
-        foreach ($match as $pathIndex => $matchString) {
-            $pathParam = '';
+        return $queryString;
+    }
 
-            if (!array_key_exists($pathIndex, $this->routeArray)) {
-                return new MatchedRoute(false);
-            }
-            if ($matchString === '{param}') {
-                $pathParam = $this->routeArray[$pathIndex];
-                continue;
-            }
-            if ($this->routeArray[$pathIndex] !== $matchString) {
-                return new MatchedRoute(false);
-            }
-        }
+    private function prepareQueryParameters(string $queryString): void
+    {
         $queryParams = [];
-        parse_str($this->queryString, $queryParams);
-        return new MatchedRoute(true, $pathParam, $queryParams);
+        parse_str($queryString, $queryParams);
+        $this->queryParams = $queryParams;
+    }
+
+    private function prepareRouteParameters($routeString): void
+    {
+        $this->routeParts = new RouteParts($routeString);
     }
 }

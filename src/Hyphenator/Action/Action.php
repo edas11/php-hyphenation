@@ -8,7 +8,7 @@
 
 namespace Edvardas\Hyphenation\Hyphenator\Action;
 
-interface HyphenationAction
+interface Action
 {
     public function execute(): void;
 }

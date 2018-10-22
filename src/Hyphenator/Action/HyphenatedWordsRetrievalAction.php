@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: edvardas
- * Date: 18.10.18
- * Time: 14.54
+ * Date: 18.10.11
+ * Time: 13.29
  */
 declare(strict_types = 1);
 
@@ -12,21 +12,22 @@ namespace Edvardas\Hyphenation\Hyphenator\Action;
 use Edvardas\Hyphenation\Hyphenator\Output\BufferedOutput;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
 
-class PatternsGetHyphenationAction implements HyphenationAction
+class HyphenatedWordsRetrievalAction implements Action
 {
-    private $modelFactory;
     private $output;
+    private $modelFactory;
+    private $filterWords;
 
-    public function __construct(HyphenationDataProvider $dataProvider, BufferedOutput $output, int $page)
+    public function __construct(HyphenationDataProvider $dataProvider, BufferedOutput $output)
     {
         $this->output = $output;
         $this->modelFactory = $dataProvider->getModelFactory();
-        $this->page = $page;
+        $this->filterWords = $dataProvider->getWordsInput();
     }
 
     public function execute(): void
     {
-        $patterns = $this->modelFactory->getKnownPatterns($this->page)->getPatterns();
-        $this->output->set('result', $patterns);
+        $words = $this->modelFactory->getKnownHyphenatedWords($this->filterWords);
+        $this->output->set('result', $words->getHyphenatedWords());
     }
 }

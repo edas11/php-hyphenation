@@ -16,7 +16,7 @@ use Edvardas\Hyphenation\Hyphenator\Output\BufferedOutput;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
 use Edvardas\Hyphenation\UtilityComponents\Timer\Timer;
 
-class WordsHyphenationWithDbHyphenationAction implements HyphenationAction
+class WordsHyphenationWithDbAction implements Action
 {
     private $output;
     private $timer;

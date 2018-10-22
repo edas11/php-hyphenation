@@ -8,9 +8,9 @@
 
 namespace Edvardas\Hyphenation\Hyphenator\Controller;
 
-use Edvardas\Hyphenation\Hyphenator\Action\HyphenationAction;
+use Edvardas\Hyphenation\Hyphenator\Action\Action;
 
 interface Controller
 {
-    public function getAction(): HyphenationAction;
+    public function getAction(): Action;
 }

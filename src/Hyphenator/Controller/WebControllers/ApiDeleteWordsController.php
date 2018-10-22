@@ -9,8 +9,8 @@ declare(strict_types = 1);
 
 namespace Edvardas\Hyphenation\Hyphenator\Controller\WebControllers;
 
-use Edvardas\Hyphenation\Hyphenator\Action\HyphenationAction;
-use Edvardas\Hyphenation\Hyphenator\Action\WordDeleteHyphenationAction;
+use Edvardas\Hyphenation\Hyphenator\Action\Action;
+use Edvardas\Hyphenation\Hyphenator\Action\HyphenatedWordDeletionAction;
 use Edvardas\Hyphenation\Hyphenator\Controller\Controller;
 use Edvardas\Hyphenation\Hyphenator\Output\BufferedOutput;
 use Edvardas\Hyphenation\Hyphenator\Output\WebOutput;
@@ -37,10 +37,10 @@ class ApiDeleteWordsController implements Controller
         $this->output = $output;
     }
 
-    public function getAction(): HyphenationAction
+    public function getAction(): Action
     {
         $this->output->configureOutput('application/json');
         $this->factory->setWords([strtolower($this->matchedRoute->getPathParam())]);
-        return new WordDeleteHyphenationAction($this->factory->build(), $this->output);
+        return new HyphenatedWordDeletionAction($this->factory->build(), $this->output);
     }
 }

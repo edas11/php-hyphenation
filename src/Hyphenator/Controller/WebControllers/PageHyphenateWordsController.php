@@ -9,9 +9,9 @@ declare(strict_types = 1);
 
 namespace Edvardas\Hyphenation\Hyphenator\Controller\WebControllers;
 
-use Edvardas\Hyphenation\Hyphenator\Action\HyphenationAction;
-use Edvardas\Hyphenation\Hyphenator\Action\NullHyphenationAction;
-use Edvardas\Hyphenation\Hyphenator\Action\WordsHyphenationWithDbHyphenationAction;
+use Edvardas\Hyphenation\Hyphenator\Action\Action;
+use Edvardas\Hyphenation\Hyphenator\Action\NullAction;
+use Edvardas\Hyphenation\Hyphenator\Action\WordsHyphenationWithDbAction;
 use Edvardas\Hyphenation\Hyphenator\Controller\Controller;
 use Edvardas\Hyphenation\Hyphenator\Output\WebOutput;
 use Edvardas\Hyphenation\Hyphenator\Providers\HttpDataProviderFactory;
@@ -35,9 +35,9 @@ class PageHyphenateWordsController implements Controller
         $this->output = $output;
     }
 
-    public function getAction(): HyphenationAction
+    public function getAction(): Action
     {
         $this->output->configureOutput('text/html', 'pages/hyphenateWordsPage.php');
-        return new NullHyphenationAction();
+        return new NullAction();
     }
 }

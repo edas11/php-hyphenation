@@ -33,7 +33,7 @@ abstract class AbstractHyphenationAlgorithm implements HyphenationAlgorithmInter
         $this->cache->set('patterns-tree', $patternTree);
     }
 
-    abstract protected function parsePatternTree(array $patterns);
+    abstract protected function parsePatternTree(array $groupOfPatterns);
 
     public function execute(string $inputWord, bool $saveMatchedPatterns = false): string
     {
@@ -77,7 +77,7 @@ abstract class AbstractHyphenationAlgorithm implements HyphenationAlgorithmInter
         }
         $this->logger->info("Matched pattern $pattern");
         if ($this->saveMatchedPatterns) {
-            array_push($this->macthedPatterns, $pattern);
+            $this->macthedPatterns[] = $pattern;
         }
         $numberPositionsInPattern = new PatternHyphenationNumbers($pattern);
         $matchedNumbers = WordHyphenationNumbers::createFromPatternNumbers(

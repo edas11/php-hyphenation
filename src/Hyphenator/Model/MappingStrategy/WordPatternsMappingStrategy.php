@@ -18,11 +18,10 @@ class WordPatternsMappingStrategy implements DbDataMappingStrategy
     {
         $matchedPatternsResult = [];
         foreach ($dbData as $match) {
-            if (array_key_exists($match['word'], $matchedPatternsResult)) {
-                array_push($matchedPatternsResult[$match['word']], $match['pattern']);
-            } else {
-                $matchedPatternsResult[$match['word']] = [$match['pattern']];
+            if (!array_key_exists($match['word'], $matchedPatternsResult)) {
+                $matchedPatternsResult[$match['word']] = [];
             }
+            $matchedPatternsResult[$match['word']][] = $match['pattern'];
         }
         return $matchedPatternsResult;
     }

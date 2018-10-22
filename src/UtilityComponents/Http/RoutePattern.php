@@ -28,4 +28,9 @@ class RoutePattern
     {
         return $this->pathParamIndex;
     }
+
+    public function getPathParamPlaceholder(): string
+    {
+        return '{param}';
+    }
 }

@@ -35,7 +35,19 @@ class Route
     public function matches(RoutePattern $routePattern): bool
     {
         $routePatternParts = $routePattern->getPatternParts();
-        return $this->routeParts->matches($routePatternParts);
+        return $this->routeParts->matches($routePatternParts, $routePattern->getPathParamPlaceholder());
+    }
+
+    private function prepareQueryParameters(string $queryString): void
+    {
+        $queryParams = [];
+        parse_str($queryString, $queryParams);
+        $this->queryParams = $queryParams;
+    }
+
+    private function prepareRouteParameters($routeString): void
+    {
+        $this->routeParts = new RouteParts($routeString);
     }
 
     private function extractRouteString(string $pathString): string
@@ -58,17 +70,5 @@ class Route
             $queryString = substr($pathString, $queryPos + 1);
         }
         return $queryString;
-    }
-
-    private function prepareQueryParameters(string $queryString): void
-    {
-        $queryParams = [];
-        parse_str($queryString, $queryParams);
-        $this->queryParams = $queryParams;
-    }
-
-    private function prepareRouteParameters($routeString): void
-    {
-        $this->routeParts = new RouteParts($routeString);
     }
 }

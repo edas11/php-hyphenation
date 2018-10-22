@@ -39,16 +39,26 @@ class HttpController implements Controller
 
     public function getAction(): Action
     {
+        $handlerName = $this->getHandlerNameForCurrentRoute();
+        if (class_exists($handlerName) && method_exists($handlerName, 'getAction')) {
+            $appController = new $handlerName($this->factory, $this->request, $this->router, $this->output);
+            return $appController->getAction();
+        } else {
+            return $this->errorResponse();
+        }
+    }
+
+    private function getHandlerNameForCurrentRoute(): string
+    {
         $handlerName = $this->router->getRouteHandlerName();
         $handlerName = "Edvardas\Hyphenation\Hyphenator\Controller\WebControllers\\$handlerName";
-        if (!class_exists($handlerName)) {
-            http_response_code(400);
-            $this->output->set('error', 'Bad request');
-            return new NullAction();
-        }
-        $appController = new $handlerName($this->factory, $this->request, $this->router, $this->output);
-        if ($appController instanceof Controller) {
-            return $appController->getAction();
-        }
+        return $handlerName;
+    }
+
+    private function errorResponse(): NullAction
+    {
+        http_response_code(400);
+        $this->output->set('error', 'Bad request');
+        return new NullAction();
     }
 }

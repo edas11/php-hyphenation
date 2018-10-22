@@ -24,31 +24,31 @@ class ShortTreeHyphenationAlgorithm extends AbstractHyphenationAlgorithm
         $this->logger->info("Started short tree hyphenation algorithm.");
     }
 
-    protected function parsePatternTree(array $patterns): array
+    protected function parsePatternTree(array $groupOfPatterns): array
     {
         $shortPatternsTree = [];
-        foreach ($patterns as $index => $pattern) {
+        foreach ($groupOfPatterns as $index => $pattern) {
             $reducedPattern = str_replace(AbstractHyphenationAlgorithm::REDUCE_CHARS, '', $pattern);
             $firstLetter = $reducedPattern[0];
             if (!array_key_exists((string)$firstLetter, $shortPatternsTree)) {
                 $shortPatternsTree[(string)$firstLetter] = [];
             }
-            array_push($shortPatternsTree[$firstLetter], $pattern);
+            $shortPatternsTree[$firstLetter][] = $pattern;
         }
         return $shortPatternsTree;
     }
 
     protected function matchedPattern(string $inputWord, int $wordIndex, $patternTree, int $level = 0): array
     {
-        $patterns = $patternTree[$inputWord[$wordIndex]];
-        foreach ($patterns as $index => $pattern) {
+        $groupOfPatterns = $patternTree[$inputWord[$wordIndex]];
+        foreach ($groupOfPatterns as $index => $pattern) {
             $reducedPattern = str_replace(AbstractHyphenationAlgorithm::REDUCE_CHARS, '', $pattern);
             $found = stripos($inputWord, $reducedPattern, $wordIndex);
             if ($found !== $wordIndex) {
-                unset($patterns[$index]);
+                unset($groupOfPatterns[$index]);
             }
         }
-        return $patterns;
+        return $groupOfPatterns;
     }
 
 }

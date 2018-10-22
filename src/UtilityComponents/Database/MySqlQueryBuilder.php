@@ -143,7 +143,7 @@ class MySqlQueryBuilder
         foreach ($newValues as $column => $value) {
             $paramName = $this->nextName();
             $this->bindParams[$paramName] = $value;
-            array_push($setClauses, "$column=$paramName");
+            $setClauses[] = "$column=$paramName";
         }
         $this->queryString = $this->queryString . implode(',', $setClauses) . " ";
         return $this;
@@ -175,7 +175,7 @@ class MySqlQueryBuilder
         $namesRow = [];
         foreach ($valuesRow as $value) {
             $name = $this->nextName();
-            array_push($namesRow, $name);
+            $namesRow[] = $name;
         }
         return $namesRow;
     }

@@ -37,7 +37,7 @@ class PageHyphenateWordsController implements Controller
 
     public function getAction(): Action
     {
-        $this->output->configureOutput('text/html', 'pages/hyphenateWordsPage.php');
+        $this->output->configureOutput('text/html', 'views/pages/hyphenateWordsPage.php');
         return new NullAction();
     }
 }

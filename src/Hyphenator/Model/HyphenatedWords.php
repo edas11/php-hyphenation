@@ -57,7 +57,7 @@ class HyphenatedWords implements PersistentModel
     {
         $builder = $this->db->builder();
         $token = $this->db->beginTransaction();
-        foreach ($this->hyphenatedWords as $word => $hyphenatedWord) {
+        foreach ($this->hyphenatedWords as $word => $singleHyphenatedWord) {
             $query = $builder
                 ->delete()
                 ->from(self::WORDS_TABLE)

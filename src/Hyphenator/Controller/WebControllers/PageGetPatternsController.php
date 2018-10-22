@@ -38,7 +38,7 @@ class PageGetPatternsController implements Controller
     
     public function getAction(): Action
     {
-        $this->output->configureOutput('text/html', 'pages/showPatternsPage.php');
+        $this->output->configureOutput('text/html', 'views/pages/showPatternsPage.php');
         $queryParams = $this->matchedRoute->getQueryParams();
         if (array_key_exists('page', $queryParams)) {
             $page = (int) $queryParams['page'];

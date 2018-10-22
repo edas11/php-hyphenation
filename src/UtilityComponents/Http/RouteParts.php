@@ -11,32 +11,34 @@ namespace Edvardas\Hyphenation\UtilityComponents\Http;
 
 class RouteParts
 {
-    private $routeParts;
+    private $partsArray;
+
+    private const PARTS_MATCH = 0;
+    private const PARTS_NOT_MATCH = 1;
 
     public function __construct(string $routeString)
     {
-        $this->routeParts = explode('/', trim($routeString, '/'));
+        $this->partsArray = explode('/', trim($routeString, '/'));
     }
 
-    public function matches(RouteParts $routePatternParts): bool
+    public function matches(RouteParts $routePatternParts, string $allowedPlaceholder): bool
     {
-        if (count($this->routeParts) !== count($routePatternParts->routeParts)) {
-            return false;
-        }
-        foreach ($routePatternParts->routeParts as $patternPartIndex => $patternPart) {
-            if ($patternPart === '{param}') {
-                continue;
+        $routeAndPatternDifference = array_udiff_assoc(
+            $this->partsArray,
+            $routePatternParts->partsArray,
+            function($routePart, $patternPart) use ($allowedPlaceholder) {
+                if ($routePart === $patternPart) return self::PARTS_MATCH;
+                if ($patternPart === $allowedPlaceholder) return self::PARTS_MATCH;
+                else return self::PARTS_NOT_MATCH;
             }
-            if ($this->routeParts[$patternPartIndex] !== $patternPart) {
-                return false;
-            }
-        }
-        return true;
+        );
+
+        return count($routeAndPatternDifference) === 0;
     }
 
-    public function getCorresponding(RouteParts $parts, string $key): string
+    public function getPlaceholderValue(RouteParts $patternWithPlaceholder, string $placeholder): string
     {
-        $pathParamIndex = array_search($key, $parts->routeParts);
-        return $this->routeParts[$pathParamIndex];
+        $pathParamIndex = array_search($placeholder, $patternWithPlaceholder->partsArray);
+        return $this->partsArray[$pathParamIndex];
     }
 }

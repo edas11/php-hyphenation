@@ -15,7 +15,7 @@ class PatternsNodeInTree
 
     public function add(string $pattern)
     {
-        array_push($this->patterns, $pattern);
+        $this->patterns[] = $pattern;
     }
 
     public function addAll(array $patterns)

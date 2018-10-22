@@ -38,7 +38,7 @@ class PageGetWordsController implements Controller
 
     public function getAction(): Action
     {
-        $this->output->configureOutput('text/html', 'pages/showWordsPage.php');
+        $this->output->configureOutput('text/html', 'views/pages/showWordsPage.php');
         $queryParams = $this->matchedRoute->getQueryParams();
         if (array_key_exists('for', $queryParams) && $queryParams['for'] !== '') {
             $this->factory->setWords([strtolower($queryParams['for'])]);

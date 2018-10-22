@@ -32,7 +32,7 @@ class Console
         $arguments = [];
         for ($i = 1; $i < count($this->cliArguments); $i++) {
             if (strpos($this->cliArguments[$i], '--') !== 0) {
-                array_push($arguments, $this->cliArguments[$i]);
+                $arguments[] = $this->cliArguments[$i];
             }
         }
         return $arguments;

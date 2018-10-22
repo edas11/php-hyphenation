@@ -14,8 +14,8 @@ class Router
     private $routeConfig;
     private $requestRoute;
     private $method;
-    private $possibleRoutes;
-    private $routeHandlerName;
+    private $routePatternsForCurrentMethod;
+    private $routeHandlerName = '';
     private $matchedRoute;
 
     public function __construct(HttpRequest $request)
@@ -38,38 +38,37 @@ class Router
 
     private function doParsing(): void
     {
-        $this->parseHttpMethod();
+        $this->determineRoutePatternsForCurrentMethod();
         $this->parseHttpMatchedRoute();
     }
 
-    private function parseHttpMethod(): void
+    private function determineRoutePatternsForCurrentMethod(): void
     {
         switch ($this->method) {
             case 'GET':
-                $this->possibleRoutes = $this->routeConfig['get'];
+                $this->routePatternsForCurrentMethod = $this->routeConfig['get'];
                 break;
             case 'POST':
-                $this->possibleRoutes = $this->routeConfig['post'];
+                $this->routePatternsForCurrentMethod = $this->routeConfig['post'];
                 break;
             case 'PUT':
-                $this->possibleRoutes = $this->routeConfig['put'];
+                $this->routePatternsForCurrentMethod = $this->routeConfig['put'];
                 break;
             case 'DELETE':
-                $this->possibleRoutes = $this->routeConfig['delete'];
+                $this->routePatternsForCurrentMethod = $this->routeConfig['delete'];
                 break;
         }
     }
 
     private function parseHttpMatchedRoute(): void
     {
-        foreach ($this->possibleRoutes as $possibleRoute => $routeHandlerName) {
-            $possibleRoute = new RoutePattern($possibleRoute);
-            if ($this->requestRoute->matches($possibleRoute)) {
-                $this->matchedRoute = new MatchedRoute($this->requestRoute, $possibleRoute);
+        foreach ($this->routePatternsForCurrentMethod as $routePatternString => $routeHandlerName) {
+            $routePattern = new RoutePattern($routePatternString);
+            if ($this->requestRoute->matches($routePattern)) {
+                $this->matchedRoute = new MatchedRoute($this->requestRoute, $routePattern);
                 $this->routeHandlerName = $routeHandlerName;
                 return;
             }
         }
-        $this->routeHandlerName = '';
     }
 }

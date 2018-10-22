@@ -25,10 +25,10 @@ class FullTreeHyphenationAlgorithm extends AbstractHyphenationAlgorithm
         $this->logger->info("Started full tree hyphenation algorithm.");
     }
 
-    protected function parsePatternTree(array $patterns): array
+    protected function parsePatternTree(array $groupOfPatterns): array
     {
         $patternsTree = [];
-        foreach ($patterns as $index => $pattern) {
+        foreach ($groupOfPatterns as $index => $pattern) {
             $reducedPattern = str_replace(
                 AbstractHyphenationAlgorithm::REDUCE_CHARS,
                 '', $pattern

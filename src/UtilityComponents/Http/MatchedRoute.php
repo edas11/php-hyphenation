@@ -32,6 +32,9 @@ class MatchedRoute
 
     private function setPathParam(RoutePattern $matchedRoutePattern): void
     {
-        $this->pathParam = $this->requestRoute->getRouteParts()->getCorresponding($matchedRoutePattern->getPatternParts(), '{param}');
+        $requestRouteParts = $this->requestRoute->getRouteParts();
+        $matchedPatternParts = $matchedRoutePattern->getPatternParts();
+        $placeholder = $matchedRoutePattern->getPathParamPlaceholder();
+        $this->pathParam = $requestRouteParts->getPlaceholderValue($matchedPatternParts, $placeholder);
     }
 }

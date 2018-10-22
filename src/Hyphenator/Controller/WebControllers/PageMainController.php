@@ -38,7 +38,7 @@ class PageMainController implements Controller
 
     public function getAction(): Action
     {
-        $this->output->configureOutput('text/html', 'pages/main-page.php');
+        $this->output->configureOutput('text/html', 'views/pages/main-page.php');
         return new NullAction();
     }
 }

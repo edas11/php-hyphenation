@@ -56,8 +56,8 @@ class Patterns implements PersistentModel
         $builder = $builder
             ->replace()
             ->into('patterns', ['pattern']);
-        foreach ($this->patterns as $pattern) {
-            $builder->values([$pattern]);
+        foreach ($this->patterns as $singlePattern) {
+            $builder->values([$singlePattern]);
         }
         $query = $builder->build();
         $this->db->execute($query);

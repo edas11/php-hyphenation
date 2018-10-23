@@ -36,7 +36,7 @@ class PageGetPatternsController implements Controller
         $this->output = $output;
     }
     
-    public function getAction(): Action
+    public function handleRequest(): void
     {
         $this->output->configureOutput('text/html', 'views/pages/showPatternsPage.php');
         $queryParams = $this->matchedRoute->getQueryParams();
@@ -47,6 +47,7 @@ class PageGetPatternsController implements Controller
             $page = 1;
         }
         $this->output->set('page', $page);
-        return new PatternsRetrievalAction($this->factory->build(), $this->output, $page);
+        $action = new PatternsRetrievalAction($this->factory->build(), $this->output, $page);
+        $action->execute();
     }
 }

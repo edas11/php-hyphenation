@@ -37,13 +37,12 @@ class PageChangeHyphenationController implements Controller
         $this->output = $output;
     }
 
-    public function getAction(): Action
+    public function handleRequest(): void
     {
         $this->output->configureOutput('text/html', 'views/pages/changeHyphenationPage.php');
         $queryParams = $this->matchedRoute->getQueryParams();
         if (array_key_exists('for', $queryParams) && $queryParams['for'] !== '') {
             $this->output->set('for', $queryParams['for']);
         }
-        return new NullAction();
     }
 }

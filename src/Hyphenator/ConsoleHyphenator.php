@@ -24,8 +24,7 @@ class ConsoleHyphenator implements Hyphenator
     }
 
     public function execute(): void {
-        $action = $this->controller->getAction();
-        $action->execute();
+        $this->controller->handleRequest();
         $this->output->flush();
     }
 }

@@ -61,7 +61,7 @@ class WordsHyphenationWithDbAction implements Action
         $wordsNotInDb = $dbWordsModel->filterUnknownWords($this->inputWords);
         if (count($wordsNotInDb) > 0) {
             $runner = new AlgorithmRunner($this->algorithm);
-            $runner->run($wordsNotInDb, true);
+            $runner->runAndSavePatterns($wordsNotInDb);
             $hyphenatedWords = $runner->getHyphenatedWords();
             $this->saveHyphenationResults($hyphenatedWords, $runner->getMatchedPatterns());
         } else {

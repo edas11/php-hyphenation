@@ -35,17 +35,22 @@ abstract class AbstractHyphenationAlgorithm implements HyphenationAlgorithmInter
 
     abstract protected function parsePatternTree(array $groupOfPatterns);
 
-    public function execute(string $inputWord, bool $saveMatchedPatterns = false): string
+    public function execute(string $inputWord): string
     {
         if ($inputWord === '') {
             return '';
         }
         $this->logger->info("Started hyphenation algorithm at " . date('Y-m-d H:i:s'));
-        $this->saveMatchedPatterns = $saveMatchedPatterns;
         $this->macthedPatterns = [];
         $matchedNumbersAll = $this->getWordHyphenationNumbers($inputWord);
         $hyphenatedWords = $this->getHyphenatedWordsFromNumbers($inputWord, $matchedNumbersAll);
         return $hyphenatedWords;
+    }
+
+    public function executeAndSavePatterns(string $inputWord): string
+    {
+        $this->saveMatchedPatterns = true;
+        return $this->execute($inputWord);
     }
 
     public function getMatchedPatterns(): array

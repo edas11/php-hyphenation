@@ -12,5 +12,5 @@ use Edvardas\Hyphenation\Hyphenator\Action\Action;
 
 interface Controller
 {
-    public function getAction(): Action;
+    public function handleRequest(): void;
 }

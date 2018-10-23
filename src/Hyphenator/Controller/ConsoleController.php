@@ -28,11 +28,12 @@ class ConsoleController implements Controller
         $this->output = $output;
     }
 
-    public function getAction(): Action
+    public function handleRequest(): void
     {
         $actionName = $this->inputData->getActionName();
         if (class_exists($actionName)) {
-            return new $actionName($this->provider, $this->output);
+            $action = new $actionName($this->provider, $this->output);
+            $action->execute();
         }
     }
 }

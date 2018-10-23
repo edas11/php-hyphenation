@@ -36,13 +36,14 @@ class ApiPutWordsController implements Controller
         $this->output = $output;
     }
 
-    public function getAction(): Action
+    public function handleRequest(): void
     {
         $this->output->configureOutput('application/json');
         if ($this->body->hasString('newHyphenatedWord')) {
             $this->factory->setHyphenatedWords([strtolower($this->body->get('newHyphenatedWord'))]);
         }
         $this->factory->setWords([strtolower($this->matchedRoute->getPathParam())]);
-        return new HyphenatedWordAddOrUpdateAction($this->factory->build(), $this->output);
+        $action = new HyphenatedWordAddOrUpdateAction($this->factory->build(), $this->output);
+        $action->execute();
     }
 }

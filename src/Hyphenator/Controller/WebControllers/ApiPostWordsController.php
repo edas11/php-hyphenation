@@ -36,7 +36,7 @@ class ApiPostWordsController implements Controller
         $this->output = $output;
     }
 
-    public function getAction(): Action
+    public function handleRequest(): void
     {
         $this->output->configureOutput('application/json');
         if ($this->body->hasArray('words')) {
@@ -45,6 +45,7 @@ class ApiPostWordsController implements Controller
             }, array_values($this->body->get('words')) );
             $this->factory->setWords($lowerCaseWords);
         }
-        return new WordsHyphenationWithDbAction($this->factory->build(), $this->output);
+        $action = new WordsHyphenationWithDbAction($this->factory->build(), $this->output);
+        $action->execute();
     }
 }

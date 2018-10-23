@@ -37,10 +37,11 @@ class ApiDeleteWordsController implements Controller
         $this->output = $output;
     }
 
-    public function getAction(): Action
+    public function handleRequest(): void
     {
         $this->output->configureOutput('application/json');
         $this->factory->setWords([strtolower($this->matchedRoute->getPathParam())]);
-        return new HyphenatedWordDeletionAction($this->factory->build(), $this->output);
+        $action = new HyphenatedWordDeletionAction($this->factory->build(), $this->output);
+        $action->execute();
     }
 }

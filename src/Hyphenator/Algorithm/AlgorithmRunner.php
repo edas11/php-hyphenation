@@ -20,30 +20,28 @@ class AlgorithmRunner
         $this->algorithm = $algorithm;
     }
 
-    public function run(array $words, bool $saveMatchedPatterns = false)
+    public function run(array $words)
     {
-        $hyphenatedWords = [];
-        $matchedPatternsAll = [];
         foreach ($words as $inputWord) {
-            $hyphenatedWord = $this->algorithm->execute($inputWord, $saveMatchedPatterns);
-            $matchedPatternsAll[$inputWord] = $this->algorithm->getMatchedPatterns();
-            $hyphenatedWords[$inputWord] = $hyphenatedWord;
+            $hyphenatedWord = $this->algorithm->execute($inputWord);
+            $this->hyphenatedWords[$inputWord] = $hyphenatedWord;
         }
-        $this->hyphenatedWords = $hyphenatedWords;
-        $this->matchedPatternsAll = $matchedPatternsAll;
     }
 
-    /**
-     * @return string[]
-     */
+    public function runAndSavePatterns(array $words)
+    {
+        foreach ($words as $inputWord) {
+            $hyphenatedWord = $this->algorithm->executeAndSavePatterns($inputWord);
+            $this->matchedPatternsAll[$inputWord] = $this->algorithm->getMatchedPatterns();
+            $this->hyphenatedWords[$inputWord] = $hyphenatedWord;
+        }
+    }
+
     public function getHyphenatedWords(): array
     {
         return $this->hyphenatedWords;
     }
 
-    /**
-     * @return string[][]
-     */
     public function getMatchedPatterns(): array
     {
         return $this->matchedPatternsAll;

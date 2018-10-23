@@ -9,8 +9,6 @@ declare(strict_types = 1);
 
 namespace Edvardas\Hyphenation\Hyphenator\Controller;
 
-use Edvardas\Hyphenation\Hyphenator\Action\Action;
-use Edvardas\Hyphenation\Hyphenator\Action\NullAction;
 use Edvardas\Hyphenation\Hyphenator\Console\HttpInput;
 use Edvardas\Hyphenation\Hyphenator\Output\WebOutput;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationHttpDataProvider;
@@ -37,14 +35,14 @@ class HttpController implements Controller
         $this->output = $output;
     }
 
-    public function getAction(): Action
+    public function handleRequest(): void
     {
         $handlerName = $this->getHandlerNameForCurrentRoute();
-        if (class_exists($handlerName) && method_exists($handlerName, 'getAction')) {
+        if (class_exists($handlerName) && method_exists($handlerName, 'handleRequest')) {
             $appController = new $handlerName($this->factory, $this->request, $this->router, $this->output);
-            return $appController->getAction();
+            $appController->handleRequest();
         } else {
-            return $this->errorResponse();
+            $this->errorResponse();
         }
     }
 
@@ -55,10 +53,9 @@ class HttpController implements Controller
         return $handlerName;
     }
 
-    private function errorResponse(): NullAction
+    private function errorResponse(): void
     {
         http_response_code(400);
         $this->output->set('error', 'Bad request');
-        return new NullAction();
     }
 }

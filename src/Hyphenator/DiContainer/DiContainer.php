@@ -92,7 +92,8 @@ class DiContainer
             case HttpRequest::class:
                 return new HttpRequest();
             case Router::class:
-                return new Router($this->get(HttpRequest::class));
+                $routeConfigData = require 'routes.php';
+                return new Router($this->get(HttpRequest::class), $routeConfigData);
             case ModelFactory::class:
                 return new ModelFactory($this->get(MySqlDatabase::class), $this->get(Config::class));
             case MySqlDatabase::class:

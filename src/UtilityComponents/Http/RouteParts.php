@@ -32,6 +32,10 @@ class RouteParts
     public function getPlaceholderValue(RouteParts $patternWithPlaceholder, string $placeholder): string
     {
         $pathParamIndex = array_search($placeholder, $patternWithPlaceholder->partsArray);
-        return $this->partsArray[$pathParamIndex];
+        if ($pathParamIndex === false) {
+            return '';
+        } else {
+            return $this->partsArray[$pathParamIndex];
+        }
     }
 }

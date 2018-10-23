@@ -24,11 +24,6 @@ class RoutePattern
         return $this->routePatternParts;
     }
 
-    public function getPathParamIndex(): int
-    {
-        return $this->pathParamIndex;
-    }
-
     public function getPathParamPlaceholder(): string
     {
         return '{param}';

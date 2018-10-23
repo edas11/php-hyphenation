@@ -9,6 +9,8 @@ declare(strict_types = 1);
 
 namespace Edvardas\Hyphenation\UtilityComponents\Http;
 
+use Edvardas\Hyphenation\UtilityComponents\Config\Config;
+
 class Router
 {
     private $routeConfig;
@@ -18,11 +20,11 @@ class Router
     private $routeHandlerName = '';
     private $matchedRoute;
 
-    public function __construct(HttpRequest $request)
+    public function __construct(HttpRequest $request, array $routeConfig)
     {
         $this->requestRoute = $request->parseRoute();
         $this->method = $request->getMethod();
-        $this->routeConfig = require 'routes.php';
+        $this->routeConfig = $routeConfig;
         $this->doParsing();
     }
 

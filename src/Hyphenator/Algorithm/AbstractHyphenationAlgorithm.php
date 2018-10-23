@@ -12,6 +12,7 @@ namespace Edvardas\Hyphenation\Hyphenator\Algorithm;
 use Edvardas\Hyphenation\Hyphenator\Algorithm\HyphenationAlgorithmInterface;
 use Edvardas\Hyphenation\Hyphenator\Algorithm\WordHyphenationNumbers;
 use Edvardas\Hyphenation\App\App;
+use Edvardas\Hyphenation\UtilityComponents\Cache\MemoryCache;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 
@@ -24,10 +25,10 @@ abstract class AbstractHyphenationAlgorithm implements HyphenationAlgorithmInter
     private $cache;
     protected $logger;
 
-    public function __construct(array $patterns, CacheInterface $cache, LoggerInterface $logger)
+    public function __construct(array $patterns, LoggerInterface $logger)
     {
         $this->patterns = $patterns;
-        $this->cache = $cache;
+        $this->cache = new MemoryCache();
         $this->logger = $logger;
         $patternTree = $this->parsePatternTree($patterns);
         $this->cache->set('patterns-tree', $patternTree);

@@ -10,36 +10,51 @@ declare(strict_types = 1);
 namespace Edvardas\Hyphenation\Hyphenator\Controller;
 
 use Edvardas\Hyphenation\Hyphenator\Console\HttpInput;
+use Edvardas\Hyphenation\Hyphenator\Model\ModelFactory;
+use Edvardas\Hyphenation\Hyphenator\ModelInput\HyphenationInputBuilder;
 use Edvardas\Hyphenation\Hyphenator\Output\WebOutput;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationHttpDataProvider;
-use Edvardas\Hyphenation\Hyphenator\Providers\HttpDataProviderFactory;
 use Edvardas\Hyphenation\UtilityComponents\Http\HttpRequest;
 use Edvardas\Hyphenation\UtilityComponents\Http\Router;
+use Psr\Log\LoggerInterface;
 
 class HttpController implements Controller
 {
-    private $factory;
+    private $modelInputBuilder;
     private $router;
     private $request;
     private $output;
+    private $modelFactory;
+    private $logger;
 
     public function __construct(
-        HttpDataProviderFactory $factory,
+        HyphenationInputBuilder $modelInputBuilder,
         HttpRequest $request,
         Router $router,
-        WebOutput $output
+        WebOutput $output,
+        ModelFactory $modelFactory,
+        LoggerInterface $logger
     ) {
-        $this->factory = $factory;
+        $this->modelInputBuilder = $modelInputBuilder;
         $this->request = $request;
         $this->router = $router;
         $this->output = $output;
+        $this->modelFactory = $modelFactory;
+        $this->logger = $logger;
     }
 
     public function handleRequest(): void
     {
         $handlerName = $this->getHandlerNameForCurrentRoute();
         if (class_exists($handlerName) && method_exists($handlerName, 'handleRequest')) {
-            $appController = new $handlerName($this->factory, $this->request, $this->router, $this->output);
+            $appController = new $handlerName(
+                $this->modelInputBuilder,
+                $this->request,
+                $this->router,
+                $this->output,
+                $this->modelFactory,
+                $this->logger
+            );
             $appController->handleRequest();
         } else {
             $this->errorResponse();

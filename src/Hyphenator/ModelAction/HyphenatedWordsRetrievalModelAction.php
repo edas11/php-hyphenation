@@ -7,22 +7,26 @@
  */
 declare(strict_types = 1);
 
-namespace Edvardas\Hyphenation\Hyphenator\Action;
+namespace Edvardas\Hyphenation\Hyphenator\ModelAction;
 
+use Edvardas\Hyphenation\Hyphenator\Model\ModelFactory;
+use Edvardas\Hyphenation\Hyphenator\ModelInput\HyphenationInput;
 use Edvardas\Hyphenation\Hyphenator\Output\BufferedOutput;
-use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
 
-class HyphenatedWordsRetrievalAction implements Action
+class HyphenatedWordsRetrievalModelAction implements ModelAction
 {
     private $output;
     private $modelFactory;
     private $filterWords;
 
-    public function __construct(HyphenationDataProvider $dataProvider, BufferedOutput $output)
-    {
+    public function __construct(
+        HyphenationInput $modelInput,
+        BufferedOutput $output,
+        ModelFactory $modelFactory
+    ) {
         $this->output = $output;
-        $this->modelFactory = $dataProvider->getModelFactory();
-        $this->filterWords = $dataProvider->getWordsInput();
+        $this->modelFactory = $modelFactory;
+        $this->filterWords = $modelInput->getWordsInput();
     }
 
     public function execute(): void

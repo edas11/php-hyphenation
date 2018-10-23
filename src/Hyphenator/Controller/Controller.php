@@ -8,7 +8,7 @@
 
 namespace Edvardas\Hyphenation\Hyphenator\Controller;
 
-use Edvardas\Hyphenation\Hyphenator\Action\Action;
+use Edvardas\Hyphenation\Hyphenator\ModelAction\ModelAction;
 
 interface Controller
 {

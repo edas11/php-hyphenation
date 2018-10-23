@@ -7,7 +7,7 @@
  */
 declare(strict_types = 1);
 
-namespace Edvardas\Hyphenation\Hyphenator\Database;
+namespace Edvardas\Hyphenation\UtilityComponents\Database;
 
 use Edvardas\Hyphenation\App\App;
 use Edvardas\Hyphenation\UtilityComponents\Config\Config;
@@ -24,11 +24,19 @@ class MySqlDatabaseProxy implements SqlDatabase
      * @var MySqlDatabase
      */
     private $mysqlDb = null;
-    private $config;
+    private $host;
+    private $db;
+    private $user;
+    private $pass;
+    private $charset;
 
-    public function __construct(Config $config)
+    public function __construct(string $host, string $db, string $user, string $pass, string $charset)
     {
-        $this->config = $config;
+        $this->host = $host;
+        $this->db = $db;
+        $this->user = $user;
+        $this->pass = $pass;
+        $this->charset = $charset;
     }
 
     public function beginTransaction(): TransactionToken
@@ -64,12 +72,7 @@ class MySqlDatabaseProxy implements SqlDatabase
     private function checkDbInstance()
     {
         if (is_null($this->mysqlDb)) {
-            $host = $this->config->get(['mysql', 'host']);
-            $db = $this->config->get(['mysql', 'db']);
-            $user = $this->config->get(['mysql', 'user']);
-            $pass = $this->config->get(['mysql', 'password']);
-            $charset = $this->config->get(['mysql', 'charset']);
-            $this->mysqlDb = new MySqlDatabase($host, $db, $user, $pass, $charset);
+            $this->mysqlDb = new MySqlDatabase($this->host, $this->db, $this->user, $this->pass, $this->charset);
         }
     }
 }

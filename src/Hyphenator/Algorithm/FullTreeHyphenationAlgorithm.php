@@ -19,9 +19,9 @@ use Psr\SimpleCache\CacheInterface;
 
 class FullTreeHyphenationAlgorithm extends AbstractHyphenationAlgorithm
 {
-    public function __construct(array $patterns, CacheInterface $cache, LoggerInterface $logger)
+    public function __construct(array $patterns, LoggerInterface $logger)
     {
-        parent::__construct($patterns, $cache, $logger);
+        parent::__construct($patterns, $logger);
         $this->logger->info("Started full tree hyphenation algorithm.");
     }
 

@@ -11,16 +11,22 @@ namespace Edvardas\Hyphenation\Hyphenator\Model;
 
 use Edvardas\Hyphenation\UtilityComponents\Config\Config;
 use Edvardas\Hyphenation\UtilityComponents\Database\SqlDatabase;
+use Edvardas\Hyphenation\UtilityComponents\File\FileReader;
+use Psr\Log\LoggerInterface;
 
 class ModelFactory
 {
     private $db;
-    private $perPage;
+    private $fileReader;
+    private $logger;
+    private $config;
 
-    public function __construct(SqlDatabase $db, Config $config)
+    public function __construct(SqlDatabase $db, Config $config, FileReader $fileReader, LoggerInterface $logger)
     {
         $this->db = $db;
-        $this->perPage = (int) $config->get(['patternsPerPage'], '20');
+        $this->config = $config;
+        $this->fileReader = $fileReader;
+        $this->logger = $logger;
     }
 
     public function createHyphenatedWords(array $words): HyphenatedWords
@@ -40,7 +46,14 @@ class ModelFactory
 
     public function getKnownPatterns(int $page = 0): Patterns
     {
-        return Patterns::getKnown($this->db, $page, $this->perPage);
+        $perPage = (int) $this->config->get(['patternsPerPage'], '20');
+        return Patterns::getKnown($this->db, $page, $perPage);
+    }
+
+    public function getKnownPatternsFromFile(): array
+    {
+        $patternsFileName = $this->config->get(['patternsFileName']);
+        return Patterns::getKnownFromFile($this->fileReader, $patternsFileName, $this->logger);
     }
 
     public function createWordPatterns(array $wordPatterns): WordPatterns

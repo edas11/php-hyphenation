@@ -18,9 +18,9 @@ use Psr\SimpleCache\CacheInterface;
 
 class ShortTreeHyphenationAlgorithm extends AbstractHyphenationAlgorithm
 {
-    public function __construct(array $patterns, CacheInterface $cache, LoggerInterface $logger)
+    public function __construct(array $patterns, LoggerInterface $logger)
     {
-        parent::__construct($patterns, $cache, $logger);
+        parent::__construct($patterns, $logger);
         $this->logger->info("Started short tree hyphenation algorithm.");
     }
 

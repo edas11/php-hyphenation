@@ -9,9 +9,9 @@ declare(strict_types=1);
 
 namespace Edvardas\Hyphenation\Hyphenator\Console;
 
-use Edvardas\Hyphenation\Hyphenator\Action\PatternsSaveInDbAction;
-use Edvardas\Hyphenation\Hyphenator\Action\WordsHyphenationAction;
-use Edvardas\Hyphenation\Hyphenator\Action\WordsHyphenationWithDbAction;
+use Edvardas\Hyphenation\Hyphenator\ModelAction\PatternsSaveInDbModelAction;
+use Edvardas\Hyphenation\Hyphenator\ModelAction\WordsHyphenationModelAction;
+use Edvardas\Hyphenation\Hyphenator\ModelAction\WordsHyphenationWithDbModelAction;
 use Edvardas\Hyphenation\Hyphenator\Algorithm\FullTreeHyphenationAlgorithm;
 use Edvardas\Hyphenation\Hyphenator\Algorithm\ShortTreeHyphenationAlgorithm;
 
@@ -33,11 +33,11 @@ class ConsoleInputData
     public function getActionName(): string
     {
         if ($this->actionInput === InputCodes::HYPHENATE_ACTION && $this->sourceInput === InputCodes::FILE_SRC) {
-            return WordsHyphenationAction::class;
+            return WordsHyphenationModelAction::class;
         } elseif ($this->actionInput === InputCodes::HYPHENATE_ACTION && $this->sourceInput === InputCodes::DB_SRC) {
-            return WordsHyphenationWithDbAction::class;
+            return WordsHyphenationWithDbModelAction::class;
         } elseif ($this->actionInput === InputCodes::PUT_PATTERNS_IN_DB_ACTION) {
-            return PatternsSaveInDbAction::class;
+            return PatternsSaveInDbModelAction::class;
         } else {
             return '';
         }

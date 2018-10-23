@@ -7,32 +7,39 @@
  */
 declare(strict_types = 1);
 
-namespace Edvardas\Hyphenation\Hyphenator\Action;
+namespace Edvardas\Hyphenation\Hyphenator\ModelAction;
 
 use Edvardas\Hyphenation\Hyphenator\Algorithm\AlgorithmRunner;
 use Edvardas\Hyphenation\Hyphenator\Database\HyphenationDatabase;
 use Edvardas\Hyphenation\Hyphenator\Model\HyphenatedWords;
+use Edvardas\Hyphenation\Hyphenator\Model\ModelFactory;
+use Edvardas\Hyphenation\Hyphenator\ModelInput\HyphenationInput;
 use Edvardas\Hyphenation\Hyphenator\Output\BufferedOutput;
 use Edvardas\Hyphenation\Hyphenator\Providers\HyphenationDataProvider;
 use Edvardas\Hyphenation\UtilityComponents\Timer\Timer;
+use Psr\Log\LoggerInterface;
 
-class WordsHyphenationWithDbAction implements Action
+class WordsHyphenationWithDbModelAction implements ModelAction
 {
     private $output;
     private $timer;
     private $modelFactory;
     private $logger;
     private $inputWords;
-    private $algorithm;
+    private $algorithmName;
 
-    public function __construct(HyphenationDataProvider $dataProvider, BufferedOutput $output)
-    {
+    public function __construct(
+        HyphenationInput $modelInput,
+        BufferedOutput $output,
+        ModelFactory $modelFactory,
+        LoggerInterface $logger
+    ) {
         $this->timer = new Timer();
         $this->output = $output;
-        $this->modelFactory = $dataProvider->getModelFactory();
-        $this->logger = $dataProvider->getLogger();
-        $this->inputWords = $dataProvider->getWordsInput();
-        $this->algorithm = $dataProvider->getAlgorithm();
+        $this->modelFactory = $modelFactory;
+        $this->logger = $logger;
+        $this->inputWords = $modelInput->getWordsInput();
+        $this->algorithmName = $modelInput->getAlgorithmName();
     }
 
     public function execute(): void
@@ -60,7 +67,9 @@ class WordsHyphenationWithDbAction implements Action
     {
         $wordsNotInDb = $dbWordsModel->filterUnknownWords($this->inputWords);
         if (count($wordsNotInDb) > 0) {
-            $runner = new AlgorithmRunner($this->algorithm);
+            $patterns = $this->modelFactory->getKnownPatterns()->getPatterns();
+            $algorithm = new $this->algorithmName($patterns, $this->logger);
+            $runner = new AlgorithmRunner($algorithm);
             $runner->runAndSavePatterns($wordsNotInDb);
             $hyphenatedWords = $runner->getHyphenatedWords();
             $this->saveHyphenationResults($hyphenatedWords, $runner->getMatchedPatterns());

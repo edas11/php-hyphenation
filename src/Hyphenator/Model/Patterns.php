@@ -11,15 +11,14 @@ namespace Edvardas\Hyphenation\Hyphenator\Model;
 
 use Edvardas\Hyphenation\Hyphenator\Model\MappingStrategy\PatternsMappingStrategy;
 use Edvardas\Hyphenation\UtilityComponents\Database\SqlDatabase;
+use Edvardas\Hyphenation\UtilityComponents\File\FileReader;
+use Psr\Log\LoggerInterface;
 
 class Patterns implements PersistentModel
 {
     private $patterns = [];
     private $db;
 
-    /**
-     * @param string[][] $patterns
-     */
     public function __construct(array $patterns, SqlDatabase $db)
     {
         $this->patterns = $patterns;
@@ -29,6 +28,12 @@ class Patterns implements PersistentModel
     public function getPatterns()
     {
         return $this->patterns;
+    }
+
+    public static function getKnownFromFile(FileReader $fileReader, $patternsFileName, LoggerInterface $logger): array
+    {
+        $patterns = $fileReader->read($patternsFileName, $logger);
+        return $patterns;
     }
 
     public static function getKnown(SqlDatabase $db, int $page = 0, int $perPage = 0): Patterns

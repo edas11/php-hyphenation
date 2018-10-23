@@ -6,9 +6,9 @@
  * Time: 13.24
  */
 
-namespace Edvardas\Hyphenation\Hyphenator\Action;
+namespace Edvardas\Hyphenation\Hyphenator\ModelAction;
 
-interface Action
+interface ModelAction
 {
     public function execute(): void;
 }

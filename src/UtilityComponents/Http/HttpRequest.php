@@ -31,16 +31,28 @@ class HttpRequest
         }
         $contentType = $_SERVER["CONTENT_TYPE"];
         if ($contentType === 'application/json') {
-            $body = file_get_contents('php://input');
-            $bodyArray = json_decode($body, true);
-            if (!is_array($bodyArray)) {
-                $bodyArray = [];
-            }
+            $bodyArray = $this->getJsonBody();
         } elseif ($contentType === 'application/x-www-form-urlencoded' || $contentType === 'multipart/form-data') {
-            $bodyArray = $_POST;
+            $bodyArray = $this->getFormDataBody();
         } else {
             throw new \Exception('Unsupported body content type');
         }
         return new HttpBody($bodyArray);
+    }
+
+    private function getJsonBody()
+    {
+        $body = file_get_contents('php://input');
+        $bodyArray = json_decode($body, true);
+        if (!is_array($bodyArray)) {
+            $bodyArray = [];
+        }
+        return $bodyArray;
+    }
+
+    private function getFormDataBody()
+    {
+        $bodyArray = $_POST;
+        return $bodyArray;
     }
 }

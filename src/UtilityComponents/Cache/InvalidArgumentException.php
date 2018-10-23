@@ -9,9 +9,9 @@ declare(strict_types=1);
 
 namespace Edvardas\Hyphenation\UtilityComponents\Cache;
 
-use Psr\Log\SimpleCache\InvalidArgumentException as PsrInvalidArgumentException;
+use Psr\Log\InvalidArgumentException as PsrInvalidArgumentException;
 
-class InvalidArgumentException extends \InvalidArgumentException implements PsrInvalidArgumentException
+class InvalidArgumentException extends PsrInvalidArgumentException
 {
 
 }

@@ -52,23 +52,13 @@ class Route
 
     private function extractRouteString(string $pathString): string
     {
-        $queryPos = strpos($pathString, '?');
-        if ($queryPos === false) {
-            $routeString = $pathString;
-        } else {
-            $routeString = substr($pathString, 0, $queryPos);
-        }
-        return $routeString;
+        $path = explode('?', $pathString, 2);
+        return $path[0];
     }
 
     private function extractQueryString(string $pathString): string
     {
-        $queryPos = strpos($pathString, '?');
-        if ($queryPos === false || strlen($pathString) === $queryPos + 1) {
-            $queryString = '';
-        } else {
-            $queryString = substr($pathString, $queryPos + 1);
-        }
-        return $queryString;
+        $path = explode('?', $pathString, 2);
+        return count($path) === 2 ? $path[1] : '';
     }
 }

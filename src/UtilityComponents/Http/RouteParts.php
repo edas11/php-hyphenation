@@ -13,9 +13,6 @@ class RouteParts
 {
     private $partsArray;
 
-    private const PARTS_MATCH = 0;
-    private const PARTS_NOT_MATCH = 1;
-
     public function __construct(string $routeString)
     {
         $this->partsArray = explode('/', trim($routeString, '/'));
@@ -23,17 +20,13 @@ class RouteParts
 
     public function matches(RouteParts $routePatternParts, string $allowedPlaceholder): bool
     {
-        $routeAndPatternDifference = array_udiff_assoc(
-            $this->partsArray,
-            $routePatternParts->partsArray,
-            function($routePart, $patternPart) use ($allowedPlaceholder) {
-                if ($routePart === $patternPart) return self::PARTS_MATCH;
-                if ($patternPart === $allowedPlaceholder) return self::PARTS_MATCH;
-                else return self::PARTS_NOT_MATCH;
-            }
-        );
+        $patternPartsArray = $routePatternParts->partsArray;
+        $partsArray = $this->partsArray;
+        $pathParamIndex = array_search($allowedPlaceholder, $patternPartsArray);
+        $patternPartsArray[$pathParamIndex] = '';
+        $partsArray[$pathParamIndex] = '';
 
-        return count($routeAndPatternDifference) === 0;
+        return $patternPartsArray === $partsArray;
     }
 
     public function getPlaceholderValue(RouteParts $patternWithPlaceholder, string $placeholder): string

@@ -9,8 +9,6 @@ declare(strict_types = 1);
 
 namespace Edvardas\Hyphenation\UtilityComponents\Http;
 
-use Edvardas\Hyphenation\UtilityComponents\Config\Config;
-
 class Router
 {
     private $routeConfig;

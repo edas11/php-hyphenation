@@ -14,11 +14,11 @@ class MySqlDatabase implements SqlDatabase
     private $builder;
     private $currentTransactionToken = null;
 
-    public function __construct(string $host, string $db, string $user, string $pass, string $charset)
+    public function __construct(string $host, string $port, string $db, string $user, string $pass, string $charset)
     {
         $this->builder = new MySqlQueryBuilder();
 
-        $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
+        $dsn = "mysql:host=$host;port=$port;dbname=$db;charset=$charset";
         $options = [
             \PDO::ATTR_ERRMODE            => \PDO::ERRMODE_EXCEPTION,
             \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,

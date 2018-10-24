@@ -23,8 +23,10 @@ class RouteParts
         $patternPartsArray = $routePatternParts->partsArray;
         $partsArray = $this->partsArray;
         $pathParamIndex = array_search($allowedPlaceholder, $patternPartsArray);
-        $patternPartsArray[$pathParamIndex] = '';
-        $partsArray[$pathParamIndex] = '';
+        if ($pathParamIndex !== false) {
+            $patternPartsArray[$pathParamIndex] = '';
+            $partsArray[$pathParamIndex] = '';
+        }
 
         return $patternPartsArray === $partsArray;
     }

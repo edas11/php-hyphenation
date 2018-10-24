@@ -25,14 +25,16 @@ class MySqlDatabaseProxy implements SqlDatabase
      */
     private $mysqlDb = null;
     private $host;
+    private $port;
     private $db;
     private $user;
     private $pass;
     private $charset;
 
-    public function __construct(string $host, string $db, string $user, string $pass, string $charset)
+    public function __construct(string $host, string $port,string $db, string $user, string $pass, string $charset)
     {
         $this->host = $host;
+        $this->port = $port;
         $this->db = $db;
         $this->user = $user;
         $this->pass = $pass;
@@ -72,7 +74,7 @@ class MySqlDatabaseProxy implements SqlDatabase
     private function checkDbInstance()
     {
         if (is_null($this->mysqlDb)) {
-            $this->mysqlDb = new MySqlDatabase($this->host, $this->db, $this->user, $this->pass, $this->charset);
+            $this->mysqlDb = new MySqlDatabase($this->host, $this->port, $this->db, $this->user, $this->pass, $this->charset);
         }
     }
 }

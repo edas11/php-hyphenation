@@ -19,6 +19,14 @@ class RoutePartsTest extends TestCase
         $this->routeParts = new RouteParts('path/to/some/place');
     }
 
+    public function testDoesntMacthOne()
+    {
+        $this->routeParts = new RouteParts('path');
+        $patternParts = new RouteParts('/pat');
+        $isMatches = $this->routeParts->matches($patternParts, '');
+        $this->assertFalse($isMatches);
+    }
+
     public function testMatchesExactly()
     {
         $patternParts = new RouteParts('/path/to/some/place');

@@ -6,7 +6,6 @@ RUN export DEBIAN_FRONTEND=noninteractive &&\
     -y php7.2 composer\
     php-mysql\
     php-mbstring\
-    mysql-server-5.7\
     apache2\
     php7.2-xml
 
@@ -15,15 +14,12 @@ WORKDIR /var/www/html
 COPY config/php.ini /etc/php/7.2/apache2/
 COPY config/000-default.conf /etc/apache2/sites-available/
 
-RUN service mysql start &&\
-    chmod 777 log &&\
-    composer install &&\
-    mysql -u root < tables.sql &&\
+RUN composer install &&\
     a2enmod rewrite &&\
-    printf '2' | php ./main.php
+    touch log &&\
+    chmod 777 log
 
 EXPOSE 80
 
-ENTRYPOINT /bin/bash service apache2 start &&\
-           /bin/bash service mysql start &&\
+ENTRYPOINT service apache2 start &&\
            /bin/bash

@@ -101,11 +101,12 @@ class DiContainer
             case MySqlDatabase::class:
                 $config = $this->get(Config::class);
                 $host = $config->get(['mysql', 'host']);
+                $port = $config->get(['mysql', 'port']);
                 $db = $config->get(['mysql', 'db']);
                 $user = $config->get(['mysql', 'user']);
                 $pass = $config->get(['mysql', 'password']);
                 $charset = $config->get(['mysql', 'charset']);
-                return new MySqlDatabaseProxy($host, $db, $user, $pass, $charset);
+                return new MySqlDatabaseProxy($host, $port, $db, $user, $pass, $charset);
             case MemoryCache::class:
                 return new MemoryCache();
             case FileLogger::class:

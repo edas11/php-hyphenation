@@ -1,4 +1,6 @@
 ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password';
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'password' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
 
 CREATE DATABASE hyph;
 

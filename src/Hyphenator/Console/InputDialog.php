@@ -9,12 +9,20 @@ declare(strict_types=1);
 
 namespace Edvardas\Hyphenation\Hyphenator\Console;
 
+use Edvardas\Hyphenation\Hyphenator\Algorithm\FullTreeHyphenationAlgorithm;
+use Edvardas\Hyphenation\Hyphenator\Algorithm\ShortTreeHyphenationAlgorithm;
+use Edvardas\Hyphenation\Hyphenator\Controller\ConsoleControllers\PatternsTransferToDbController;
+use Edvardas\Hyphenation\Hyphenator\Controller\ConsoleControllers\WordsHyphenationController;
+use Edvardas\Hyphenation\Hyphenator\Controller\ConsoleControllers\WordsHyphenationWithDController;
 use Edvardas\Hyphenation\UtilityComponents\Console\Console;
 
 class InputDialog
 {
     private $console;
-    private $inputData;
+    private $actionInput;
+    private $sourceInput;
+    private $wordsInput;
+    private $algorithmInput;
 
     public function __construct(Console $console)
     {
@@ -22,23 +30,48 @@ class InputDialog
         $this->askInput();
     }
 
-    public function getConsoleInput(): ConsoleInputData
+    public function getHandlerName(): string
     {
-        return $this->inputData;
+        if ($this->actionInput === InputCodes::PUT_PATTERNS_IN_DB_ACTION) {
+            return PatternsTransferToDbController::class;
+        } elseif ($this->actionInput === InputCodes::HYPHENATE_ACTION && $this->sourceInput === InputCodes::FILE_SRC) {
+            return WordsHyphenationController::class;
+        } elseif ($this->actionInput === InputCodes::HYPHENATE_ACTION && $this->sourceInput === InputCodes::DB_SRC) {
+            return WordsHyphenationWithDController::class;
+        } else {
+            return '';
+        }
+    }
+
+    public function getInputWords()
+    {
+        if ($this->wordsInput === '') {
+            return [];
+        } else {
+            return explode(' ', $this->wordsInput);
+        }
+    }
+
+    public function getAlgorithmName(): string
+    {
+        if ($this->algorithmInput === InputCodes::FULL_TREE_ALGORITHM) {
+            return FullTreeHyphenationAlgorithm::class;
+        } elseif ($this->algorithmInput === InputCodes::SHORT_TREE_ALGORITHM) {
+            return ShortTreeHyphenationAlgorithm::class;
+        } else {
+            return '';
+        }
     }
 
     private function askInput(): void
     {
-        $actionInput = $this->askActionInput();
-        if ($actionInput === InputCodes::PUT_PATTERNS_IN_DB_ACTION) {
-            $sourceInput = InputCodes::DB_SRC;
-            $this->inputData = new ConsoleInputData($actionInput, $sourceInput);
+        $this->actionInput = $this->askActionInput();
+        if ($this->actionInput === InputCodes::PUT_PATTERNS_IN_DB_ACTION) {
             return;
         }
-        $sourceInput = $this->askSourceInput();
-        $wordsInput = $this->askWordsInput();
-        $algorithmInput = $this->askAlgorithmInput();
-        $this->inputData = new ConsoleInputData($actionInput, $sourceInput, $wordsInput, $algorithmInput);
+        $this->sourceInput = $this->askSourceInput();
+        $this->wordsInput = $this->askWordsInput();
+        $this->algorithmInput = $this->askAlgorithmInput();
     }
 
     public function askActionInput(): int

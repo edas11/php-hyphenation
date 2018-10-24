@@ -16,7 +16,7 @@ class ShortTreeHyphenationAlgorithmTest extends TestCase
     public function testHyphenatesWords()
     {
         $patterns = file(__DIR__.'/patterns-for-tests', FILE_IGNORE_NEW_LINES);
-        $algorithm = new ShortTreeHyphenationAlgorithm($patterns, new MemoryCache(), new NullLogger());
+        $algorithm = new ShortTreeHyphenationAlgorithm($patterns, new NullLogger());
 
         $hyphenated = $algorithm->execute('mistranslate');
         $this->assertSame('mis-trans-late', $hyphenated);

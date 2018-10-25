@@ -57,16 +57,20 @@ class Router
             case 'DELETE':
                 $this->routePatternsForCurrentMethod = $this->routeConfig['delete'];
                 break;
+            case 'OPTIONS':
+                $this->routePatternsForCurrentMethod = $this->routeConfig['options'];
+                break;
         }
     }
 
     private function parseHttpMatchedRoute(): void
     {
+        $handlerPrefix = $this->routeConfig['handlerPrefix'];
         foreach ($this->routePatternsForCurrentMethod as $routePatternString => $routeHandlerName) {
             $routePattern = new RoutePattern($routePatternString);
             if ($this->requestRoute->matches($routePattern)) {
                 $this->matchedRoute = new MatchedRoute($this->requestRoute, $routePattern);
-                $this->routeHandlerName = $routeHandlerName;
+                $this->routeHandlerName = $handlerPrefix . $routeHandlerName;
                 return;
             }
         }

@@ -21,6 +21,11 @@ class RouteParts
     public function matches(RouteParts $routePatternParts, string $allowedPlaceholder): bool
     {
         $patternPartsArray = $routePatternParts->partsArray;
+
+        if ($patternPartsArray === ['*']) {
+            return true;
+        }
+
         $partsArray = $this->partsArray;
         $pathParamIndex = array_search($allowedPlaceholder, $patternPartsArray);
         if ($pathParamIndex !== false) {

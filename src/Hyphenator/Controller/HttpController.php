@@ -45,7 +45,8 @@ class HttpController implements Controller
 
     public function handleRequest(): void
     {
-        $handlerName = $this->getHandlerNameForCurrentRoute();
+        header("Access-Control-Allow-Origin: *");
+        $handlerName = $handlerName = $this->router->getRouteHandlerName();
         if (class_exists($handlerName) && method_exists($handlerName, 'handleRequest')) {
             $appController = new $handlerName(
                 $this->modelInputBuilder,
@@ -59,13 +60,6 @@ class HttpController implements Controller
         } else {
             $this->errorResponse();
         }
-    }
-
-    private function getHandlerNameForCurrentRoute(): string
-    {
-        $handlerName = $this->router->getRouteHandlerName();
-        $handlerName = "Edvardas\Hyphenation\Hyphenator\Controller\WebControllers\\$handlerName";
-        return $handlerName;
     }
 
     private function errorResponse(): void

@@ -1,5 +1,7 @@
 "use strict";
 window.addEventListener("load", function () {
+    var urlHost = 'http://172.17.0.1:80';
+
     // CHANGE HYPHENATION PAGE
     $("#wordToShow").val(getUrlParameter('for'));
     $("#changeForm").submit(function(event) {
@@ -125,7 +127,7 @@ window.addEventListener("load", function () {
             rowsString = rowsString + "<td>";
             rowsString = rowsString + data.result[word];
             rowsString = rowsString + '<a class="badge badge-danger word-delete-button" data-word="' + word + '">Delete</a>';
-            rowsString = rowsString + '<a class="badge badge-primary" href="/hyphenation/change-hyphenation?for=' + word + '">Change</a>';
+            rowsString = rowsString + '<a class="badge badge-primary" href="/frontend/hyphenation/add-or-change-hyphenation?for=' + word + '">Change</a>';
             rowsString = rowsString + "</td>";
             rowsString = rowsString + "</tr>";
         }
@@ -143,10 +145,10 @@ window.addEventListener("load", function () {
         );
     }
 
-    function doApiRequest(method, url, successFunction, data = null) {
+    function doApiRequest(method, relativeUrl, successFunction, data = null) {
         $.ajax({
             type: method,
-            url: url,
+            url: urlHost + relativeUrl,
             data: data,
             success: successFunction,
             error: function(xhr) {

@@ -1,12 +1,6 @@
 <?php
-// route => Edvardas\Hyphenation\Hyphenator\Controller\WebControllers class name
 return $routes = [
     'get' => [
-        'hyphenation/' => 'PageMainController',
-        'hyphenation/show/words' => 'PageGetWordsController',
-        'hyphenation/show/patterns' => 'PageGetPatternsController',
-        'hyphenation/hyphenated-words' => 'PageHyphenateWordsController',
-        'hyphenation/change-hyphenation' => 'PageChangeHyphenationController',
         'api/hyphenation/words/'  => 'ApiGetWordsController',
         'api/hyphenation/patterns/'  => 'ApiGetPatternsController'
     ],
@@ -18,5 +12,9 @@ return $routes = [
     ],
     'delete' => [
         'api/hyphenation/words/{param}'  => 'ApiDeleteWordsController'
-    ]
+    ],
+    'options' => [
+        '*' => 'ApiOptionsController'
+    ],
+    'handlerPrefix' => 'Edvardas\Hyphenation\Hyphenator\Controller\WebControllers\\'
 ];

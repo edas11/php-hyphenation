@@ -25,3 +25,6 @@ a.badge {
 #post-data {
     display: none;
 }
+.page-previous{
+    visibility: hidden;
+}

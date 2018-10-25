@@ -7,7 +7,8 @@ return $routes = [
         'hyphenation/show/patterns' => 'PageGetPatternsController',
         'hyphenation/hyphenated-words' => 'PageHyphenateWordsController',
         'hyphenation/change-hyphenation' => 'PageChangeHyphenationController',
-        'api/hyphenation/words/'  => 'ApiGetWordsController'
+        'api/hyphenation/words/'  => 'ApiGetWordsController',
+        'api/hyphenation/patterns/'  => 'ApiGetPatternsController'
     ],
     'post' => [
         'api/hyphenation/words/'  => 'ApiPostWordsController'

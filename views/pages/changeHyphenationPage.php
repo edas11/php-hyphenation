@@ -5,18 +5,11 @@
     <?php require('views/page-parts/main-header.php'); ?>
     <main>
         <h3>Change hyphenation or add new</h3>
-        <?php
-        if (array_key_exists('for', $data)) {
-            $default = $data['for'];
-        } else {
-            $default = '';
-        }
-        ?>
         <form id="changeForm" method="post">
             <div class="form-group">
                 <label for="wordToShow">Enter word</label>
                 <input type="text" name="for" class="form-control" id="wordToShow" placeholder="Enter word"
-                       value="<?php echo htmlspecialchars($default); ?>">
+                       value="">
             </div>
             <div class="form-group">
                 <label for="wordToShow">Enter new hyphenation</label>

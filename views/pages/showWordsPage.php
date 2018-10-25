@@ -6,7 +6,7 @@
     <main>
         <h3>Hyphenated words list</h3>
 
-        <form method="get">
+        <form method="get" id="show-specific-word-form">
             <div class="form-group">
                 <label for="wordToShow">Enter word you want to see or leave empty to show all</label>
                 <input type="text" name="for" class="form-control" id="wordToShow" placeholder="Enter word">
@@ -19,16 +19,8 @@
                 <th>Original word</th>
                 <th>Hyphenated word</th>
             </tr>
-            <?php foreach ($data['result'] as $word => $hyphenatedWord) { ?>
-                <tr id="<?= $word ?>">
-                    <td><?= $word ?></td>
-                    <td>
-                        <?= $hyphenatedWord ?>
-                        <a class="badge badge-danger word-delete-button" data-word="<?= $word ?>">Delete</a>
-                        <a class="badge badge-primary" href="/hyphenation/change-hyphenation?for=<?= $word ?>">Change</a>
-                    </td>
-                </tr>
-            <?php } ?>
+            <tbody id="words-table">
+            </tbody>
             <tr>
                 <td colspan="2">
                     <a id="add-new" class="badge badge-primary" href="/hyphenation/change-hyphenation">Add new</a>

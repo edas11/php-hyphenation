@@ -1,5 +1,5 @@
 ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password';
-GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'password' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'172.17.0.2' IDENTIFIED BY 'password' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
 
 CREATE DATABASE hyph;
